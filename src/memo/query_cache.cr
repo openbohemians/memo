@@ -10,15 +10,22 @@ module Memo
   class QueryCache
     getter max_entries : Int32
     getter max_db_entries : Int32
-    getter hits : Int64
-    getter misses : Int64
+
+    def hits : Int64
+      @mutex.synchronize { @hits }
+    end
+
+    def misses : Int64
+      @mutex.synchronize { @misses }
+    end
 
     def initialize(
       @max_entries : Int32 = 10_000,
       @max_db_entries : Int32 = 100_000,
       @db : DB::Database? = nil,
-      @service_id : Int64 = 0
+      @service_id : Int64 = 0,
     )
+      @mutex = Mutex.new
       @cache = {} of String => CacheEntry
       @order = Deque(String).new
       @hits = 0_i64
@@ -30,55 +37,57 @@ module Memo
     # Look up a cached embedding for a query string.
     # Returns {embedding, token_count} or nil on miss.
     def get(query : String) : {Array(Float64), Int32}?
-      key = query
-
-      # Check memory LRU
-      if entry = @cache[key]?
-        touch(key)
-        @hits += 1
-        return {entry.embedding, entry.token_count}
-      end
-
-      # Check DB
-      if db = @db
-        row = db.memo_queries.get_query_cache(key, @service_id)
-        if row
-          embedding_blob, token_count = row
-          embedding = Storage.deserialize_embedding(embedding_blob)
-          put_memory(key, embedding, token_count)
+      @mutex.synchronize do
+        if entry = @cache[query]?
+          touch(query)
           @hits += 1
-          return {embedding, token_count}
+          {entry.embedding, entry.token_count}
+        elsif db = @db
+          if row = db.memo_queries.get_query_cache(query, @service_id)
+            embedding_blob, token_count = row
+            embedding = Storage.deserialize_embedding(embedding_blob)
+            put_memory(query, embedding, token_count)
+            @hits += 1
+            {embedding, token_count}
+          else
+            @misses += 1
+            nil
+          end
+        else
+          @misses += 1
+          nil
         end
       end
-
-      @misses += 1
-      nil
     end
 
     # Store an embedding for a query string.
     def put(query : String, embedding : Array(Float64), token_count : Int32)
-      key = query
-      put_memory(key, embedding, token_count)
-      put_db(key, embedding, token_count)
+      @mutex.synchronize do
+        put_memory(query, embedding, token_count)
+        put_db(query, embedding, token_count)
+      end
     end
 
     # Number of entries in memory cache
     def size : Int32
-      @cache.size
+      @mutex.synchronize { @cache.size }
     end
 
     # Clear all cached entries (memory and DB)
     def clear
-      @cache.clear
-      @order.clear
-      @db.try { |db| db.memo_queries.clear_query_cache(@service_id) }
+      @mutex.synchronize do
+        @cache.clear
+        @order.clear
+        @db.try { |db| db.memo_queries.clear_query_cache(@service_id) }
+      end
     end
 
     # Cache hit rate as a percentage
     def hit_rate : Float64
-      total = @hits + @misses
-      return 0.0 if total == 0
-      (@hits.to_f64 / total * 100).round(1)
+      @mutex.synchronize do
+        total = @hits + @misses
+        total == 0 ? 0.0 : (@hits.to_f64 / total * 100).round(1)
+      end
     end
 
     private struct CacheEntry

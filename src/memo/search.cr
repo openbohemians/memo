@@ -23,8 +23,8 @@ module Memo
       getter chunk_id : Int64
       getter hash : Bytes
       getter source_type : String
-      getter source_id : ExternalId?       # External ID (nil for memo-managed sources)
-      getter internal_source_id : Int64    # Internal ID (FK to sources)
+      getter source_id : ExternalId?    # External ID (nil for memo-managed sources)
+      getter internal_source_id : Int64 # Internal ID (FK to sources)
       getter pair_id : ExternalId?
       getter parent_id : ExternalId?
       getter offset : Int32?
@@ -32,12 +32,12 @@ module Memo
       getter match_count : Int32
       getter read_count : Int32
       getter score : Float64
-      getter text : String?  # Only populated with detail level
+      getter text : String? # Only populated with detail level
 
       def initialize(
         @chunk_id, @hash, @source_type, @source_id, @internal_source_id,
         @pair_id, @parent_id, @offset, @size,
-        @match_count, @read_count, @score, @text = nil
+        @match_count, @read_count, @score, @text = nil,
       )
       end
     end
@@ -55,7 +55,7 @@ module Memo
         @source_type = nil,
         @internal_source_id = nil,
         @internal_pair_id = nil,
-        @internal_parent_id = nil
+        @internal_parent_id = nil,
       )
       end
     end
@@ -81,16 +81,18 @@ module Memo
       sql_where : String? = nil,
       like : Array(String)? = nil,
       match : String? = nil,
-      include_text : Bool = true
+      include_text : Bool = true,
+      sql_where_args : Array(DB::Any) = [] of DB::Any,
+      track_matches : Bool = true,
     ) : Array(Result)
       has_filters = filters || sql_where || (like && !like.empty?) || (match && !match.empty?)
 
       # Get nearest neighbor candidates from USearch
       usearch_results = if has_filters
-                           search_filtered(db, usearch_index, embedding, service_id, limit, filters, sql_where, like, match)
-                         else
-                           USearchIndex.search(usearch_index, embedding, limit)
-                         end
+                          search_filtered(db, usearch_index, embedding, service_id, limit, filters, sql_where, like, match, sql_where_args)
+                        else
+                          USearchIndex.search(usearch_index, embedding, limit)
+                        end
 
       return [] of Result if usearch_results.empty?
 
@@ -105,7 +107,7 @@ module Memo
       return [] of Result if scores.empty?
 
       # Batch-fetch chunk metadata for matching rowids
-      fetch_results(db, service_id, scores, limit, include_text)
+      fetch_results(db, service_id, scores, limit, include_text, track_matches)
     end
 
     # Mark chunks as read (increment read_count)
@@ -123,7 +125,8 @@ module Memo
       filters : Filters?,
       sql_where : String?,
       like : Array(String)?,
-      match : String?
+      match : String?,
+      sql_where_args : Array(DB::Any),
     ) : Array(USearch::SearchResult)
       # Build WHERE clauses and params
       where_clauses = ["e.service_id = ?"] of String
@@ -150,6 +153,7 @@ module Memo
 
       if sql_where && !sql_where.empty?
         where_clauses << "(#{sql_where})"
+        params.concat(sql_where_args)
       end
 
       text_join = ""
@@ -184,17 +188,14 @@ module Memo
       service_id : Int64,
       scores : Hash(UInt64, Float64),
       limit : Int32,
-      include_text : Bool
+      include_text : Bool,
+      track_matches : Bool,
     ) : Array(Result)
       rowids = scores.keys.map(&.to_i64)
       rows = db.memo_queries.fetch_search_results(rowids, service_id, include_text)
 
       results = rows.map do |row|
-        embedding_rowid, chunk_id, hash, source_type, internal_source_id,
-          external_int, external_text, external_blob,
-          internal_pair_id, pair_external_int, pair_external_text, pair_external_blob,
-          internal_parent_id, parent_external_int, parent_external_text, parent_external_blob,
-          offset, size, match_count, read_count, text_content = row
+        embedding_rowid, chunk_id, hash, source_type, internal_source_id, external_int, external_text, external_blob, internal_pair_id, pair_external_int, pair_external_text, pair_external_blob, internal_parent_id, parent_external_int, parent_external_text, parent_external_blob, offset, size, match_count, read_count, text_content = row
 
         score = scores[embedding_rowid]? || 0.0
         external_source_id : ExternalId? = external_int || external_text || external_blob
@@ -213,7 +214,7 @@ module Memo
 
       results.sort_by! { |r| -r.score }
       results = results.first(limit)
-      Storage.increment_match_count(db, results.map(&.chunk_id))
+      Storage.increment_match_count(db, results.map(&.chunk_id)) if track_matches
       results
     end
   end

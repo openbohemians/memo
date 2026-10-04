@@ -88,6 +88,12 @@ module Memo
     # Key is the embedding rowid (SQLite rowid or PostgreSQL eid).
     # Embedding is converted from Float64 to Float32 at this boundary.
     def add(index : USearch::Index, key : UInt64, embedding : Array(Float64))
+      # The Crystal USearch wrapper reserves 1,024 slots on first add. Grow
+      # explicitly before that reservation fills so large indexes keep working.
+      capacity = index.capacity
+      if index.size >= capacity
+        index.reserve(Math.max(capacity.to_i * 2, 1024))
+      end
       index.add(key, to_f32(embedding))
     end
 

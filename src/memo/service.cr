@@ -32,7 +32,7 @@ module Memo
       @source_id : ExternalId,
       @text : String,
       @pair_id : ExternalId? = nil,
-      @parent_id : ExternalId? = nil
+      @parent_id : ExternalId? = nil,
     )
     end
   end
@@ -173,7 +173,9 @@ module Memo
       batch_size : Int32 = 100,
       max_retries : Int32 = 3,
       index_dir : String? = nil,
-      query_cache_size : Int32 = 10_000
+      query_cache_size : Int32 = 10_000,
+      persistent_query_cache : Bool = true,
+      track_matches : Bool = true,
     )
       # Detect backend from connection string
       if db_path.starts_with?("postgres")
@@ -193,8 +195,9 @@ module Memo
       end
 
       @owns_db = true
+      @track_matches = track_matches
       @text_storage = store_text
-      @build_vocab = build_vocab && store_text  # vocab requires text storage
+      @build_vocab = build_vocab && store_text # vocab requires text storage
 
       # Initialize schema
       Database.init(@db)
@@ -241,7 +244,7 @@ module Memo
       # Query embedding cache
       @query_cache = QueryCache.new(
         max_entries: query_cache_size,
-        db: @db,
+        db: persistent_query_cache ? @db : nil,
         service_id: @service_id
       )
     end
@@ -269,12 +272,15 @@ module Memo
       max_retries : Int32 = 3,
       db_path : String? = nil,
       index_dir : String? = nil,
-      query_cache_size : Int32 = 10_000
+      query_cache_size : Int32 = 10_000,
+      persistent_query_cache : Bool = true,
+      track_matches : Bool = true,
     )
       @db = db
-      @owns_db = false  # Caller owns the connection
+      @owns_db = false # Caller owns the connection
+      @track_matches = track_matches
       @text_storage = store_text
-      @build_vocab = build_vocab && store_text  # vocab requires text storage
+      @build_vocab = build_vocab && store_text # vocab requires text storage
 
       # Get db path from dialect if not provided
       @db_path = db_path || @db.memo_dialect.db_file_path(@db)
@@ -325,7 +331,7 @@ module Memo
       # Query embedding cache
       @query_cache = QueryCache.new(
         max_entries: query_cache_size,
-        db: @db,
+        db: persistent_query_cache ? @db : nil,
         service_id: @service_id
       )
     end
@@ -346,7 +352,7 @@ module Memo
       source_id : ExternalId?,
       text : String,
       pair_id : ExternalId? = nil,
-      parent_id : ExternalId? = nil
+      parent_id : ExternalId? = nil,
     ) : Int32
       # Resolve or create source ID
       internal_source_id = if sid = source_id
@@ -437,14 +443,15 @@ module Memo
       like : String | Array(String) | Nil = nil,
       match : String? = nil,
       sql_where : String? = nil,
-      include_text : Bool = true
+      include_text : Bool = true,
+      sql_where_args : Array(DB::Any) = [] of DB::Any,
     ) : Array(Search::Result)
       results, _timings = search_with_timings(
         query: query, limit: limit, min_score: min_score,
         source_type: source_type, source_id: source_id,
         pair_id: pair_id, parent_id: parent_id,
         like: like, match: match, sql_where: sql_where,
-        include_text: include_text
+        include_text: include_text, sql_where_args: sql_where_args
       )
       results
     end
@@ -463,7 +470,8 @@ module Memo
       like : String | Array(String) | Nil = nil,
       match : String? = nil,
       sql_where : String? = nil,
-      include_text : Bool = true
+      include_text : Bool = true,
+      sql_where_args : Array(DB::Any) = [] of DB::Any,
     ) : {Array(Search::Result), Search::Timings}
       t_start = Time.instant
 
@@ -513,7 +521,8 @@ module Memo
         sql_where: sql_where,
         like: @text_storage ? like_patterns : nil,
         match: @text_storage ? match : nil,
-        include_text: @text_storage && include_text
+        include_text: @text_storage && include_text,
+        sql_where_args: sql_where_args, track_matches: @track_matches
       )
       t_end = Time.instant
 
@@ -524,7 +533,7 @@ module Memo
       timings = Search::Timings.new(
         embed_ms: embed_ms.round(1),
         search_ms: search_ms.round(1),
-        fetch_ms: (search_ms * 0.5).round(1),  # approximate — fetch is part of semantic()
+        fetch_ms: (search_ms * 0.5).round(1), # approximate — fetch is part of semantic()
         total_ms: total_ms.round(1),
         cache_hit: !!cached
       )
@@ -563,7 +572,6 @@ module Memo
     #   If nil and source_id is Int64, searches integer IDs across all types.
     #   If nil and source_id is String, searches string IDs across all types.
     def delete(source_id : ExternalId, source_type : String? = nil) : Int32
-
       # Resolve external ID to internal ID
       internal_id = if source_type
                       SourceRegistry.get_internal(@db, source_type, source_id)
@@ -651,7 +659,7 @@ module Memo
       model : String,
       dimensions : Int32,
       max_tokens : Int32,
-      base_url : String? = nil
+      base_url : String? = nil,
     ) : ServiceProvider::Info
       ServiceProvider.create(@db, name, format, model, dimensions, max_tokens, base_url)
     end
@@ -684,7 +692,7 @@ module Memo
     def update_service(
       name : String,
       base_url : String? = nil,
-      max_tokens : Int32? = nil
+      max_tokens : Int32? = nil,
     ) : ServiceProvider::Info?
       svc = ServiceProvider.get_by_name(@db, name)
       return nil unless svc
@@ -792,7 +800,7 @@ module Memo
       source_id : ExternalId,
       text : String,
       pair_id : ExternalId? = nil,
-      parent_id : ExternalId? = nil
+      parent_id : ExternalId? = nil,
     )
       # Resolve external IDs to internal IDs
       internal_source_id = SourceRegistry.resolve(@db, source_type, source_id)
@@ -822,9 +830,8 @@ module Memo
       internal_source_id : Int64,
       text : String,
       internal_pair_id : Int64? = nil,
-      internal_parent_id : Int64? = nil
+      internal_parent_id : Int64? = nil,
     )
-
       now = Time.utc.to_unix_ms
 
       # Store source_type, pair_id and parent_id in the text field as metadata prefix
@@ -1068,7 +1075,6 @@ module Memo
     # memo.process_queue
     # ```
     def reindex(source_type : String, &block : ExternalId -> String) : Int32
-
       queued = 0
 
       # Get all internal source_ids and metadata for this source type
@@ -1124,7 +1130,7 @@ module Memo
     #
     # Example:
     # ```
-    # memo.build_vocab()
+    # memo.build_vocab
     # results = memo.like("database")
     # ```
     def build_vocab(batch_size : Int32 = 2000, clear_existing : Bool = true) : Int32
@@ -1175,7 +1181,7 @@ module Memo
     def like(
       query : String,
       limit : Int32 = 10,
-      min_score : Float64 = 0.5
+      min_score : Float64 = 0.5,
     ) : Array(Vocab::Result)
       # Generate query embedding
       query_embedding, _tokens = @provider.embed_text(query, "query")
@@ -1228,7 +1234,7 @@ module Memo
       total = 0
 
       # Collect files to index
-      files_to_index = [] of {Int64, String, Files::FileInfo}  # source_id, content, info
+      files_to_index = [] of {Int64, String, Files::FileInfo} # source_id, content, info
 
       Files.walk(root_path, ignore_file) do |file_path|
         total += 1
@@ -1278,8 +1284,8 @@ module Memo
       return if files.empty?
 
       # Phase 1: Chunk all files and collect data
-      all_chunks = [] of {Int64, String, Int32, Int32}  # source_id, chunk_text, offset, size
-      vocab_map = Hash(String, Int32).new(0)  # word => total count
+      all_chunks = [] of {Int64, String, Int32, Int32} # source_id, chunk_text, offset, size
+      vocab_map = Hash(String, Int32).new(0)           # word => total count
 
       files.each do |source_id, content, info|
         chunks = Chunking.chunk_text(content, @chunking_config)
@@ -1381,7 +1387,7 @@ module Memo
       root : String,
       ignore_file : String = ".gitignore",
       incremental : Bool = true,
-      dry_run : Bool = false
+      dry_run : Bool = false,
     ) : {Int32, Int32, Int32}
       index_files(root, ignore_file, incremental, dry_run) { |_, _| }
     end
@@ -1459,7 +1465,7 @@ module Memo
       paths : Array(String),
       root : String = Dir.current,
       incremental : Bool = true,
-      dry_run : Bool = false
+      dry_run : Bool = false,
     ) : {Int32, Int32, Int32}
       index_file_list(paths, root, incremental, dry_run) { |_, _| }
     end
@@ -1505,7 +1511,7 @@ module Memo
       dimensions : Int32?,
       max_tokens : Int32?,
       api_key : String?,
-      chunking_max_tokens : Int32
+      chunking_max_tokens : Int32,
     ) : ProviderConfig
       if service
         # Look up existing service configuration by name
@@ -1569,7 +1575,7 @@ module Memo
         # Register or get existing service in database (auto-generates name)
         service_id = Storage.register_service(
           db: @db,
-          name: nil,  # Auto-generate from format/model
+          name: nil, # Auto-generate from format/model
           format: final_format,
           base_url: base_url,
           model: final_model,
@@ -1690,12 +1696,12 @@ module Memo
       internal_source_id : Int64,
       text : String,
       internal_pair_id : Int64? = nil,
-      internal_parent_id : Int64? = nil
+      internal_parent_id : Int64? = nil,
     ) : Int32
       # Check if content has changed (skip re-embedding if identical)
       content_hash = Storage.compute_hash(text)
       unless source_text_changed?(internal_source_id, content_hash)
-        return -1  # Unchanged, skip
+        return -1 # Unchanged, skip
       end
 
       # Chunk text (returns tuples of {text, offset, size})
