@@ -24,7 +24,7 @@ module Memo
         columns : String,
         placeholders : String,
         conflict_columns : String,
-        update_columns : Array(String)
+        update_columns : Array(String),
       ) : String
 
       # The column name for embedding row identity used as USearch key.

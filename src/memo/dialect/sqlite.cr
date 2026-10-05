@@ -15,7 +15,7 @@ module Memo
         columns : String,
         placeholders : String,
         conflict_columns : String,
-        update_columns : Array(String)
+        update_columns : Array(String),
       ) : String
         "INSERT OR REPLACE INTO #{table} (#{columns}) VALUES (#{placeholders})"
       end

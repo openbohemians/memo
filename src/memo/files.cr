@@ -12,10 +12,10 @@ module Memo
 
     # File info for indexing
     struct FileInfo
-      getter path : String           # Relative path
-      getter content_hash : Bytes    # SHA256 of content
-      getter mtime : Int64           # Modification time (Unix ms)
-      getter size : Int64            # File size in bytes
+      getter path : String        # Relative path
+      getter content_hash : Bytes # SHA256 of content
+      getter mtime : Int64        # Modification time (Unix ms)
+      getter size : Int64         # File size in bytes
 
       def initialize(@path, @content_hash, @mtime, @size)
       end

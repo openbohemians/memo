@@ -104,7 +104,7 @@ module Memo
       query_embedding : Array(Float64),
       service_id : Int64,
       limit : Int32 = 10,
-      min_score : Float64 = 0.5
+      min_score : Float64 = 0.5,
     ) : Array(Result)
       results = [] of Result
 
@@ -129,7 +129,7 @@ module Memo
       words : Array(String),
       embeddings : Array(Array(Float64)),
       frequencies : Array(Int32),
-      service_id : Int64
+      service_id : Int64,
     )
       q = db.memo_queries
       now = Time.utc.to_unix_ms

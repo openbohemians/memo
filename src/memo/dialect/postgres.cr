@@ -14,7 +14,7 @@ module Memo
         columns : String,
         placeholders : String,
         conflict_columns : String,
-        update_columns : Array(String)
+        update_columns : Array(String),
       ) : String
         updates = update_columns.map { |col| "#{col} = EXCLUDED.#{col}" }.join(", ")
         "INSERT INTO #{table} (#{columns}) VALUES (#{placeholders}) " \

@@ -16,7 +16,7 @@ module Memo
       base_url : String?,
       model : String,
       dimensions : Int32,
-      max_tokens : Int32
+      max_tokens : Int32,
     ) : Int64
       q = db.memo_queries
       service_name = name || "#{format}/#{model}"
@@ -30,7 +30,7 @@ module Memo
     # Get service by name
     def get_service_by_name(
       db : DB::Database,
-      name : String
+      name : String,
     ) : {Int64, String, String?, String, Int32, Int32, Float64}?
       db.memo_queries.get_service_by_name(name)
     end
@@ -39,7 +39,7 @@ module Memo
     def get_service_by_format_model(
       db : DB::Database,
       format : String,
-      model : String
+      model : String,
     ) : {Int64, String, String?, String, Int32, Int32, Float64}?
       db.memo_queries.get_service_by_format_model(format, model)
     end
@@ -48,7 +48,7 @@ module Memo
     def update_tokens_per_byte(
       db : DB::Database,
       service_id : Int64,
-      observed_ratio : Float64
+      observed_ratio : Float64,
     )
       q = db.memo_queries
       current = q.get_tokens_per_byte(service_id) || 0.25
@@ -63,7 +63,7 @@ module Memo
       db : DB::Database,
       hash : Bytes,
       token_count : Int32,
-      service_id : Int64
+      service_id : Int64,
     ) : {Bool, Int64}
       q = db.memo_queries
 
@@ -93,7 +93,7 @@ module Memo
       offset : Int32?,
       size : Int32,
       pair_id : Int64? = nil,
-      parent_id : Int64? = nil
+      parent_id : Int64? = nil,
     ) : Int64
       db.memo_queries.insert_chunk_ignore(hash, source_id, source_type, pair_id, parent_id, offset, size, Time.utc.to_unix_ms)
     end

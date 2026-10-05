@@ -11,7 +11,7 @@ module Memo
     def resolve(
       db : DB::Database,
       source_type : String,
-      external_id : ExternalId
+      external_id : ExternalId,
     ) : Int64
       q = db.memo_queries
       now = Time.utc.to_unix_ms
@@ -46,7 +46,7 @@ module Memo
     def get_internal(
       db : DB::Database,
       source_type : String,
-      external_id : ExternalId
+      external_id : ExternalId,
     ) : Int64?
       q = db.memo_queries
       case external_id
@@ -59,7 +59,7 @@ module Memo
     # Get internal ID without source_type filter
     def get_internal_any_type(
       db : DB::Database,
-      external_id : ExternalId
+      external_id : ExternalId,
     ) : Int64?
       q = db.memo_queries
       case external_id
@@ -73,7 +73,7 @@ module Memo
     def delete(
       db : DB::Database,
       source_type : String,
-      external_id : ExternalId
+      external_id : ExternalId,
     ) : Bool
       q = db.memo_queries
       rows = case external_id
@@ -94,7 +94,7 @@ module Memo
       db : DB::Database,
       source_type : String,
       limit : Int32 = 100,
-      offset : Int32 = 0
+      offset : Int32 = 0,
     ) : Array({Int64, ExternalId?})
       db.memo_queries.list_sources(source_type, limit, offset).map do |internal_id, ext_int, ext_text, ext_blob|
         external_id : ExternalId? = ext_int || ext_text || ext_blob

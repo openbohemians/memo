@@ -10,7 +10,7 @@ module Memo
 
     def insert_service(
       name : String, format : String, base_url : String?,
-      model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64
+      model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64,
     ) : Int64
       @db.scalar(
         "INSERT INTO memo_services (name, format, base_url, model, dimensions, max_tokens, created_at)
@@ -146,7 +146,7 @@ module Memo
     def insert_service_full(
       name : String, format : String, base_url : String?,
       model : String, dimensions : Int32, max_tokens : Int32,
-      is_default : Int32, created_at : Int64
+      is_default : Int32, created_at : Int64,
     ) : Int64
       @db.scalar(
         "INSERT INTO memo_services (name, format, base_url, model, dimensions, max_tokens, is_default, created_at)
@@ -183,7 +183,7 @@ module Memo
     def insert_chunk_ignore(
       hash : Bytes, source_id : Int64, source_type : String,
       pair_id : Int64?, parent_id : Int64?,
-      offset : Int32?, size : Int32, created_at : Int64
+      offset : Int32?, size : Int32, created_at : Int64,
     ) : Int64
       result = @db.exec(
         "INSERT INTO memo_chunks (hash, source_id, source_type, pair_id, parent_id, \"offset\", size, created_at)
@@ -590,10 +590,10 @@ module Memo
       params : Array(DB::Any),
       where_clauses : Array(String),
       text_join : String,
-      fts_join : String
+      fts_join : String,
     ) : Set(UInt64)
       # Rewrite ? placeholders to $N, starting after $1 (service_id in JOIN)
-      n = 1  # $1 is service_id in the JOIN clause
+      n = 1 # $1 is service_id in the JOIN clause
       pg_where = where_clauses.map do |clause|
         clause.gsub("?") { n += 1; "$#{n}" }
       end
@@ -618,7 +618,7 @@ module Memo
     def fetch_search_results(
       rowids : Array(Int64),
       service_id : Int64,
-      include_text : Bool
+      include_text : Bool,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
       text_select = include_text ? ", SUBSTR(st.content, c.\"offset\" + 1, c.size) AS chunk_text" : ""
       text_join = include_text ? "LEFT JOIN memo_texts st ON c.source_id = st.source_id" : ""
@@ -717,7 +717,7 @@ module Memo
     def load_embedding_rowids(
       service_id : Int64,
       source_type : String,
-      external_ids : Array(Int64)
+      external_ids : Array(Int64),
     ) : Array({Int64, Int64})
       results = [] of {Int64, Int64}
       placeholders = external_ids.each_with_index.map { |_, i| "$#{i + 3}" }.join(", ")

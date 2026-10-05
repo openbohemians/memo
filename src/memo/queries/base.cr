@@ -38,7 +38,7 @@ module Memo
 
     abstract def insert_service(
       name : String, format : String, base_url : String?,
-      model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64
+      model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64,
     ) : Int64
 
     abstract def get_service_by_name(name : String) : {Int64, String, String?, String, Int32, Int32, Float64}?
@@ -85,7 +85,7 @@ module Memo
     abstract def insert_service_full(
       name : String, format : String, base_url : String?,
       model : String, dimensions : Int32, max_tokens : Int32,
-      is_default : Int32, created_at : Int64
+      is_default : Int32, created_at : Int64,
     ) : Int64
 
     # =========================================================================
@@ -105,7 +105,7 @@ module Memo
     abstract def insert_chunk_ignore(
       hash : Bytes, source_id : Int64, source_type : String,
       pair_id : Int64?, parent_id : Int64?,
-      offset : Int32?, size : Int32, created_at : Int64
+      offset : Int32?, size : Int32, created_at : Int64,
     ) : Int64
 
     abstract def get_chunk_id(source_id : Int64, offset : Int32?) : Int64
@@ -263,13 +263,13 @@ module Memo
       params : Array(DB::Any),
       where_clauses : Array(String),
       text_join : String,
-      fts_join : String
+      fts_join : String,
     ) : Set(UInt64)
 
     abstract def fetch_search_results(
       rowids : Array(Int64),
       service_id : Int64,
-      include_text : Bool
+      include_text : Bool,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
 
     # =========================================================================
@@ -295,7 +295,7 @@ module Memo
     abstract def load_embedding_rowids(
       service_id : Int64,
       source_type : String,
-      external_ids : Array(Int64)
+      external_ids : Array(Int64),
     ) : Array({Int64, Int64})
   end
 end

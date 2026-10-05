@@ -14,7 +14,7 @@ module Memo
 
       def initialize(
         @id, @name, @format, @base_url, @model, @dimensions,
-        @max_tokens, @tokens_per_byte, @is_default, @created_at
+        @max_tokens, @tokens_per_byte, @is_default, @created_at,
       )
       end
     end
@@ -41,7 +41,7 @@ module Memo
       dimensions : Int32,
       max_tokens : Int32,
       base_url : String? = nil,
-      is_default : Bool = false
+      is_default : Bool = false,
     ) : Info
       q = db.memo_queries
       existing = q.get_service_info_by_name(name)
@@ -92,7 +92,7 @@ module Memo
       db : DB::Database,
       id : Int64,
       base_url : String? = nil,
-      max_tokens : Int32? = nil
+      max_tokens : Int32? = nil,
     ) : Info?
       q = db.memo_queries
       updates = [] of String
