@@ -100,7 +100,7 @@ module Memo
     # Compares query embedding against stored word embeddings.
     # Returns results ranked by cosine similarity.
     def search(
-      db : DB::Database,
+      db : DBHandle,
       query_embedding : Array(Float64),
       service_id : Int64,
       limit : Int32 = 10,
@@ -125,15 +125,15 @@ module Memo
 
     # Store a batch of word embeddings
     def store_batch(
-      db : DB::Database,
+      db : DBHandle,
       words : Array(String),
       embeddings : Array(Array(Float64)),
       frequencies : Array(Int32),
       service_id : Int64,
     )
-      q = db.memo_queries
       now = Time.utc.to_unix_ms
-      db.transaction do
+      Memo::Database.transaction(db) do |cnn|
+        q = cnn.memo_queries
         words.each_with_index do |word, idx|
           embedding_blob = Storage.serialize_embedding(embeddings[idx])
           q.upsert_vocab(word, service_id, embedding_blob, frequencies[idx], now)
@@ -142,13 +142,13 @@ module Memo
     end
 
     # Get existing words from vocab for a service
-    def get_existing_words(db : DB::Database, words : Array(String), service_id : Int64) : Set(String)
+    def get_existing_words(db : DBHandle, words : Array(String), service_id : Int64) : Set(String)
       return Set(String).new if words.empty?
       db.memo_queries.get_existing_words(service_id, words)
     end
 
     # Update frequencies for existing words (increment by count)
-    def update_frequencies(db : DB::Database, word_freqs : Array(WordFrequency), service_id : Int64)
+    def update_frequencies(db : DBHandle, word_freqs : Array(WordFrequency), service_id : Int64)
       return if word_freqs.empty?
       q = db.memo_queries
       word_freqs.each do |wf|
@@ -157,18 +157,18 @@ module Memo
     end
 
     # Store a single word with embedding
-    def store_word(db : DB::Database, word : String, embedding : Array(Float64), frequency : Int32, service_id : Int64)
+    def store_word(db : DBHandle, word : String, embedding : Array(Float64), frequency : Int32, service_id : Int64)
       embedding_blob = Storage.serialize_embedding(embedding)
       db.memo_queries.upsert_vocab(word, service_id, embedding_blob, frequency, Time.utc.to_unix_ms)
     end
 
     # Clear all vocabulary for a service
-    def clear(db : DB::Database, service_id : Int64)
+    def clear(db : DBHandle, service_id : Int64)
       db.memo_queries.delete_vocab(service_id)
     end
 
     # Get vocabulary count for a service
-    def count(db : DB::Database, service_id : Int64) : Int64
+    def count(db : DBHandle, service_id : Int64) : Int64
       db.memo_queries.count_vocab(service_id)
     end
 

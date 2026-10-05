@@ -13,7 +13,7 @@ module Memo
     # - DB path discovery (pragma vs connection string)
     abstract class Base
       # Execute an INSERT and return the generated ID.
-      abstract def insert_returning_id(db : DB::Database, sql : String, *args) : Int64
+      abstract def insert_returning_id(db : DBHandle, sql : String, *args) : Int64
 
       # Build INSERT OR IGNORE SQL.
       abstract def insert_or_ignore_sql(table : String, columns : String, placeholders : String) : String
@@ -43,10 +43,10 @@ module Memo
       abstract def db_file_path(db : DB::Database) : String?
 
       # Insert or update FTS index for a source.
-      abstract def fts_upsert(db : DB::Database, source_id : Int64, content : String)
+      abstract def fts_upsert(db : DBHandle, source_id : Int64, content : String)
 
       # Delete FTS index entry for a source.
-      abstract def fts_delete(db : DB::Database, source_id : Int64)
+      abstract def fts_delete(db : DBHandle, source_id : Int64)
 
       # Build FTS JOIN clause for search queries.
       abstract def fts_join_sql : String

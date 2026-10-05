@@ -1,5 +1,9 @@
 module Memo
   class Queries::SQLite < Queries
+    def for_connection(cnn : DB::Connection) : Queries
+      SQLite.new(cnn)
+    end
+
     # =========================================================================
     # Services
     # =========================================================================
@@ -16,8 +20,7 @@ module Memo
         "INSERT INTO memo_services (name, format, base_url, model, dimensions, max_tokens, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?)",
         name, format, base_url, model, dimensions, max_tokens, created_at
-      )
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      ).last_insert_id
     end
 
     def get_service_by_name(name : String) : {Int64, String, String?, String, Int32, Int32, Float64}?
@@ -147,8 +150,7 @@ module Memo
         "INSERT INTO memo_services (name, format, base_url, model, dimensions, max_tokens, is_default, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         name, format, base_url, model, dimensions, max_tokens, is_default, created_at
-      )
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      ).last_insert_id
     end
 
     # =========================================================================
@@ -240,23 +242,19 @@ module Memo
     # =========================================================================
 
     def insert_source(source_type : String, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, created_at) VALUES (?, ?)", source_type, created_at)
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      @db.exec("INSERT INTO memo_sources (source_type, created_at) VALUES (?, ?)", source_type, created_at).last_insert_id
     end
 
     def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at)
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      @db.exec("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
     end
 
     def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at)
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      @db.exec("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
     end
 
     def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at)
-      @db.scalar("SELECT last_insert_rowid()").as(Int64)
+      @db.exec("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
     end
 
     def find_source_int(source_type : String, external_id : Int64) : Int64?

@@ -5,10 +5,13 @@ module Memo
   # with SQL native to that backend. This avoids placeholder
   # translation and keeps SQL explicit per backend.
   abstract class Queries
-    getter db : DB::Database
+    getter db : DBHandle
 
-    def initialize(@db : DB::Database)
+    def initialize(@db : DBHandle)
     end
+
+    # Same queries, run on one connection (for use inside a transaction).
+    abstract def for_connection(cnn : DB::Connection) : Queries
 
     # Factory for PostgreSQL queries (set by requiring memo/pg)
     @@pg_factory : (DB::Database -> Queries)? = nil

@@ -11,6 +11,19 @@ class DB::Database
   property memo_queries : Memo::Queries { Memo::Queries::SQLite.new(self) }
 end
 
+# A connection carries the same config while it runs a transaction
+# (copied from its database by Memo::Database.transaction).
+class DB::Connection
+  property memo_dialect : Memo::Dialect::Base { Memo::Dialect::SQLite.new }
+  property memo_queries : Memo::Queries { Memo::Queries::SQLite.new(self) }
+end
+
+module Memo
+  # Where statements run: the connection pool, or the single connection
+  # holding an open transaction.
+  alias DBHandle = DB::Database | DB::Connection
+end
+
 require "./memo/types"
 require "./memo/config"
 require "./memo/dialect"

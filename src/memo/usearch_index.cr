@@ -88,6 +88,11 @@ module Memo
     # Key is the embedding rowid (SQLite rowid or PostgreSQL eid).
     # Embedding is converted from Float64 to Float32 at this boundary.
     def add(index : USearch::Index, key : UInt64, embedding : Array(Float64))
+      # A new embedding row can reuse a deleted row's rowid (SQLite), while a
+      # saved index file may still hold the deleted vector. The database row
+      # is authoritative, so replace whatever the index has under this key.
+      index.remove(key) if index.contains?(key)
+
       # The Crystal USearch wrapper reserves 1,024 slots on first add. Grow
       # explicitly before that reservation fills so large indexes keep working.
       capacity = index.capacity
@@ -100,6 +105,32 @@ module Memo
     # Remove a vector from the index by key.
     def remove(index : USearch::Index, key : UInt64)
       index.remove(key) if index.contains?(key)
+    end
+
+    # Index changes made during a database transaction, applied in order
+    # once it commits. The index can't roll back, so changing it earlier
+    # would leave it out of step with the database after a rollback.
+    class Pending
+      @changes = [] of {UInt64, Array(Float64)?} # nil embedding = remove
+
+      def add(key : UInt64, embedding : Array(Float64))
+        @changes << {key, embedding}
+      end
+
+      def remove(key : UInt64)
+        @changes << {key, nil}
+      end
+
+      def apply(index : USearch::Index)
+        @changes.each do |key, embedding|
+          if embedding
+            USearchIndex.add(index, key, embedding)
+          else
+            USearchIndex.remove(index, key)
+          end
+        end
+        @changes.clear
+      end
     end
 
     # Search for k nearest neighbors (unfiltered).

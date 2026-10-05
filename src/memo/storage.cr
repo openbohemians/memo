@@ -10,7 +10,7 @@ module Memo
 
     # Register or get existing service by name
     def register_service(
-      db : DB::Database,
+      db : DBHandle,
       name : String?,
       format : String,
       base_url : String?,
@@ -29,7 +29,7 @@ module Memo
 
     # Get service by name
     def get_service_by_name(
-      db : DB::Database,
+      db : DBHandle,
       name : String,
     ) : {Int64, String, String?, String, Int32, Int32, Float64}?
       db.memo_queries.get_service_by_name(name)
@@ -37,7 +37,7 @@ module Memo
 
     # Returns service record by format and model, or nil if not found
     def get_service_by_format_model(
-      db : DB::Database,
+      db : DBHandle,
       format : String,
       model : String,
     ) : {Int64, String, String?, String, Int32, Int32, Float64}?
@@ -46,7 +46,7 @@ module Memo
 
     # Update tokens_per_byte ratio using exponential moving average
     def update_tokens_per_byte(
-      db : DB::Database,
+      db : DBHandle,
       service_id : Int64,
       observed_ratio : Float64,
     )
@@ -60,7 +60,7 @@ module Memo
     #
     # Returns {inserted, rowid} where inserted is true if new, rowid is the USearch key.
     def store_embedding(
-      db : DB::Database,
+      db : DBHandle,
       hash : Bytes,
       token_count : Int32,
       service_id : Int64,
@@ -78,7 +78,7 @@ module Memo
     end
 
     # Get the rowid of an embedding by hash and service_id.
-    def get_rowid(db : DB::Database, hash : Bytes, service_id : Int64) : Int64?
+    def get_rowid(db : DBHandle, hash : Bytes, service_id : Int64) : Int64?
       db.memo_queries.get_embedding_rowid?(hash, service_id)
     end
 
@@ -86,7 +86,7 @@ module Memo
     #
     # Returns chunk id if inserted, or 0 if chunk already existed (was ignored)
     def create_chunk(
-      db : DB::Database,
+      db : DBHandle,
       hash : Bytes,
       source_type : String,
       source_id : Int64,
@@ -99,13 +99,13 @@ module Memo
     end
 
     # Increment match_count for chunks
-    def increment_match_count(db : DB::Database, chunk_ids : Array(Int64))
+    def increment_match_count(db : DBHandle, chunk_ids : Array(Int64))
       return if chunk_ids.empty?
       db.memo_queries.increment_match_count(chunk_ids)
     end
 
     # Increment read_count for chunks
-    def increment_read_count(db : DB::Database, chunk_ids : Array(Int64))
+    def increment_read_count(db : DBHandle, chunk_ids : Array(Int64))
       return if chunk_ids.empty?
       db.memo_queries.increment_read_count(chunk_ids)
     end

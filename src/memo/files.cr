@@ -117,27 +117,27 @@ module Memo
     end
 
     # Store file record in database
-    def store(db : DB::Database, source_id : Int64, info : FileInfo)
+    def store(db : DBHandle, source_id : Int64, info : FileInfo)
       db.memo_queries.upsert_file(source_id, info.path, info.content_hash, info.mtime, info.size, Time.utc.to_unix_ms)
     end
 
     # Get file record by path
-    def get_by_path(db : DB::Database, path : String) : FileRecord?
+    def get_by_path(db : DBHandle, path : String) : FileRecord?
       db.memo_queries.get_file_by_path(path)
     end
 
     # Get file record by content hash
-    def get_by_hash(db : DB::Database, hash : Bytes) : FileRecord?
+    def get_by_hash(db : DBHandle, hash : Bytes) : FileRecord?
       db.memo_queries.get_file_by_hash(hash)
     end
 
     # Get file record by source_id
-    def get_by_source(db : DB::Database, source_id : Int64) : FileRecord?
+    def get_by_source(db : DBHandle, source_id : Int64) : FileRecord?
       db.memo_queries.get_file_by_source(source_id)
     end
 
     # Delete file record
-    def delete(db : DB::Database, source_id : Int64) : Bool
+    def delete(db : DBHandle, source_id : Int64) : Bool
       db.memo_queries.delete_file(source_id) > 0
     end
 
@@ -147,12 +147,12 @@ module Memo
     end
 
     # List all indexed files
-    def list(db : DB::Database, limit : Int32 = 100, offset : Int32 = 0) : Array(FileRecord)
+    def list(db : DBHandle, limit : Int32 = 100, offset : Int32 = 0) : Array(FileRecord)
       db.memo_queries.list_files(limit, offset)
     end
 
     # Count indexed files
-    def count(db : DB::Database) : Int64
+    def count(db : DBHandle) : Int64
       db.memo_queries.count_files
     end
 

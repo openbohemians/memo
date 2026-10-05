@@ -1,9 +1,8 @@
 module Memo
   module Dialect
     class SQLite < Base
-      def insert_returning_id(db : DB::Database, sql : String, *args) : Int64
-        db.exec(sql, *args)
-        db.scalar("SELECT last_insert_rowid()").as(Int64)
+      def insert_returning_id(db : DBHandle, sql : String, *args) : Int64
+        db.exec(sql, *args).last_insert_id
       end
 
       def insert_or_ignore_sql(table : String, columns : String, placeholders : String) : String
@@ -40,12 +39,12 @@ module Memo
         )
       end
 
-      def fts_upsert(db : DB::Database, source_id : Int64, content : String)
+      def fts_upsert(db : DBHandle, source_id : Int64, content : String)
         db.exec("DELETE FROM memo_texts_fts WHERE source_id = ?", source_id)
         db.exec("INSERT INTO memo_texts_fts (source_id, content) VALUES (?, ?)", source_id, content)
       end
 
-      def fts_delete(db : DB::Database, source_id : Int64)
+      def fts_delete(db : DBHandle, source_id : Int64)
         db.exec("DELETE FROM memo_texts_fts WHERE source_id = ?", source_id)
       end
 

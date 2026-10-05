@@ -3,13 +3,13 @@ module Memo
     extend self
 
     # Create a source with no external ID (memo-managed)
-    def create(db : DB::Database, source_type : String) : Int64
+    def create(db : DBHandle, source_type : String) : Int64
       db.memo_queries.insert_source(source_type, Time.utc.to_unix_ms)
     end
 
     # Resolve external ID to internal ID, creating source record if needed
     def resolve(
-      db : DB::Database,
+      db : DBHandle,
       source_type : String,
       external_id : ExternalId,
     ) : Int64
@@ -34,7 +34,7 @@ module Memo
     end
 
     # Get external ID and source_type from internal ID
-    def get_external(db : DB::Database, internal_id : Int64) : {String, ExternalId?}?
+    def get_external(db : DBHandle, internal_id : Int64) : {String, ExternalId?}?
       row = db.memo_queries.get_source_external(internal_id)
       return nil unless row
       source_type, external_int, external_text, external_blob = row
@@ -44,7 +44,7 @@ module Memo
 
     # Get internal ID for an external source (doesn't create)
     def get_internal(
-      db : DB::Database,
+      db : DBHandle,
       source_type : String,
       external_id : ExternalId,
     ) : Int64?
@@ -58,7 +58,7 @@ module Memo
 
     # Get internal ID without source_type filter
     def get_internal_any_type(
-      db : DB::Database,
+      db : DBHandle,
       external_id : ExternalId,
     ) : Int64?
       q = db.memo_queries
@@ -71,7 +71,7 @@ module Memo
 
     # Delete a source record
     def delete(
-      db : DB::Database,
+      db : DBHandle,
       source_type : String,
       external_id : ExternalId,
     ) : Bool
@@ -85,13 +85,13 @@ module Memo
     end
 
     # Delete source by internal ID
-    def delete_by_id(db : DB::Database, internal_id : Int64) : Bool
+    def delete_by_id(db : DBHandle, internal_id : Int64) : Bool
       db.memo_queries.delete_source_by_id(internal_id) > 0
     end
 
     # List all sources for a given type
     def list(
-      db : DB::Database,
+      db : DBHandle,
       source_type : String,
       limit : Int32 = 100,
       offset : Int32 = 0,

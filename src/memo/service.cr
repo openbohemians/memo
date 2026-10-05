@@ -581,40 +581,61 @@ module Memo
 
       return 0 unless internal_id
 
-      delete_internal(internal_id, source_type)
+      deleted = 0
+      write_transaction do |cnn, pending|
+        deleted = delete_internal(cnn, pending, internal_id, source_type)
+      end
+      deleted
     end
 
     # Delete chunks by internal source ID
     #
-    # Internal method used by delete() and embed_and_store().
-    private def delete_internal(internal_source_id : Int64, source_type : String? = nil) : Int32
-      q = @db.memo_queries
+    # Internal method used by delete() and embed_and_store(). Runs inside the
+    # caller's transaction; index removals are queued on `pending`.
+    private def delete_internal(
+      cnn : DB::Connection,
+      pending : USearchIndex::Pending,
+      internal_source_id : Int64,
+      source_type : String? = nil,
+    ) : Int32
+      q = cnn.memo_queries
       hashes = q.get_chunk_hashes(internal_source_id, source_type)
 
       deleted_count = 0
 
-      @db.transaction do
-        hashes.each do |hash|
-          deleted_count += if source_type
-                             q.delete_chunks(hash, internal_source_id, source_type)
-                           else
-                             q.delete_chunks(hash, internal_source_id)
-                           end
-        end
-
-        hashes.each do |hash|
-          if q.count_chunks_by_hash(hash) == 0
-            if rowid = q.get_embedding_rowid?(hash, @service_id)
-              USearchIndex.remove(@usearch_index, rowid.to_u64)
-            end
-            q.delete_embeddings_by_hash(hash)
-          end
-        end
-
-        delete_source_text_internal(internal_source_id)
+      hashes.each do |hash|
+        deleted_count += if source_type
+                           q.delete_chunks(hash, internal_source_id, source_type)
+                         else
+                           q.delete_chunks(hash, internal_source_id)
+                         end
       end
 
+      hashes.each do |hash|
+        if q.count_chunks_by_hash(hash) == 0
+          if rowid = q.get_embedding_rowid?(hash, @service_id)
+            pending.remove(rowid.to_u64)
+          end
+          q.delete_embeddings_by_hash(hash)
+        end
+      end
+
+      delete_source_text_internal(internal_source_id, cnn)
+
       deleted_count
+    end
+
+    # Run the block in a database transaction, yielding its connection and a
+    # queue for index changes. Statements in the block must use the
+    # connection. Queued index changes are applied only once it commits.
+    private def write_transaction(&)
+      pending = USearchIndex::Pending.new
+      committed = false
+      Memo::Database.transaction(@db) do |cnn|
+        yield cnn, pending
+        committed = true
+      end
+      pending.apply(@usearch_index) if committed
     end
 
     # Close database connection
@@ -831,6 +852,7 @@ module Memo
       text : String,
       internal_pair_id : Int64? = nil,
       internal_parent_id : Int64? = nil,
+      db : DBHandle = @db,
     )
       now = Time.utc.to_unix_ms
 
@@ -838,14 +860,14 @@ module Memo
       # Format: "MEMO_META:source_type,pair_id,parent_id\n" followed by actual text
       stored_text = "MEMO_META:#{source_type},#{internal_pair_id || ""},#{internal_parent_id || ""}\n#{text}"
 
-      @db.memo_queries.enqueue(internal_source_id, stored_text, now)
+      db.memo_queries.enqueue(internal_source_id, stored_text, now)
 
       # Store text immediately so it's available for retrieval
       # before embedding runs. Embedding is deferred, text is not.
       # skip_hash: source_text_changed? treats NULL hash as "changed",
       # so process_queue will still embed this text later.
       if @text_storage
-        store_source_text_internal(internal_source_id, text, skip_hash: true)
+        store_source_text_internal(internal_source_id, text, skip_hash: true, db: db)
       end
     end
 
@@ -867,17 +889,17 @@ module Memo
     def enqueue_batch(docs : Array(Document))
       return if docs.empty?
 
-      @db.transaction do
+      write_transaction do |cnn, _|
         docs.each do |doc|
           # Resolve external IDs to internal IDs
-          internal_source_id = SourceRegistry.resolve(@db, doc.source_type, doc.source_id)
+          internal_source_id = SourceRegistry.resolve(cnn, doc.source_type, doc.source_id)
           internal_pair_id = if pid = doc.pair_id
-                               SourceRegistry.resolve(@db, doc.source_type, pid)
+                               SourceRegistry.resolve(cnn, doc.source_type, pid)
                              else
                                nil
                              end
           internal_parent_id = if pid = doc.parent_id
-                                 SourceRegistry.resolve(@db, doc.source_type, pid)
+                                 SourceRegistry.resolve(cnn, doc.source_type, pid)
                                else
                                  nil
                                end
@@ -887,7 +909,8 @@ module Memo
             internal_source_id: internal_source_id,
             text: doc.text,
             internal_pair_id: internal_pair_id,
-            internal_parent_id: internal_parent_id
+            internal_parent_id: internal_parent_id,
+            db: cnn
           )
         end
       end
@@ -1037,11 +1060,11 @@ module Memo
 
       return 0 if sources.empty?
 
-      @db.transaction do
+      write_transaction do |cnn, pending|
         # Delete existing chunks and embeddings for this source type
         # (orphan cleanup will handle embeddings not referenced elsewhere)
         sources.each do |internal_source_id, _, _, _|
-          delete_internal(internal_source_id, source_type)
+          delete_internal(cnn, pending, internal_source_id, source_type)
         end
 
         # Queue for re-embedding using internal IDs
@@ -1051,7 +1074,8 @@ module Memo
             internal_source_id: internal_source_id,
             text: text,
             internal_pair_id: pair_id,
-            internal_parent_id: parent_id
+            internal_parent_id: parent_id,
+            db: cnn
           )
           queued += 1
         end
@@ -1088,10 +1112,10 @@ module Memo
 
       return 0 if sources.empty?
 
-      @db.transaction do
+      write_transaction do |cnn, pending|
         # Delete existing chunks and embeddings
         sources.each do |internal_source_id, _, _, _|
-          delete_internal(internal_source_id, source_type)
+          delete_internal(cnn, pending, internal_source_id, source_type)
         end
 
         # Queue for re-embedding using block to get text (passes external ID)
@@ -1102,7 +1126,8 @@ module Memo
             internal_source_id: internal_source_id,
             text: text,
             internal_pair_id: pair_id,
-            internal_parent_id: parent_id
+            internal_parent_id: parent_id,
+            db: cnn
           )
           queued += 1
         end
@@ -1330,23 +1355,23 @@ module Memo
       embed_result = embed_texts_batched(texts_to_embed)
 
       # Phase 3: Store everything in a transaction
-      @db.transaction do
+      write_transaction do |cnn, pending|
         # Delete existing chunks for all sources being re-indexed
         source_ids = files.map { |(source_id, _, _)| source_id }.uniq
         source_ids.each do |source_id|
-          delete_internal(source_id, "file")
+          delete_internal(cnn, pending, source_id, "file")
         end
 
         # Store source texts
         if @text_storage
           files.each do |source_id, content, info|
-            store_source_text_internal(source_id, content, info.content_hash)
+            store_source_text_internal(source_id, content, info.content_hash, db: cnn)
           end
         end
 
         # Store file metadata
         files.each do |source_id, _, info|
-          Files.store(@db, source_id, info)
+          Files.store(cnn, source_id, info)
         end
 
         # Store chunk embeddings
@@ -1355,11 +1380,11 @@ module Memo
           embedding = embed_result.embeddings[idx]
           token_count = embed_result.token_counts[idx]
 
-          inserted, rowid = Storage.store_embedding(@db, hash, token_count, @service_id)
-          USearchIndex.add(@usearch_index, rowid.to_u64, embedding) if inserted
+          inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
+          pending.add(rowid.to_u64, embedding) if inserted
 
           Storage.create_chunk(
-            db: @db,
+            db: cnn,
             hash: hash,
             source_type: "file",
             source_id: source_id,
@@ -1373,11 +1398,11 @@ module Memo
           chunk_count = all_chunks.size
           new_vocab.each_with_index do |wf, idx|
             embedding = embed_result.embeddings[chunk_count + idx]
-            Vocab.store_word(@db, wf.word, embedding, wf.count, @service_id)
+            Vocab.store_word(cnn, wf.word, embedding, wf.count, @service_id)
           end
 
           # Update frequencies for existing words
-          Vocab.update_frequencies(@db, existing_vocab, @service_id)
+          Vocab.update_frequencies(cnn, existing_vocab, @service_id)
         end
       end
     end
@@ -1607,10 +1632,10 @@ module Memo
     #
     # Stores the original un-chunked text. Chunk text is extracted
     # using offset/size from the chunks table.
-    private def store_source_text_internal(internal_source_id : Int64, content : String, content_hash : Bytes? = nil, skip_hash : Bool = false)
+    private def store_source_text_internal(internal_source_id : Int64, content : String, content_hash : Bytes? = nil, skip_hash : Bool = false, db : DBHandle = @db)
       hash = skip_hash ? nil : (content_hash || Storage.compute_hash(content))
-      @db.memo_queries.upsert_text(internal_source_id, content, hash, Time.utc.to_unix_ms)
-      @db.memo_dialect.fts_upsert(@db, internal_source_id, content)
+      db.memo_queries.upsert_text(internal_source_id, content, hash, Time.utc.to_unix_ms)
+      db.memo_dialect.fts_upsert(db, internal_source_id, content)
     end
 
     # Embed texts in batches of @batch_size to avoid API input limits
@@ -1638,9 +1663,9 @@ module Memo
     end
 
     # Delete source text by internal ID
-    private def delete_source_text_internal(internal_source_id : Int64)
-      @db.memo_queries.delete_text(internal_source_id)
-      @db.memo_dialect.fts_delete(@db, internal_source_id)
+    private def delete_source_text_internal(internal_source_id : Int64, db : DBHandle = @db)
+      db.memo_queries.delete_text(internal_source_id)
+      db.memo_dialect.fts_delete(db, internal_source_id)
     end
 
     # Get source text by internal source_id
@@ -1748,14 +1773,14 @@ module Memo
       # Delete old and store new atomically
       success_count = 0
 
-      @db.transaction do
+      write_transaction do |cnn, pending|
         # Delete existing chunks for this source before storing new ones
         # This ensures clean state if chunking settings have changed
-        delete_internal(internal_source_id, source_type)
+        delete_internal(cnn, pending, internal_source_id, source_type)
 
         # Store source text once (not per-chunk)
         # Chunk text is extracted using offset/size when needed
-        store_source_text_internal(internal_source_id, text, content_hash) if @text_storage
+        store_source_text_internal(internal_source_id, text, content_hash, db: cnn) if @text_storage
 
         # Store chunk embeddings
         chunks.each_with_index do |(chunk_text, offset, size), idx|
@@ -1764,13 +1789,13 @@ module Memo
           token_count = embed_result.token_counts[idx]
 
           # Store embedding (deduplicated by hash) and add to USearch index
-          inserted, rowid = Storage.store_embedding(@db, hash, token_count, @service_id)
-          USearchIndex.add(@usearch_index, rowid.to_u64, embedding) if inserted
+          inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
+          pending.add(rowid.to_u64, embedding) if inserted
 
           # Create chunk reference with offset/size from chunking
           # All IDs are internal (FK to sources table)
           chunk_id = Storage.create_chunk(
-            db: @db,
+            db: cnn,
             hash: hash,
             source_type: source_type,
             source_id: internal_source_id,
@@ -1789,11 +1814,11 @@ module Memo
           chunk_count = chunks.size
           new_word_freqs.each_with_index do |wf, idx|
             embedding = embed_result.embeddings[chunk_count + idx]
-            Vocab.store_word(@db, wf.word, embedding, wf.count, @service_id)
+            Vocab.store_word(cnn, wf.word, embedding, wf.count, @service_id)
           end
 
           # Update frequencies for existing words
-          Vocab.update_frequencies(@db, existing_word_freqs, @service_id)
+          Vocab.update_frequencies(cnn, existing_word_freqs, @service_id)
         end
       end
 

@@ -1,7 +1,7 @@
 module Memo
   module Dialect
     class Postgres < Base
-      def insert_returning_id(db : DB::Database, sql : String, *args) : Int64
+      def insert_returning_id(db : DBHandle, sql : String, *args) : Int64
         db.scalar("#{sql} RETURNING id", *args).as(Int64)
       end
 
@@ -36,11 +36,11 @@ module Memo
         nil
       end
 
-      def fts_upsert(db : DB::Database, source_id : Int64, content : String)
+      def fts_upsert(db : DBHandle, source_id : Int64, content : String)
         # No-op: the memo_trg_texts_tsv trigger auto-populates content_tsv
       end
 
-      def fts_delete(db : DB::Database, source_id : Int64)
+      def fts_delete(db : DBHandle, source_id : Int64)
         # No-op: content_tsv is a column on memo_texts, deleted with the row
       end
 

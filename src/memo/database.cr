@@ -35,5 +35,26 @@ module Memo
     def load_schema(db : DB::Database)
       init(db)
     end
+
+    # Run the block in a transaction, yielding the connection it holds.
+    #
+    # Every statement in the block must go through the yielded connection
+    # (or its memo_queries). Statements sent to the pool run on another
+    # connection and commit on their own, outside the transaction.
+    #
+    # Given a connection (already inside a transaction), joins it.
+    def transaction(db : DBHandle, & : DB::Connection ->)
+      if db.is_a?(DB::Connection)
+        yield db
+        return
+      end
+
+      db.transaction do |tx|
+        cnn = tx.connection
+        cnn.memo_dialect = db.memo_dialect
+        cnn.memo_queries = db.memo_queries.for_connection(cnn)
+        yield cnn
+      end
+    end
   end
 end

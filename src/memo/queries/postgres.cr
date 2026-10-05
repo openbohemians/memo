@@ -1,5 +1,9 @@
 module Memo
   class Queries::Postgres < Queries
+    def for_connection(cnn : DB::Connection) : Queries
+      Postgres.new(cnn)
+    end
+
     # =========================================================================
     # Services
     # =========================================================================

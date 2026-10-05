@@ -73,9 +73,10 @@ module Memo
       svc = q.get_service_info_by_name(name)
       return false unless svc
 
-      db.transaction do
-        q.clear_default_service
-        q.set_default_service(svc.id)
+      Memo::Database.transaction(db) do |cnn|
+        tq = cnn.memo_queries
+        tq.clear_default_service
+        tq.set_default_service(svc.id)
       end
       true
     end
@@ -125,13 +126,14 @@ module Memo
         )
       end
 
-      db.transaction do
+      Memo::Database.transaction(db) do |cnn|
+        tq = cnn.memo_queries
         if force && !s.empty?
-          hashes = q.get_embedding_hashes_for_service(id)
-          hashes.each { |hash| q.delete_chunks_by_hash(hash) }
-          q.delete_embeddings_by_service(id)
+          hashes = tq.get_embedding_hashes_for_service(id)
+          hashes.each { |hash| tq.delete_chunks_by_hash(hash) }
+          tq.delete_embeddings_by_service(id)
         end
-        q.delete_service(id)
+        tq.delete_service(id)
       end
       true
     end
