@@ -10,7 +10,7 @@ authors:
 
 repository: https://github.com/trans/memo
 
-crystal: ">= 1.10.0"
+crystal: ">= 1.19.1"
 
 dependencies:
   db:
