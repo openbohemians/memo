@@ -67,8 +67,8 @@ module Memo
     # IMPORTANT: Must provide service_id to ensure embeddings are from same vector space.
     #
     # When metadata filters are present (source_type, like, match, sql_where),
-    # pre-filters via SQL to get valid embedding rowids, then uses USearch
-    # filtered_search. When no filters, uses direct USearch search.
+    # see search_filtered for how they're applied. When no filters, uses
+    # direct USearch search.
     def semantic(
       db : DB::Database,
       embedding : Array(Float64),
@@ -89,7 +89,7 @@ module Memo
 
       # Get nearest neighbor candidates from USearch
       usearch_results = if has_filters
-                          search_filtered(db, usearch_index, embedding, service_id, limit, filters, sql_where, like, match, sql_where_args)
+                          search_filtered(db, usearch_index, embedding, service_id, limit, min_score, filters, sql_where, like, match, sql_where_args)
                         else
                           USearchIndex.search(usearch_index, embedding, limit)
                         end
@@ -115,20 +115,119 @@ module Memo
       Storage.increment_read_count(db, chunk_ids)
     end
 
-    # Pre-filter via SQL, then use USearch filtered_search
+    # Unfiltered candidates fetched per filter check, at most (or 25 per
+    # result for large limits). A filter that would need more is narrow
+    # enough that applying it before searching is cheaper: at 20K vectors
+    # of 1536 dimensions, a search for 256 neighbors takes ~4 ms, while
+    # comparing the query directly with 2,000 vectors takes ~4 ms.
+    MAX_CANDIDATES = 256
+
+    # Prefiltered searches compare the query with each match directly when
+    # there are at most this many (else they use USearch's filtered search).
+    EXACT_SCAN_MAX = 2048
+
+    private record FilterClauses,
+      where : Array(String),
+      params : Array(DB::Any),
+      text_join : String,
+      fts_join : String
+
+    # Nearest neighbors that pass the metadata filters.
+    #
+    # What's cheap depends on how many rows a filter matches. A broad filter
+    # is cheapest after searching: take the nearest candidates and check
+    # just those in SQL (collecting every matching row first costs time in
+    # proportion to the collection). A narrow filter is cheapest before:
+    # collect its few rows and compare the query with each directly
+    # (USearch's filtered search wanders much of its graph to find matches
+    # that sparse). So:
+    #
+    # 1. Search unfiltered for a few times `limit`; check those candidates.
+    # 2. If too few pass, size one more search from the pass rate seen,
+    #    with a 2x margin so it rarely comes up short.
+    # 3. If that would take more than MAX_CANDIDATES, the filter is narrow:
+    #    prefilter instead.
     private def search_filtered(
       db : DB::Database,
       usearch_index : USearch::Index,
       embedding : Array(Float64),
       service_id : Int64,
       limit : Int32,
+      min_score : Float64,
       filters : Filters?,
       sql_where : String?,
       like : Array(String)?,
       match : String?,
       sql_where_args : Array(DB::Any),
     ) : Array(USearch::SearchResult)
-      # Build WHERE clauses and params
+      clauses = filter_clauses(db, service_id, filters, sql_where, like, match, sql_where_args)
+
+      k = {limit * 4, 40}.max
+      max_candidates = {MAX_CANDIDATES, limit * 25}.max
+      2.times do |round|
+        candidates = USearchIndex.search(usearch_index, embedding, k)
+        passed = passing(db, service_id, clauses, candidates)
+        return passed.first(limit) if passed.size >= limit
+
+        # More candidates can't help once every vector was one, or once the
+        # farthest of them already scores below min_score
+        exhausted = candidates.size < k
+        return passed if exhausted || candidates.empty? || 1.0 - candidates.last.distance.to_f64 < min_score
+        break if round == 1 || passed.empty?
+
+        k = (k * limit * 2.0 / passed.size).ceil.to_i
+        break if k > max_candidates
+      end
+
+      prefiltered_search(db, usearch_index, embedding, service_id, limit, clauses)
+    end
+
+    # The candidates whose embeddings pass the filters, in the same order
+    private def passing(
+      db : DB::Database,
+      service_id : Int64,
+      clauses : FilterClauses,
+      candidates : Array(USearch::SearchResult),
+    ) : Array(USearch::SearchResult)
+      return candidates if candidates.empty?
+
+      matching = db.memo_queries.filter_candidates(
+        service_id, clauses.params, clauses.where, clauses.text_join, clauses.fts_join,
+        candidates.map(&.key.to_i64))
+      candidates.select { |candidate| matching.includes?(candidate.key) }
+    end
+
+    # Collect every embedding that passes the filters, then search among them
+    private def prefiltered_search(
+      db : DB::Database,
+      usearch_index : USearch::Index,
+      embedding : Array(Float64),
+      service_id : Int64,
+      limit : Int32,
+      clauses : FilterClauses,
+    ) : Array(USearch::SearchResult)
+      valid_rowids = db.memo_queries.search_filtered_rowids(service_id, clauses.params, clauses.where, clauses.text_join, clauses.fts_join)
+      return [] of USearch::SearchResult if valid_rowids.empty?
+
+      if valid_rowids.size <= EXACT_SCAN_MAX
+        USearchIndex.exact_search(usearch_index, embedding, valid_rowids, limit)
+      else
+        USearchIndex.filtered_search(usearch_index, embedding, limit) do |key|
+          valid_rowids.includes?(key)
+        end
+      end
+    end
+
+    # SQL conditions for the metadata filters
+    private def filter_clauses(
+      db : DB::Database,
+      service_id : Int64,
+      filters : Filters?,
+      sql_where : String?,
+      like : Array(String)?,
+      match : String?,
+      sql_where_args : Array(DB::Any),
+    ) : FilterClauses
       where_clauses = ["e.service_id = ?"] of String
       params = [service_id] of DB::Any
 
@@ -174,12 +273,7 @@ module Memo
         params << match
       end
 
-      valid_rowids = db.memo_queries.search_filtered_rowids(service_id, params, where_clauses, text_join, fts_join)
-      return [] of USearch::SearchResult if valid_rowids.empty?
-
-      USearchIndex.filtered_search(usearch_index, embedding, limit) do |key|
-        valid_rowids.includes?(key)
-      end
+      FilterClauses.new(where_clauses, params, text_join, fts_join)
     end
 
     # Fetch chunk metadata for USearch results

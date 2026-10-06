@@ -269,6 +269,17 @@ module Memo
       fts_join : String,
     ) : Set(UInt64)
 
+    # Which of `candidate_ids` pass the filter clauses (looked up by id, so the
+    # cost depends on the number of candidates, not the collection)
+    abstract def filter_candidates(
+      service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      candidate_ids : Array(Int64),
+    ) : Set(UInt64)
+
     abstract def fetch_search_results(
       rowids : Array(Int64),
       service_id : Int64,

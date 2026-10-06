@@ -179,6 +179,20 @@ module Memo
       index.filtered_search(to_f32(query), k: k, &filter)
     end
 
+    # Exact nearest neighbors among `keys`, comparing the query with each.
+    #
+    # Faster than filtered_search when the keys are few: HNSW explores much
+    # of its graph to find matches that sparse.
+    def exact_search(index : USearch::Index, query : Array(Float64), keys : Enumerable(UInt64), k : Int32) : Array(USearch::SearchResult)
+      query_f32 = to_f32(query)
+      results = keys.compact_map do |key|
+        if vector = index.get(key)
+          USearch::SearchResult.new(key, USearch::Index.distance(query_f32, vector))
+        end
+      end
+      results.sort_by!(&.distance).first(k)
+    end
+
     # Retrieve a vector from the index by key.
     #
     # Returns Float64 array for compatibility with the rest of Memo,

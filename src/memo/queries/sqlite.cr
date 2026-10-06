@@ -598,6 +598,38 @@ module Memo
       valid_rowids
     end
 
+    def filter_candidates(
+      service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      candidate_ids : Array(Int64),
+    ) : Set(UInt64)
+      passing = Set(UInt64).new
+      return passing if candidate_ids.empty?
+
+      # CROSS JOIN fixes the join order and INDEXED BY the chunk lookup.
+      # Without table statistics SQLite otherwise starts from whatever the
+      # filter names (e.g. every chunk of a source_type), costing time in
+      # proportion to the collection.
+      placeholders = Array.new(candidate_ids.size, "?").join(", ")
+      @db.query(
+        <<-SQL,
+          SELECT DISTINCT e.rowid
+          FROM memo_embeddings e
+          CROSS JOIN memo_chunks c INDEXED BY memo_idx_chunks_hash ON c.hash = e.hash
+          #{text_join}
+          #{fts_join}
+          WHERE e.rowid IN (#{placeholders}) AND #{where_clauses.join(" AND ")}
+        SQL
+        args: candidate_ids.map(&.as(DB::Any)) + params
+      ) do |rs|
+        rs.each { passing << rs.read(Int64).to_u64 }
+      end
+      passing
+    end
+
     def fetch_search_results(
       rowids : Array(Int64),
       service_id : Int64,

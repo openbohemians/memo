@@ -619,6 +619,40 @@ module Memo
       valid_rowids
     end
 
+    def filter_candidates(
+      service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      candidate_ids : Array(Int64),
+    ) : Set(UInt64)
+      passing = Set(UInt64).new
+      return passing if candidate_ids.empty?
+
+      # Candidates take $1..$n; rewrite the clauses' ? placeholders after them
+      n = 0
+      placeholders = candidate_ids.map { n += 1; "$#{n}" }.join(", ")
+      pg_where = where_clauses.map do |clause|
+        clause.gsub("?") { n += 1; "$#{n}" }
+      end
+
+      @db.query(
+        <<-SQL,
+          SELECT DISTINCT e.eid
+          FROM memo_embeddings e
+          JOIN memo_chunks c ON c.hash = e.hash
+          #{text_join}
+          #{fts_join}
+          WHERE e.eid IN (#{placeholders}) AND #{pg_where.join(" AND ")}
+        SQL
+        args: candidate_ids.map(&.as(DB::Any)) + params
+      ) do |rs|
+        rs.each { passing << rs.read(Int64).to_u64 }
+      end
+      passing
+    end
+
     def fetch_search_results(
       rowids : Array(Int64),
       service_id : Int64,
