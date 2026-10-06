@@ -1,5 +1,6 @@
 require "http/client"
 require "json"
+require "./http_pool"
 
 module Memo
   module Providers
@@ -21,6 +22,7 @@ module Memo
         @model : String = "voyage-3",
         @base_url : String = DEFAULT_BASE_URL
       )
+        @http = HTTPPool.new(@base_url)
       end
 
       def embed_text(text : String, input_type : String? = nil) : {Array(Float64), Int32}
@@ -37,24 +39,15 @@ module Memo
         body["input"] = texts
         body["input_type"] = input_type if input_type
 
-        client = HTTP::Client.new(uri)
-        client.connect_timeout = 30.seconds
-        client.read_timeout = 120.seconds
-
-        # Close the connection once the body is read; each call opens its
-        # own, so under load they'd otherwise pile up until GC.
-        response = begin
-          client.post(
-            uri.request_target,
-            headers: HTTP::Headers{
-              "Authorization" => "Bearer #{@api_key}",
-              "Content-Type"  => "application/json",
-            },
-            body: body.to_json
-          )
-        ensure
-          client.close
-        end
+        # Reuses connections and retries rate limits and transient errors
+        response = @http.post(
+          uri.request_target,
+          headers: HTTP::Headers{
+            "Authorization" => "Bearer #{@api_key}",
+            "Content-Type"  => "application/json",
+          },
+          body: body.to_json
+        )
 
         unless response.success?
           error_msg = begin
