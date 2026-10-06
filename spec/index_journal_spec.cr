@@ -49,6 +49,26 @@ describe Memo::IndexJournal do
     end
   end
 
+  it "saves only when the index has changed" do
+    with_test_db_path do |db_path|
+      service = open_service(db_path)
+      checkpoint_path = Memo::USearchIndex.checkpoint_path(service.index_path)
+
+      service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      service.save_index
+      first = File.read(checkpoint_path)
+      saved_at = File.info(service.index_path).modification_time
+
+      service.save_index # nothing changed: no write
+      File.info(service.index_path).modification_time.should eq saved_at
+
+      service.index(source_type: "doc", source_id: 2_i64, text: "tiny haunted robot")
+      service.save_index
+      File.read(checkpoint_path).to_i64.should be > first.to_i64
+      service.close
+    end
+  end
+
   it "replays nothing after a clean restart" do
     with_test_db_path do |db_path|
       first = open_service(db_path)

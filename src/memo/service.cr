@@ -135,6 +135,9 @@ module Memo
     # still has them; saves skip the checkpoint so they replay on next open.
     @index_out_of_step = false
 
+    # Set when the in-memory index has changes the saved file lacks
+    @index_dirty = false
+
     # Track whether text storage is enabled
     getter? text_storage : Bool = false
 
@@ -649,7 +652,9 @@ module Memo
         next unless committed
 
         begin
+          changed = !pending.empty?
           pending.apply(@usearch_index)
+          @index_dirty = true if changed
         rescue ex
           @index_out_of_step = true
           raise ex
@@ -680,14 +685,18 @@ module Memo
     # Save the USearch index to disk and checkpoint the journal.
     #
     # Safe to call at any time (e.g. periodically, or after processing the
-    # queue). The more often it runs, the less there is to replay after a
+    # queue), and does nothing when the index hasn't changed since the last
+    # save. The more often it runs, the less there is to replay after a
     # crash; close calls it too.
     def save_index
       @write_lock.synchronize do
+        next if @usearch_index.closed?
+
         if @index_out_of_step
           USearchIndex.save(@usearch_index, @index_path)
-        else
+        elsif @index_dirty
           IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
+          @index_dirty = false
         end
       end
     end

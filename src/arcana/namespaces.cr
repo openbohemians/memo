@@ -90,6 +90,12 @@ module Memo
       end
     end
 
+    # Snapshot of the open services, for work done outside the lock
+    # (e.g. periodic index saves).
+    def open_services : Array({String, Memo::Service})
+      @mutex.synchronize { @services.to_a }
+    end
+
     # Preload all namespaces marked with preload: true in their config.
     def preload_all
       to_preload = @configs.values.select(&.preload).map(&.ns)
@@ -203,6 +209,11 @@ module Memo
         index_dir: config.index_dir,
         chunking_max_tokens: chunking,
       )
+      r = svc.index_recovery
+      if r.replayed > 0 || r.rebuilt > 0 || r.missing > 0
+        STDERR.puts "memo-arcana: '#{ns}' index recovery: #{r.replayed} replayed, " \
+                    "#{r.rebuilt} rebuilt, #{r.missing} missing (re-index to restore)"
+      end
       @services[ns] = svc
       svc
     end

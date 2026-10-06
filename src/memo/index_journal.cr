@@ -75,6 +75,11 @@ module Memo
     # Record the removal of every service's embedding of `hash`, inside the
     # caller's transaction. Only `service_id`'s index is open here; other
     # services pick up their removals from the log when they next open.
+    #
+    # Limitation: if another Service has one of those indexes open at the
+    # same time, its next save can checkpoint past the removal, leaving a
+    # stale vector in that index. Searches filter it out (its embedding row
+    # is gone), but it takes up one of the nearest-neighbor slots.
     def record_removals(
       cnn : DB::Connection,
       pending : USearchIndex::Pending,

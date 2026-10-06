@@ -147,6 +147,10 @@ module Memo
         @changes << {key, nil}
       end
 
+      def empty? : Bool
+        @changes.empty?
+      end
+
       def apply(index : USearch::Index)
         @changes.each do |key, embedding|
           if embedding

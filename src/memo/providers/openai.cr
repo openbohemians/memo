@@ -42,14 +42,20 @@ module Memo
         client.connect_timeout = 30.seconds
         client.read_timeout = 120.seconds
 
-        response = client.post(
-          uri.request_target,
-          headers: HTTP::Headers{
-            "Authorization" => "Bearer #{@api_key}",
-            "Content-Type"  => "application/json",
-          },
-          body: body.to_json
-        )
+        # Close the connection once the body is read; each call opens its
+        # own, so under load they'd otherwise pile up until GC.
+        response = begin
+          client.post(
+            uri.request_target,
+            headers: HTTP::Headers{
+              "Authorization" => "Bearer #{@api_key}",
+              "Content-Type"  => "application/json",
+            },
+            body: body.to_json
+          )
+        ensure
+          client.close
+        end
 
         unless response.success?
           error_msg = begin

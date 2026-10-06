@@ -16,6 +16,8 @@ require "arcana-core"
 #   ARCANA_HOST           — Arcana server host (default: 127.0.0.1)
 #   ARCANA_PORT           — Arcana server port (default: 19118)
 #   MEMO_NAMESPACES       — Path to namespaces config (default: /etc/memo/namespaces.yaml)
+#   MEMO_MAX_CONCURRENCY  — Requests handled at once (default: 32)
+#   MEMO_SAVE_INTERVAL    — Seconds between saves of changed indexes (default: 60)
 
 # ANSI color helpers
 DIM    = "\e[2m"
@@ -71,6 +73,8 @@ end
 arcana_host = ENV["ARCANA_HOST"]? || "127.0.0.1"
 arcana_port = (ENV["ARCANA_PORT"]? || "19118").to_i
 config_path = ENV["MEMO_NAMESPACES"]? || "/etc/memo/namespaces.yaml"
+max_concurrency = (ENV["MEMO_MAX_CONCURRENCY"]? || "32").to_i
+save_interval = (ENV["MEMO_SAVE_INTERVAL"]? || "60").to_i
 
 namespaces = Memo::Namespaces.new
 if File.exists?(config_path)
@@ -84,6 +88,8 @@ STDERR.puts "#{DIM}┌───────────────────�
 STDERR.puts "#{DIM}│#{RESET} config     #{DIM}│#{RESET} #{File.exists?(config_path) ? config_path : "(none)"}"
 STDERR.puts "#{DIM}│#{RESET} namespaces #{DIM}│#{RESET} #{namespaces.configs.size} registered"
 STDERR.puts "#{DIM}│#{RESET} bus        #{DIM}│#{RESET} #{arcana_host}:#{arcana_port}"
+STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurrency} at once"
+STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} every #{save_interval}s (changed indexes)"
 STDERR.puts "#{DIM}└──────────────────────────────────────────────────#{RESET}"
 
 namespaces.configs.each_value do |c|
@@ -108,9 +114,49 @@ client = Arcana::Client.new(
 )
 Memo::Providers::Bus.client = client
 
+# Requests run concurrently, up to max_concurrency at a time. The client
+# calls on_message from its WebSocket read loop, so handling a request there
+# would hold up every other request, and the replies that memo's own bus
+# calls (the bus/* embedding formats) are waiting for.
+slots = Channel(Nil).new(max_concurrency)
 client.on_message do |envelope|
+  spawn do
+    slots.send(nil)
+    begin
+      handle_request(client, handler, envelope)
+    ensure
+      slots.receive
+    end
+  end
+end
+
+# Save changed indexes periodically, so a crash leaves little for the
+# journal to replay on the next start.
+spawn do
+  loop do
+    sleep save_interval.seconds
+    namespaces.open_services.each do |ns, svc|
+      svc.save_index
+    rescue ex
+      log "#{RED}error#{RESET}      saving #{ns} index: #{ex.message}"
+    end
+  end
+end
+
+# Answer one request envelope.
+def handle_request(client : Arcana::Client, handler : Memo::ArcanaService, envelope : Arcana::Envelope)
+  payload = envelope.payload
+
+  # A reply (result, need, help, error) isn't a request: e.g. an embedding
+  # reply that arrived after memo stopped waiting for it. Answering it with
+  # an error could start an error ping-pong with the sender.
+  status = payload.as_h? ? Arcana::Protocol.status(payload) : nil
+  if status && status != "request"
+    log "#{DIM}ignored    #{envelope.from.ljust(12)} unexpected #{status} reply#{RESET}"
+    return
+  end
+
   begin
-    payload = envelope.payload
     data = if payload.as_h? && payload["_proto"]?
              payload["data"]? || JSON::Any.new(nil)
            else
@@ -125,7 +171,7 @@ client.on_message do |envelope|
     if payload.as_h? && payload["_intent"]?.try(&.as_s?) == "help"
       help_payload = JSON.parse(%({"_proto":"arcana/1","_status":"help","guide":#{Memo::ArcanaService::GUIDE.to_json},"schema":#{Memo::ArcanaService::SCHEMA.to_json}}))
       client.send(envelope.reply(from: "memo:rag", payload: help_payload))
-      next
+      return
     end
 
     result = handler.handle(data)
