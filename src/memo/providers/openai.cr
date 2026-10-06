@@ -38,6 +38,9 @@ module Memo
         body["model"] = @model
         body["input"] = texts
         body["encoding_format"] = "float"
+        # OpenAI's own API ignores input_type (it isn't an OpenAI parameter;
+        # memo sent it for months without error), but some OpenAI-compatible
+        # APIs use it to embed queries and documents differently.
         body["input_type"] = input_type if input_type
 
         # Reuses connections and retries rate limits and transient errors

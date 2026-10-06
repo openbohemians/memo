@@ -7,6 +7,7 @@ require "http/server"
 private class FakeEmbeddingAPI
   getter requests = 0
   getter ports = Set(Int32).new
+  getter bodies = [] of JSON::Any
   getter base_url : String
 
   def initialize(@script = [] of {Int32, String}, @delay : Time::Span = Time::Span.zero)
@@ -16,6 +17,7 @@ private class FakeEmbeddingAPI
       sleep @delay unless @delay.zero?
 
       body = ctx.request.body.try(&.gets_to_end) || ""
+      @bodies << JSON.parse(body) unless body.empty?
       status, response = @script.shift? || {200, embeddings_for(body)}
       ctx.response.status_code = status
       ctx.response.headers["Retry-After"] = "0" unless status == 200
@@ -104,6 +106,16 @@ describe Memo::Providers::HTTPPool do
       end
       api.requests.should eq 8
       api.ports.size.should eq 4
+    end
+  end
+end
+
+describe Memo::Providers::OpenAI do
+  it "passes input_type through for OpenAI-compatible APIs that use it" do
+    with_fake_api do |api, provider|
+      provider.embed_text("hello", "query")
+      api.bodies.first["input_type"].should eq "query"
+      api.bodies.first.as_h.keys.sort.should eq ["encoding_format", "input", "input_type", "model"]
     end
   end
 end
