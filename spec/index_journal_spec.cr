@@ -69,6 +69,36 @@ describe Memo::IndexJournal do
     end
   end
 
+  it "saves on its own once enough changes are unsaved" do
+    with_test_db_path do |db_path|
+      service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50,
+        index_save_changes: 3, index_save_interval: 1.hour)
+      2.times { |i| service.index(source_type: "doc", source_id: i.to_i64, text: "document #{i}") }
+      File.exists?(service.index_path).should be_false
+
+      service.index(source_type: "doc", source_id: 2_i64, text: "document 2")
+      20.times { break if File.exists?(service.index_path); sleep 10.milliseconds } # saves in a separate fiber
+      File.exists?(service.index_path).should be_true
+      File.read(Memo::USearchIndex.checkpoint_path(service.index_path)).to_i64.should be > 0
+      service.close
+    end
+  end
+
+  it "saves when due, not on every call" do
+    with_test_db_path do |db_path|
+      service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50,
+        index_save_changes: 100, index_save_interval: 50.milliseconds)
+      service.index(source_type: "doc", source_id: 1_i64, text: "document 1")
+      service.save_index_if_due
+      File.exists?(service.index_path).should be_false
+
+      sleep 60.milliseconds # one change, unsaved past the interval
+      service.save_index_if_due
+      File.exists?(service.index_path).should be_true
+      service.close
+    end
+  end
+
   it "replays nothing after a clean restart" do
     with_test_db_path do |db_path|
       first = open_service(db_path)

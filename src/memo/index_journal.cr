@@ -104,16 +104,18 @@ module Memo
     end
 
     # Save the index and checkpoint the journal: record the last log entry
-    # the saved file includes, then prune the log up to it.
+    # the saved file includes, then prune the log up to it. The file is
+    # written on a separate thread (see USearchIndex.save_in_background).
     #
     # The caller must make sure every committed change has been applied to
-    # `index`, or the checkpoint would claim changes the file lacks.
+    # `index`, and keep writers out until this returns, or the checkpoint
+    # would claim changes the file lacks.
     def checkpoint(db : DB::Database, index : USearch::Index, service_id : Int64, path : String) : Nil
       q = db.memo_queries
       pruned_through = q.get_index_state(service_id).try(&.[0]) || 0_i64
       seq = {q.max_index_log_seq(service_id), pruned_through}.max
 
-      USearchIndex.save(index, path)
+      USearchIndex.save_in_background(index, path)
       write_checkpoint(path, seq)
       return if seq == pruned_through
 

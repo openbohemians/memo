@@ -135,8 +135,18 @@ module Memo
     # still has them; saves skip the checkpoint so they replay on next open.
     @index_out_of_step = false
 
-    # Set when the in-memory index has changes the saved file lacks
-    @index_dirty = false
+    # Index changes applied since the last save, and when that was. A save
+    # rewrites the whole index file, so memo saves on a policy (see
+    # save_index_if_due) rather than after every change; the journal
+    # replays whatever is unsaved after a crash, ~4 ms per change.
+    @unsaved_changes = 0
+    @saved_at = Time.instant
+    @save_scheduled = false
+
+    # Save once this many index changes are unsaved, or once any have been
+    # unsaved this long
+    getter index_save_changes : Int32 = 10_000
+    getter index_save_interval : Time::Span = 5.minutes
 
     # Track whether text storage is enabled
     getter? text_storage : Bool = false
@@ -191,6 +201,8 @@ module Memo
       query_cache_size : Int32 = 10_000,
       persistent_query_cache : Bool = true,
       track_matches : Bool = true,
+      @index_save_changes : Int32 = 10_000,
+      @index_save_interval : Time::Span = 5.minutes,
     )
       # Detect backend from connection string
       if db_path.starts_with?("postgres")
@@ -290,6 +302,8 @@ module Memo
       query_cache_size : Int32 = 10_000,
       persistent_query_cache : Bool = true,
       track_matches : Bool = true,
+      @index_save_changes : Int32 = 10_000,
+      @index_save_interval : Time::Span = 5.minutes,
     )
       @db = db
       @owns_db = false # Caller owns the connection
@@ -652,13 +666,33 @@ module Memo
         next unless committed
 
         begin
-          changed = !pending.empty?
+          change_count = pending.size
           pending.apply(@usearch_index)
-          @index_dirty = true if changed
+          @unsaved_changes += change_count
         rescue ex
           @index_out_of_step = true
           raise ex
         end
+      end
+      schedule_save if save_due?
+    end
+
+    private def save_due? : Bool
+      return false if @unsaved_changes == 0
+      @unsaved_changes >= @index_save_changes || Time.instant - @saved_at >= @index_save_interval
+    end
+
+    # Save in a separate fiber, so the write that made it due returns now
+    private def schedule_save
+      return if @save_scheduled
+      @save_scheduled = true
+      spawn do
+        save_index_if_due
+      rescue ex
+        # Unsaved changes stay in the journal; the next due check retries
+        STDERR.puts "memo: saving #{@index_path} failed: #{ex.message}"
+      ensure
+        @save_scheduled = false
       end
     end
 
@@ -682,23 +716,31 @@ module Memo
       # Already closed or other error - ignore
     end
 
-    # Save the USearch index to disk and checkpoint the journal.
+    # Save the USearch index to disk and checkpoint the journal, now.
     #
-    # Safe to call at any time (e.g. periodically, or after processing the
-    # queue), and does nothing when the index hasn't changed since the last
-    # save. The more often it runs, the less there is to replay after a
-    # crash; close calls it too.
+    # Does nothing when the index hasn't changed since the last save. The
+    # file is written on a separate thread: searches carry on meanwhile,
+    # writes wait. close calls this; for routine saves prefer
+    # save_index_if_due (memo also schedules those itself after writes).
     def save_index
       @write_lock.synchronize do
-        next if @usearch_index.closed?
+        next if @usearch_index.closed? || (@unsaved_changes == 0 && !@index_out_of_step)
 
         if @index_out_of_step
-          USearchIndex.save(@usearch_index, @index_path)
-        elsif @index_dirty
+          USearchIndex.save_in_background(@usearch_index, @index_path)
+        else
           IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
-          @index_dirty = false
         end
+        @unsaved_changes = 0
+        @saved_at = Time.instant
       end
+    end
+
+    # Save if the policy says it's time: index_save_changes unsaved changes,
+    # or any unsaved for index_save_interval. Cheap to call often (e.g. after
+    # each queue run, or from a timer).
+    def save_index_if_due
+      save_index if save_due?
     end
 
     # =========================================================================

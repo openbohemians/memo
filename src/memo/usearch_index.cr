@@ -87,6 +87,20 @@ module Memo
       File.rename(tmp, path)
     end
 
+    # Save on a separate system thread, suspending only the calling fiber.
+    #
+    # Writing a large index takes seconds (it's one blocking call), and on a
+    # single-threaded runtime that would freeze every other fiber. Searches
+    # can run meanwhile (they only read the index); the caller must keep
+    # writers out until this returns.
+    def save_in_background(index : USearch::Index, path : String)
+      {% if (!flag?(:without_mt) && !flag?(:preview_mt)) || flag?(:execution_context) %}
+        Fiber::ExecutionContext::Isolated.new("memo-index-save") { save(index, path) }.wait
+      {% else %}
+        save(index, path)
+      {% end %}
+    end
+
     # Path of the journal checkpoint saved beside an index file.
     def checkpoint_path(path : String) : String
       "#{path}.checkpoint"
@@ -149,6 +163,10 @@ module Memo
 
       def empty? : Bool
         @changes.empty?
+      end
+
+      def size : Int32
+        @changes.size
       end
 
       def apply(index : USearch::Index)

@@ -17,7 +17,7 @@ require "arcana-core"
 #   ARCANA_PORT           — Arcana server port (default: 19118)
 #   MEMO_NAMESPACES       — Path to namespaces config (default: /etc/memo/namespaces.yaml)
 #   MEMO_MAX_CONCURRENCY  — Requests handled at once (default: 32)
-#   MEMO_SAVE_INTERVAL    — Seconds between saves of changed indexes (default: 60)
+#   MEMO_SAVE_INTERVAL    — Seconds between checks for an index save that's due (default: 60)
 
 # ANSI color helpers
 DIM    = "\e[2m"
@@ -89,7 +89,7 @@ STDERR.puts "#{DIM}│#{RESET} config     #{DIM}│#{RESET} #{File.exists?(confi
 STDERR.puts "#{DIM}│#{RESET} namespaces #{DIM}│#{RESET} #{namespaces.configs.size} registered"
 STDERR.puts "#{DIM}│#{RESET} bus        #{DIM}│#{RESET} #{arcana_host}:#{arcana_port}"
 STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurrency} at once"
-STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} every #{save_interval}s (changed indexes)"
+STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} checked every #{save_interval}s (due after 10,000 changes or 5 min)"
 STDERR.puts "#{DIM}└──────────────────────────────────────────────────#{RESET}"
 
 namespaces.configs.each_value do |c|
@@ -130,13 +130,13 @@ client.on_message do |envelope|
   end
 end
 
-# Save changed indexes periodically, so a crash leaves little for the
-# journal to replay on the next start.
+# Memo saves an index on its own once enough changes are unsaved; this
+# also saves ones that have been unsaved too long without further writes.
 spawn do
   loop do
     sleep save_interval.seconds
     namespaces.open_services.each do |ns, svc|
-      svc.save_index
+      svc.save_index_if_due
     rescue ex
       log "#{RED}error#{RESET}      saving #{ns} index: #{ex.message}"
     end
