@@ -13,6 +13,7 @@ module Memo
       dialect.schema_statements.each do |statement|
         db.exec(statement)
       end
+      dialect.migrate(db)
     end
 
     # Create database connection and initialize schema (standalone mode)

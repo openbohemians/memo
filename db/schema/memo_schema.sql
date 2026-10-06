@@ -231,6 +231,12 @@ CREATE INDEX IF NOT EXISTS memo_idx_query_cache_service ON memo_query_cache(serv
 -- far the log has been pruned and whether older vectors have been backfilled.
 -- =============================================================================
 
+-- One-time migrations memo has applied to this database
+CREATE TABLE IF NOT EXISTS memo_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS memo_vectors (
     embedding_id INTEGER PRIMARY KEY, -- memo_embeddings rowid
     service_id INTEGER NOT NULL,

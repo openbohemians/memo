@@ -36,6 +36,10 @@ module Memo
       # Get schema DDL statements.
       abstract def schema_statements : Array(String)
 
+      # One-time data migrations, run by Database.init after the schema.
+      def migrate(db : DB::Database) : Nil
+      end
+
       # Get the database file path from a connection, if applicable.
       #
       # SQLite: reads pragma_database_list

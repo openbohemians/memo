@@ -39,17 +39,33 @@ module Memo
         )
       end
 
+      # FTS rows are keyed by rowid = source_id. An FTS5 table can only look
+      # rows up by rowid (or MATCH); filtering on its source_id column scans
+      # the whole table, which made each indexed document slower than the
+      # last (9 ms per lookup at 150K documents).
       def fts_upsert(db : DBHandle, source_id : Int64, content : String)
-        db.exec("DELETE FROM memo_texts_fts WHERE source_id = ?", source_id)
-        db.exec("INSERT INTO memo_texts_fts (source_id, content) VALUES (?, ?)", source_id, content)
+        db.exec("DELETE FROM memo_texts_fts WHERE rowid = ?", source_id)
+        db.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) VALUES (?, ?, ?)", source_id, source_id, content)
       end
 
       def fts_delete(db : DBHandle, source_id : Int64)
-        db.exec("DELETE FROM memo_texts_fts WHERE source_id = ?", source_id)
+        db.exec("DELETE FROM memo_texts_fts WHERE rowid = ?", source_id)
       end
 
       def fts_join_sql : String
-        "JOIN memo_texts_fts ON c.source_id = memo_texts_fts.source_id"
+        "JOIN memo_texts_fts ON memo_texts_fts.rowid = c.source_id"
+      end
+
+      def migrate(db : DB::Database) : Nil
+        # Databases from before FTS rows were keyed by source_id: rebuild
+        # the FTS table from memo_texts once.
+        return if db.query_one?("SELECT 1 FROM memo_meta WHERE key = 'fts_rowid_is_source_id'", as: Int32)
+
+        Memo::Database.transaction(db) do |cnn|
+          cnn.exec("DELETE FROM memo_texts_fts")
+          cnn.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) SELECT source_id, source_id, content FROM memo_texts")
+          cnn.exec("INSERT INTO memo_meta (key, value) VALUES ('fts_rowid_is_source_id', '1')")
+        end
       end
 
       def fts_where_sql : String
