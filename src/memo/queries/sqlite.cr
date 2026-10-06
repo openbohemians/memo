@@ -690,6 +690,112 @@ module Memo
     end
 
     # =========================================================================
+    # Vectors and index journal
+    # =========================================================================
+
+    def upsert_vector(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil
+      @db.exec(
+        "INSERT OR REPLACE INTO memo_vectors (embedding_id, service_id, vector) VALUES (?, ?, ?)",
+        embedding_id, service_id, vector
+      )
+    end
+
+    def get_vector(embedding_id : Int64) : Bytes?
+      @db.query_one?("SELECT vector FROM memo_vectors WHERE embedding_id = ?", embedding_id, as: Bytes)
+    end
+
+    def delete_vector(embedding_id : Int64) : Nil
+      @db.exec("DELETE FROM memo_vectors WHERE embedding_id = ?", embedding_id)
+    end
+
+    def count_vectors(service_id : Int64) : Int64
+      @db.scalar("SELECT COUNT(*) FROM memo_vectors WHERE service_id = ?", service_id).as(Int64)
+    end
+
+    def each_vector(service_id : Int64, & : Int64, Bytes ->) : Nil
+      @db.query("SELECT embedding_id, vector FROM memo_vectors WHERE service_id = ?", service_id) do |rs|
+        rs.each { yield rs.read(Int64), rs.read(Bytes) }
+      end
+    end
+
+    def embedding_ids_for_hash(hash : Bytes) : Array({Int64, Int64})
+      ids = [] of {Int64, Int64}
+      @db.query("SELECT rowid, service_id FROM memo_embeddings WHERE hash = ?", hash) do |rs|
+        rs.each { ids << {rs.read(Int64), rs.read(Int64)} }
+      end
+      ids
+    end
+
+    def embedding_ids_without_vectors(service_id : Int64) : Array(Int64)
+      ids = [] of Int64
+      @db.query(
+        "SELECT e.rowid FROM memo_embeddings e
+         LEFT JOIN memo_vectors v ON v.embedding_id = e.rowid
+         WHERE e.service_id = ? AND v.embedding_id IS NULL",
+        service_id
+      ) do |rs|
+        rs.each { ids << rs.read(Int64) }
+      end
+      ids
+    end
+
+    def delete_embedding(embedding_id : Int64) : Nil
+      @db.exec("DELETE FROM memo_embeddings WHERE rowid = ?", embedding_id)
+    end
+
+    def log_index_change(service_id : Int64, embedding_id : Int64) : Nil
+      @db.exec("INSERT INTO memo_index_log (service_id, embedding_id) VALUES (?, ?)", service_id, embedding_id)
+    end
+
+    def index_changes_since(service_id : Int64, seq : Int64) : Array(Int64)
+      ids = [] of Int64
+      @db.query(
+        "SELECT DISTINCT embedding_id FROM memo_index_log WHERE service_id = ? AND seq > ?",
+        service_id, seq
+      ) do |rs|
+        rs.each { ids << rs.read(Int64) }
+      end
+      ids
+    end
+
+    def max_index_log_seq(service_id : Int64) : Int64
+      @db.scalar("SELECT COALESCE(MAX(seq), 0) FROM memo_index_log WHERE service_id = ?", service_id).as(Int64)
+    end
+
+    def prune_index_log(service_id : Int64, through : Int64) : Nil
+      @db.exec("DELETE FROM memo_index_log WHERE service_id = ? AND seq <= ?", service_id, through)
+    end
+
+    def get_index_state(service_id : Int64) : {Int64, Bool}?
+      @db.query_one?(
+        "SELECT pruned_through, vectors_backfilled FROM memo_index_state WHERE service_id = ?",
+        service_id
+      ) { |rs| {rs.read(Int64), rs.read(Int64) == 1} }
+    end
+
+    def set_index_pruned_through(service_id : Int64, seq : Int64) : Nil
+      @db.exec(
+        "INSERT INTO memo_index_state (service_id, pruned_through) VALUES (?, ?)
+         ON CONFLICT(service_id) DO UPDATE SET pruned_through = excluded.pruned_through",
+        service_id, seq
+      )
+    end
+
+    def set_vectors_backfilled(service_id : Int64) : Nil
+      @db.exec(
+        "INSERT INTO memo_index_state (service_id, vectors_backfilled) VALUES (?, 1)
+         ON CONFLICT(service_id) DO UPDATE SET vectors_backfilled = 1",
+        service_id
+      )
+    end
+
+    def delete_index_data(service_id : Int64) : Nil
+      @db.exec("DELETE FROM memo_vectors WHERE service_id = ?", service_id)
+      @db.exec("DELETE FROM memo_index_log WHERE service_id = ?", service_id)
+      @db.exec("DELETE FROM memo_index_state WHERE service_id = ?", service_id)
+    end
+
+    # =========================================================================
     # Clustering
     # =========================================================================
 

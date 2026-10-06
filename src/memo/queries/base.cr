@@ -292,6 +292,46 @@ module Memo
     abstract def get_recent_query_cache(service_id : Int64, limit : Int32) : Array({String, Bytes, Int32})
 
     # =========================================================================
+    # Vectors and index journal
+    # =========================================================================
+
+    abstract def upsert_vector(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil
+
+    abstract def get_vector(embedding_id : Int64) : Bytes?
+
+    abstract def delete_vector(embedding_id : Int64) : Nil
+
+    abstract def count_vectors(service_id : Int64) : Int64
+
+    abstract def each_vector(service_id : Int64, & : Int64, Bytes ->) : Nil
+
+    # {embedding id, service id} for every service's embedding of a hash
+    abstract def embedding_ids_for_hash(hash : Bytes) : Array({Int64, Int64})
+
+    abstract def embedding_ids_without_vectors(service_id : Int64) : Array(Int64)
+
+    abstract def delete_embedding(embedding_id : Int64) : Nil
+
+    abstract def log_index_change(service_id : Int64, embedding_id : Int64) : Nil
+
+    # Distinct embedding ids logged after `seq`
+    abstract def index_changes_since(service_id : Int64, seq : Int64) : Array(Int64)
+
+    abstract def max_index_log_seq(service_id : Int64) : Int64
+
+    abstract def prune_index_log(service_id : Int64, through : Int64) : Nil
+
+    # {pruned_through, vectors_backfilled}
+    abstract def get_index_state(service_id : Int64) : {Int64, Bool}?
+
+    abstract def set_index_pruned_through(service_id : Int64, seq : Int64) : Nil
+
+    abstract def set_vectors_backfilled(service_id : Int64) : Nil
+
+    # Remove a service's vectors, journal entries and journal state
+    abstract def delete_index_data(service_id : Int64) : Nil
+
+    # =========================================================================
     # Clustering
     # =========================================================================
 

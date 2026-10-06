@@ -219,3 +219,36 @@ CREATE TABLE IF NOT EXISTS memo_query_cache (
 );
 
 CREATE INDEX IF NOT EXISTS memo_idx_query_cache_service ON memo_query_cache(service_id, created_at);
+
+-- =============================================================================
+-- Stored vectors and index journal
+--
+-- memo_vectors keeps every embedding's vector (IEEE 16-bit floats, the
+-- precision the USearch index stores), so the index can be rebuilt without
+-- calling the embedding API. memo_index_log records each embedding added or
+-- removed, in the same transaction as the change. On open, memo replays the
+-- entries newer than the index file's checkpoint. memo_index_state tracks how
+-- far the log has been pruned and whether older vectors have been backfilled.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS memo_vectors (
+    embedding_id INTEGER PRIMARY KEY, -- memo_embeddings rowid
+    service_id INTEGER NOT NULL,
+    vector BLOB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS memo_idx_vectors_service ON memo_vectors(service_id);
+
+CREATE TABLE IF NOT EXISTS memo_index_log (
+    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_id INTEGER NOT NULL,
+    embedding_id INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS memo_idx_index_log_service ON memo_index_log(service_id, seq);
+
+CREATE TABLE IF NOT EXISTS memo_index_state (
+    service_id INTEGER PRIMARY KEY,
+    pruned_through INTEGER NOT NULL DEFAULT 0,
+    vectors_backfilled INTEGER NOT NULL DEFAULT 0
+);

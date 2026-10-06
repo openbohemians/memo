@@ -61,10 +61,35 @@ module Memo
       end
     end
 
+    # Load the index at `path`, or create an empty one when the file is
+    # missing or can't be loaded (corrupt, wrong dimensions). Returns the
+    # index and whether it was loaded from the file.
+    def load_or_create(path : String, dimensions : Int32) : {USearch::Index, Bool}
+      if File.exists?(path)
+        begin
+          return {USearch::Index.load(path, dimensions: dimensions, metric: :cos, quantization: :f16), true}
+        rescue
+          # Fall through: the caller rebuilds it from stored vectors
+        end
+      end
+      Dir.mkdir_p(File.dirname(path))
+      {USearch::Index.new(dimensions: dimensions, metric: :cos, quantization: :f16), false}
+    end
+
     # Save the index to disk.
+    #
+    # Writes a temporary file and renames it over `path`, so a crash
+    # mid-save leaves the previous file intact.
     def save(index : USearch::Index, path : String)
       Dir.mkdir_p(File.dirname(path))
-      index.save(path)
+      tmp = "#{path}.tmp"
+      index.save(tmp)
+      File.rename(tmp, path)
+    end
+
+    # Path of the journal checkpoint saved beside an index file.
+    def checkpoint_path(path : String) : String
+      "#{path}.checkpoint"
     end
 
     # Save and close the index, freeing resources.
@@ -73,9 +98,10 @@ module Memo
       index.close
     end
 
-    # Delete the index file from disk.
+    # Delete the index file (and its journal checkpoint) from disk.
     def delete_file(path : String)
       File.delete(path) if File.exists?(path)
+      File.delete(checkpoint_path(path)) if File.exists?(checkpoint_path(path))
     end
 
     # Convert Float64 array to Float32 array for USearch.

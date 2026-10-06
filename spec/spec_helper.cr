@@ -38,8 +38,9 @@ def with_test_db_path(&block : String ->)
     yield db_path
   ensure
     File.delete(db_path) if File.exists?(db_path)
-    # Clean up USearch index files
+    # Clean up USearch index files and their journal checkpoints
     Dir.glob("#{File.dirname(db_path)}/*.usearch").each { |f| File.delete(f) rescue nil }
+    Dir.glob("#{File.dirname(db_path)}/*.usearch.checkpoint").each { |f| File.delete(f) rescue nil }
   end
 end
 

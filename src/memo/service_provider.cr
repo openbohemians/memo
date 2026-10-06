@@ -133,6 +133,7 @@ module Memo
           hashes.each { |hash| tq.delete_chunks_by_hash(hash) }
           tq.delete_embeddings_by_service(id)
         end
+        tq.delete_index_data(id)
         tq.delete_service(id)
       end
       true

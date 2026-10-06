@@ -109,6 +109,9 @@ module Memo
     getter index_path : String
     getter query_cache : QueryCache
 
+    # What opening the index took (journal replay, rebuild, missing vectors)
+    getter index_recovery : IndexJournal::Recovery
+
     # Private struct for init_provider return value
     private record ProviderConfig,
       provider : Providers::Base,
@@ -122,6 +125,15 @@ module Memo
 
     # Track whether we own the db connection (for close behavior)
     @owns_db : Bool = true
+
+    # Held for a write transaction plus applying its index changes, and for
+    # saving the index, so a save never checkpoints a committed change the
+    # in-memory index hasn't applied yet.
+    @write_lock = Mutex.new
+
+    # Set when applying committed changes to the index failed. The journal
+    # still has them; saves skip the checkpoint so they replay on next open.
+    @index_out_of_step = false
 
     # Track whether text storage is enabled
     getter? text_storage : Bool = false
@@ -227,7 +239,7 @@ module Memo
                     else
                       USearchIndex.index_path(db_path, config.format, config.model, config.dimensions)
                     end
-      @usearch_index = USearchIndex.open(@index_path, config.dimensions)
+      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -314,7 +326,7 @@ module Memo
                     else
                       USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, config.format, config.model, config.dimensions)
                     end
-      @usearch_index = USearchIndex.open(@index_path, config.dimensions)
+      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -613,9 +625,7 @@ module Memo
 
       hashes.each do |hash|
         if q.count_chunks_by_hash(hash) == 0
-          if rowid = q.get_embedding_rowid?(hash, @service_id)
-            pending.remove(rowid.to_u64)
-          end
+          IndexJournal.record_removals(cnn, pending, hash, @service_id)
           q.delete_embeddings_by_hash(hash)
         end
       end
@@ -629,13 +639,22 @@ module Memo
     # queue for index changes. Statements in the block must use the
     # connection. Queued index changes are applied only once it commits.
     private def write_transaction(&)
-      pending = USearchIndex::Pending.new
-      committed = false
-      Memo::Database.transaction(@db) do |cnn|
-        yield cnn, pending
-        committed = true
+      @write_lock.synchronize do
+        pending = USearchIndex::Pending.new
+        committed = false
+        Memo::Database.transaction(@db) do |cnn|
+          yield cnn, pending
+          committed = true
+        end
+        next unless committed
+
+        begin
+          pending.apply(@usearch_index)
+        rescue ex
+          @index_out_of_step = true
+          raise ex
+        end
       end
-      pending.apply(@usearch_index) if committed
     end
 
     # Close database connection
@@ -646,12 +665,31 @@ module Memo
     # Note: If service was initialized with an existing db connection,
     # close is a no-op (caller owns the connection).
     def close
-      # Save USearch index before closing
-      USearchIndex.close(@usearch_index, @index_path)
+      begin
+        save_index
+      rescue
+        # Unsaved index changes stay in the journal and replay on next open
+      end
+      @usearch_index.close
       return unless @owns_db
       @db.close
     rescue
       # Already closed or other error - ignore
+    end
+
+    # Save the USearch index to disk and checkpoint the journal.
+    #
+    # Safe to call at any time (e.g. periodically, or after processing the
+    # queue). The more often it runs, the less there is to replay after a
+    # crash; close calls it too.
+    def save_index
+      @write_lock.synchronize do
+        if @index_out_of_step
+          USearchIndex.save(@usearch_index, @index_path)
+        else
+          IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
+        end
+      end
     end
 
     # =========================================================================
@@ -778,8 +816,9 @@ module Memo
       provider_instance = Providers::Registry.create(svc.format, api_key, svc.model, svc.base_url)
       raise ArgumentError.new("Unknown format: #{svc.format}") unless provider_instance
 
-      # Close current USearch index
-      USearchIndex.close(@usearch_index, @index_path)
+      # Save and close the current service's index
+      save_index
+      @usearch_index.close
 
       @provider = provider_instance
       @service_name = name
@@ -794,7 +833,7 @@ module Memo
                     else
                       USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, svc.format, svc.model, svc.dimensions)
                     end
-      @usearch_index = USearchIndex.open(@index_path, svc.dimensions)
+      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id)
     end
 
     # =========================================================================
@@ -1381,7 +1420,7 @@ module Memo
           token_count = embed_result.token_counts[idx]
 
           inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
-          pending.add(rowid.to_u64, embedding) if inserted
+          IndexJournal.record_vector(cnn, pending, rowid, @service_id, embedding, inserted)
 
           Storage.create_chunk(
             db: cnn,
@@ -1790,7 +1829,7 @@ module Memo
 
           # Store embedding (deduplicated by hash) and add to USearch index
           inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
-          pending.add(rowid.to_u64, embedding) if inserted
+          IndexJournal.record_vector(cnn, pending, rowid, @service_id, embedding, inserted)
 
           # Create chunk reference with offset/size from chunking
           # All IDs are internal (FK to sources table)

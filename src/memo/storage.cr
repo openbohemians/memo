@@ -130,5 +130,79 @@ module Memo
       end
       embedding
     end
+
+    # Encode a vector for memo_vectors as little-endian IEEE half floats.
+    #
+    # That is the precision the USearch index keeps (f16 quantization), so an
+    # index rebuilt from stored vectors matches one built from the provider's.
+    # Unlike serialize_embedding, values outside -1..1 aren't clamped.
+    def encode_vector(vector : Array(Float64)) : Bytes
+      bytes = Bytes.new(vector.size * 2)
+      vector.each_with_index do |value, i|
+        IO::ByteFormat::LittleEndian.encode(f32_to_f16(value.to_f32), bytes[i * 2, 2])
+      end
+      bytes
+    end
+
+    # Decode a vector stored by encode_vector.
+    def decode_vector(blob : Bytes) : Array(Float64)
+      Array.new(blob.size // 2) do |i|
+        f16_to_f32(IO::ByteFormat::LittleEndian.decode(UInt16, blob[i * 2, 2])).to_f64
+      end
+    end
+
+    # Round a Float32 to the nearest IEEE half float (ties to even).
+    private def f32_to_f16(value : Float32) : UInt16
+      bits = value.unsafe_as(UInt32)
+      sign = (bits >> 16) & 0x8000_u32
+      exponent = ((bits >> 23) & 0xff_u32).to_i32
+      mantissa = bits & 0x7fffff_u32
+
+      if exponent == 0xff # infinity or NaN
+        return (sign | 0x7c00_u32 | (mantissa == 0 ? 0_u32 : 0x200_u32)).to_u16
+      end
+
+      half_exponent = exponent - 127 + 15
+      return (sign | 0x7c00_u32).to_u16 if half_exponent >= 0x1f # too large: infinity
+
+      if half_exponent <= 0 # subnormal half, or too small: zero
+        return sign.to_u16 if half_exponent < -10
+        mantissa |= 0x800000_u32
+        shift = 14 - half_exponent
+        half = mantissa >> shift
+        remainder = mantissa & ((1_u32 << shift) - 1)
+        halfway = 1_u32 << (shift - 1)
+        half += 1 if remainder > halfway || (remainder == halfway && half.odd?)
+        return (sign | half).to_u16
+      end
+
+      half = (half_exponent.to_u32 << 10) | (mantissa >> 13)
+      remainder = mantissa & 0x1fff_u32
+      # Rounding up can carry into the exponent, which is still correct.
+      half += 1 if remainder > 0x1000 || (remainder == 0x1000 && half.odd?)
+      (sign | half).to_u16
+    end
+
+    private def f16_to_f32(half : UInt16) : Float32
+      sign = (half.to_u32 & 0x8000_u32) << 16
+      exponent = (half.to_u32 >> 10) & 0x1f_u32
+      mantissa = half.to_u32 & 0x3ff_u32
+
+      bits = if exponent == 0x1f # infinity or NaN
+               sign | 0x7f800000_u32 | (mantissa << 13)
+             elsif exponent != 0
+               sign | ((exponent + 127 - 15) << 23) | (mantissa << 13)
+             elsif mantissa == 0
+               sign
+             else # subnormal half: normalize
+               e = 127 - 15 + 1
+               until mantissa & 0x400_u32 != 0
+                 mantissa <<= 1
+                 e -= 1
+               end
+               sign | (e.to_u32 << 23) | ((mantissa & 0x3ff_u32) << 13)
+             end
+      bits.unsafe_as(Float32)
+    end
   end
 end
