@@ -712,10 +712,16 @@ module Memo
       @db.scalar("SELECT COUNT(*) FROM memo_vectors WHERE service_id = ?", service_id).as(Int64)
     end
 
-    def each_vector(service_id : Int64, & : Int64, Bytes ->) : Nil
-      @db.query("SELECT embedding_id, vector FROM memo_vectors WHERE service_id = ?", service_id) do |rs|
-        rs.each { yield rs.read(Int64), rs.read(Bytes) }
+    def vectors_after(service_id : Int64, after_id : Int64, limit : Int32) : Array({Int64, Bytes})
+      vectors = [] of {Int64, Bytes}
+      @db.query(
+        "SELECT embedding_id, vector FROM memo_vectors
+         WHERE service_id = ? AND embedding_id > ? ORDER BY embedding_id LIMIT ?",
+        service_id, after_id, limit
+      ) do |rs|
+        rs.each { vectors << {rs.read(Int64), rs.read(Bytes)} }
       end
+      vectors
     end
 
     def embedding_ids_for_hash(hash : Bytes) : Array({Int64, Int64})

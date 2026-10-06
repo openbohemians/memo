@@ -303,7 +303,8 @@ module Memo
 
     abstract def count_vectors(service_id : Int64) : Int64
 
-    abstract def each_vector(service_id : Int64, & : Int64, Bytes ->) : Nil
+    # Up to `limit` {embedding id, vector} pairs with ids above `after_id`, in id order
+    abstract def vectors_after(service_id : Int64, after_id : Int64, limit : Int32) : Array({Int64, Bytes})
 
     # {embedding id, service id} for every service's embedding of a hash
     abstract def embedding_ids_for_hash(hash : Bytes) : Array({Int64, Int64})

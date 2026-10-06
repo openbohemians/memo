@@ -17,6 +17,15 @@ module Memo
   module IndexJournal
     extend self
 
+    # Replay and rebuild hand the thread to other fibers every this many
+    # vectors, so opening an index doesn't stall the rest of a server (an
+    # insert takes ~4 ms at 1536 dimensions).
+    YIELD_EVERY = 16
+
+    # Vectors read per query during a rebuild. Reading in pages keeps no
+    # cursor open while other fibers run.
+    REBUILD_PAGE = 256
+
     # What opening the index took to bring it up to date.
     record Recovery,
       # Logged changes replayed since the file's checkpoint
@@ -118,12 +127,13 @@ module Memo
     private def replay(db : DB::Database, index : USearch::Index, service_id : Int64, checkpoint : Int64) : Int32
       q = db.memo_queries
       ids = q.index_changes_since(service_id, checkpoint)
-      ids.each do |embedding_id|
+      ids.each_with_index(1) do |embedding_id, n|
         if blob = q.get_vector(embedding_id)
           USearchIndex.add(index, embedding_id.to_u64, Storage.decode_vector(blob))
         else
           USearchIndex.remove(index, embedding_id.to_u64)
         end
+        Fiber.yield if n % YIELD_EVERY == 0
       end
       ids.size
     end
@@ -135,10 +145,19 @@ module Memo
       return 0 if count == 0
 
       index.reserve(count)
-      q.each_vector(service_id) do |embedding_id, blob|
-        USearchIndex.add(index, embedding_id.to_u64, Storage.decode_vector(blob))
+      added = 0
+      after_id = 0_i64
+      loop do
+        page = q.vectors_after(service_id, after_id, REBUILD_PAGE)
+        break if page.empty?
+        page.each do |embedding_id, blob|
+          USearchIndex.add(index, embedding_id.to_u64, Storage.decode_vector(blob))
+          added += 1
+          Fiber.yield if added % YIELD_EVERY == 0
+        end
+        after_id = page.last[0]
       end
-      count.to_i32
+      added
     end
 
     # One-time migration for embeddings stored before memo kept vectors:

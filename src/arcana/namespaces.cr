@@ -45,6 +45,7 @@ module Memo
       @configs = {} of String => Config
       @services = {} of String => Memo::Service
       @mutex = Mutex.new
+      @open_locks = {} of String => Mutex
     end
 
     # Register a namespace config (without opening).
@@ -56,28 +57,35 @@ module Memo
 
     # Register and immediately open a namespace. Returns the Service.
     def open(config : Config) : Memo::Service
-      @mutex.synchronize do
-        @configs[config.ns] = config
-        open_locked(config.ns)
-      end
+      register(config)
+      get(config.ns)
     end
 
     # Get the Memo::Service for a namespace, opening it lazily if needed.
     # Raises if the namespace isn't registered.
+    #
+    # Opening can be slow (it may replay or rebuild the index), so it holds
+    # only that namespace's open lock; requests for other namespaces carry on.
     def get(ns : String) : Memo::Service
       @mutex.synchronize do
-        return @services[ns] if @services.has_key?(ns)
-        unless @configs.has_key?(ns)
-          raise "namespace not registered: #{ns}"
+        if svc = @services[ns]?
+          return svc
         end
-        open_locked(ns)
+        raise "namespace not registered: #{ns}" unless @configs.has_key?(ns)
+      end
+
+      open_lock(ns).synchronize do
+        # Another request may have opened it while this one waited
+        @mutex.synchronize { @services[ns]? } || open_service(ns)
       end
     end
 
-    # Close and remove a namespace.
+    # Close and remove a namespace. Waits for an open in progress.
     def close(ns : String) : Bool
-      @mutex.synchronize do
-        svc = @services.delete(ns)
+      return false unless @mutex.synchronize { @configs.has_key?(ns) }
+
+      open_lock(ns).synchronize do
+        svc = @mutex.synchronize { @services.delete(ns) }
         svc.try(&.close)
         !svc.nil?
       end
@@ -190,11 +198,14 @@ module Memo
       end
     end
 
-    # Internal: open a namespace. Must be called with @mutex held.
-    private def open_locked(ns : String) : Memo::Service
-      return @services[ns] if @services.has_key?(ns)
+    private def open_lock(ns : String) : Mutex
+      @mutex.synchronize { @open_locks[ns] ||= Mutex.new }
+    end
 
-      config = @configs[ns]? || raise "namespace not registered: #{ns}"
+    # Build a namespace's Service and add it to the registry. Called with the
+    # namespace's open lock held, not @mutex (building can be slow).
+    private def open_service(ns : String) : Memo::Service
+      config = @mutex.synchronize { @configs[ns]? } || raise "namespace not registered: #{ns}"
 
       service_name = config.service || "mock"
       chunking = config.chunking_max_tokens
@@ -214,7 +225,7 @@ module Memo
         STDERR.puts "memo-arcana: '#{ns}' index recovery: #{r.replayed} replayed, " \
                     "#{r.rebuilt} rebuilt, #{r.missing} missing (re-index to restore)"
       end
-      @services[ns] = svc
+      @mutex.synchronize { @services[ns] = svc }
       svc
     end
   end
