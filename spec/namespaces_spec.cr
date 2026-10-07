@@ -47,4 +47,26 @@ describe Memo::Namespaces do
       namespaces.list.should eq [{"a", false}]
     end
   end
+
+  it "lets requests already using a namespace finish before closing it" do
+    with_test_db_path do |db_path|
+      namespaces = Memo::Namespaces.new
+      namespaces.register(Memo::Namespaces::Config.new(ns: "a", db: db_path, service: "mock", chunking_max_tokens: 50))
+      namespaces.get("a").index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+
+      outcome = Channel(Int32 | Exception).new(1)
+      spawn do
+        namespaces.use("a") do |memo|
+          sleep 100.milliseconds # e.g. waiting on an embedding call
+          outcome.send(memo.search(query: "purple gorilla", min_score: 0.0).size)
+        end
+      rescue ex
+        outcome.send(ex)
+      end
+      Fiber.yield # the request is now using the service
+
+      namespaces.close("a").should be_true
+      outcome.receive.should eq 1 # it finished, rather than finding the index closed
+    end
+  end
 end

@@ -45,11 +45,11 @@ module Memo
       when "open"        then handle_open(data)
       when "close"       then handle_close(data)
       when "list"        then handle_list
-      when "index"       then handle_index(data)
-      when "index_batch" then handle_index_batch(data)
-      when "search"      then handle_search(data)
-      when "delete"      then handle_delete(data)
-      when "stats"       then handle_stats(data)
+      when "index"       then with_memo(data) { |memo| handle_index(memo, data) }
+      when "index_batch" then with_memo(data) { |memo| handle_index_batch(memo, data) }
+      when "search"      then with_memo(data) { |memo| handle_search(memo, data) }
+      when "delete"      then with_memo(data) { |memo| handle_delete(memo, data) }
+      when "stats"       then with_memo(data) { |memo| handle_stats(memo, data) }
       when "help"        then JSON::Any.new({"guide" => JSON::Any.new(GUIDE)})
       else                    raise "unknown action: #{action}"
       end
@@ -96,13 +96,14 @@ module Memo
     # Data actions
     # =========================================================================
 
-    private def memo_for(data : JSON::Any) : Memo::Service
+    # Run the block with the request's namespace service; closing the
+    # namespace waits for it (see Namespaces#use)
+    private def with_memo(data : JSON::Any, &)
       ns = data["ns"]?.try(&.as_s?) || raise "missing ns"
-      @namespaces.get(ns)
+      @namespaces.use(ns) { |memo| yield memo }
     end
 
-    private def handle_index(data : JSON::Any) : JSON::Any
-      memo = memo_for(data)
+    private def handle_index(memo : Memo::Service, data : JSON::Any) : JSON::Any
       source_type = data["source_type"]?.try(&.as_s?) || raise "missing source_type"
       text = data["text"]?.try(&.as_s?) || raise "missing text"
       source_id = parse_source_id(data["source_id"]?)
@@ -111,8 +112,7 @@ module Memo
       JSON::Any.new({"ok" => JSON::Any.new(true), "chunks" => JSON::Any.new(chunks.to_i64)})
     end
 
-    private def handle_index_batch(data : JSON::Any) : JSON::Any
-      memo = memo_for(data)
+    private def handle_index_batch(memo : Memo::Service, data : JSON::Any) : JSON::Any
       docs_json = data["documents"]?.try(&.as_a?) || raise "missing documents"
 
       docs = docs_json.map do |d|
@@ -126,8 +126,7 @@ module Memo
       JSON::Any.new({"ok" => JSON::Any.new(true), "chunks" => JSON::Any.new(chunks.to_i64)})
     end
 
-    private def handle_search(data : JSON::Any) : JSON::Any
-      memo = memo_for(data)
+    private def handle_search(memo : Memo::Service, data : JSON::Any) : JSON::Any
       query = data["query"]?.try(&.as_s?) || raise "missing query"
       limit = data["limit"]?.try(&.as_i?) || 10
       min_score = data["min_score"]?.try(&.as_f?) || 0.7
@@ -163,8 +162,7 @@ module Memo
       })
     end
 
-    private def handle_delete(data : JSON::Any) : JSON::Any
-      memo = memo_for(data)
+    private def handle_delete(memo : Memo::Service, data : JSON::Any) : JSON::Any
       source_id = parse_source_id(data["source_id"]?) || raise "missing source_id"
       source_type = data["source_type"]?.try(&.as_s?)
 
@@ -172,8 +170,7 @@ module Memo
       JSON::Any.new({"ok" => JSON::Any.new(true), "deleted" => JSON::Any.new(deleted.to_i64)})
     end
 
-    private def handle_stats(data : JSON::Any) : JSON::Any
-      memo = memo_for(data)
+    private def handle_stats(memo : Memo::Service, data : JSON::Any) : JSON::Any
       s = memo.stats
       JSON::Any.new({
         "ok"                 => JSON::Any.new(true),

@@ -1,3 +1,4 @@
+require "wait_group"
 require "../memo"
 require "../memo/pg"
 
@@ -33,7 +34,7 @@ module Memo
         @model : String? = nil,
         @index_dir : String? = nil,
         @chunking_max_tokens : Int32 = 2000,
-        @preload : Bool = false
+        @preload : Bool = false,
       )
       end
     end
@@ -46,6 +47,7 @@ module Memo
       @services = {} of String => Memo::Service
       @mutex = Mutex.new
       @open_locks = {} of String => Mutex
+      @in_flight = {} of String => WaitGroup
     end
 
     # Register a namespace config (without opening).
@@ -80,12 +82,26 @@ module Memo
       end
     end
 
-    # Close and remove a namespace. Waits for an open in progress.
+    # Run the block with the namespace's service, opening it if needed.
+    # close waits for blocks already running before it closes the service.
+    def use(ns : String, &)
+      svc, in_flight = enter(ns)
+      begin
+        yield svc
+      ensure
+        in_flight.done
+      end
+    end
+
+    # Close and remove a namespace. Waits for an open in progress, and for
+    # requests already using the service (see use). New requests wait, then
+    # open it afresh.
     def close(ns : String) : Bool
       return false unless @mutex.synchronize { @configs.has_key?(ns) }
 
       open_lock(ns).synchronize do
-        svc = @mutex.synchronize { @services.delete(ns) }
+        svc, in_flight = @mutex.synchronize { {@services.delete(ns), @in_flight.delete(ns)} }
+        in_flight.try(&.wait)
         svc.try(&.close)
         !svc.nil?
       end
@@ -116,12 +132,10 @@ module Memo
       end
     end
 
-    # Close all open services (called on shutdown).
+    # Close all open services (called on shutdown), each after its
+    # in-flight requests finish.
     def close_all
-      @mutex.synchronize do
-        @services.each_value(&.close)
-        @services.clear
-      end
+      @mutex.synchronize { @services.keys }.each { |ns| close(ns) }
     end
 
     # Load namespace configs from a YAML-ish config file.
@@ -170,7 +184,7 @@ module Memo
 
       preload = case block["preload"]?.try(&.downcase)
                 when "true", "yes", "1" then true
-                else                          false
+                else                         false
                 end
 
       chunking = block["chunking_max_tokens"]?.try(&.to_i?) || 2000
@@ -195,6 +209,19 @@ module Memo
       value.gsub(/\$\{(\w+)\}|\$(\w+)/) do |_, match|
         name = match[1]? || match[2]
         name ? (ENV[name]? || "") : ""
+      end
+    end
+
+    # The namespace's service, counted in flight. Retries if close removed
+    # the service between get and counting.
+    private def enter(ns : String) : {Memo::Service, WaitGroup}
+      loop do
+        svc = get(ns)
+        in_flight = @mutex.synchronize do
+          next nil unless @services[ns]?.try(&.same?(svc))
+          (@in_flight[ns] ||= WaitGroup.new).tap(&.add(1))
+        end
+        return {svc, in_flight} if in_flight
       end
     end
 
