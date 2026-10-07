@@ -23,4 +23,17 @@ describe Memo::QueryCache do
       cached_rows(db).should be <= 303
     end
   end
+
+  it "prunes on the first write of a new instance (e.g. one CLI search per process)" do
+    with_test_db do |db|
+      # Earlier short-lived processes left the table over its limit
+      310.times do |i|
+        db.exec("INSERT INTO memo_query_cache (query, service_id, embedding, token_count, created_at) VALUES (?, 1, ?, 3, ?)",
+          "old #{i}", Memo::Storage.serialize_embedding([0.5]), i.to_i64)
+      end
+      cache = Memo::QueryCache.new(max_entries: 10, max_db_entries: 300, db: db, service_id: 1_i64)
+      cache.put("new query", [0.5, 0.25], 3)
+      cached_rows(db).should eq 300
+    end
+  end
 end

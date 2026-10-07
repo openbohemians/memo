@@ -10,6 +10,8 @@ module Memo
   class QueryCache
     getter max_entries : Int32
     getter max_db_entries : Int32
+    @prune_check_every : Int32
+    @db_writes_since_check : Int32
 
     def hits : Int64
       @mutex.synchronize { @hits }
@@ -26,7 +28,10 @@ module Memo
       @service_id : Int64 = 0,
     )
       @mutex = Mutex.new
-      @db_writes_since_check = 0
+      # Check the size once per 1% of max_db_entries writes, starting with
+      # the first: a short-lived process (one CLI search) writes only once
+      @prune_check_every = {@max_db_entries // 100, 1}.max
+      @db_writes_since_check = @prune_check_every - 1
       @cache = {} of String => CacheEntry
       @order = Deque(String).new
       @hits = 0_i64
@@ -120,10 +125,10 @@ module Memo
       db.memo_queries.upsert_query_cache(key, @service_id, blob, token_count, Time.utc.to_unix_ms)
 
       # Prune if over limit (delete oldest entries beyond max). Counting
-      # scans the service's rows (~2 ms at 100K), so check once per 1% of
-      # max_db_entries writes; the table may run that far over in between.
+      # scans the service's rows (~2 ms at 100K), so it runs on a schedule
+      # (see initialize); the table may run up to 1% over in between.
       @db_writes_since_check += 1
-      return if @db_writes_since_check < {@max_db_entries // 100, 1}.max
+      return if @db_writes_since_check < @prune_check_every
       @db_writes_since_check = 0
 
       count = db.memo_queries.count_query_cache(@service_id)
