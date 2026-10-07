@@ -37,8 +37,21 @@ module Memo
       # their sources are indexed again.
       missing : Int32 = 0
 
-    # Open the index at `path`, bringing it up to date with the database.
-    def open(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : {USearch::Index, Recovery}
+    # Lock and open the index at `path`, bringing it up to date with the
+    # database. Returns the index, what recovery did, and the lock to hold
+    # while the index is open (see USearchIndex.lock).
+    def open(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : {USearch::Index, Recovery, File}
+      lock = USearchIndex.lock(path)
+      begin
+        index, recovery = open_locked(db, path, dimensions, service_id)
+        {index, recovery, lock}
+      rescue ex
+        lock.close
+        raise ex
+      end
+    end
+
+    private def open_locked(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : {USearch::Index, Recovery}
       index, loaded = USearchIndex.load_or_create(path, dimensions)
       q = db.memo_queries
       pruned_through, backfilled = q.get_index_state(service_id) || {0_i64, false}

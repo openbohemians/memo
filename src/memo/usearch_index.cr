@@ -101,6 +101,33 @@ module Memo
       {% end %}
     end
 
+    # Raised when an index is already open in another process or Service.
+    class InUse < Exception
+    end
+
+    # Lock the index at `path` for this process, or raise InUse. Two holders
+    # of one index would each keep their own copy in memory and overwrite
+    # each other's saves, so a second open fails instead. The lock lasts
+    # until the returned file is closed or the process exits (a crash
+    # included).
+    def lock(path : String) : File
+      Dir.mkdir_p(File.dirname(path))
+      lock_path = "#{path}.lock"
+      file = File.open(lock_path, "a+")
+      begin
+        file.flock_exclusive(blocking: false)
+      rescue IO::Error
+        file.close
+        holder = File.read(lock_path).strip
+        raise InUse.new("#{path} is already open#{" by process #{holder}" unless holder.empty?}. " \
+                        "Processes can't share an index: each would overwrite the other's saves.")
+      end
+      file.truncate
+      file.print(Process.pid)
+      file.flush
+      file
+    end
+
     # Path of the journal checkpoint saved beside an index file.
     def checkpoint_path(path : String) : String
       "#{path}.checkpoint"
@@ -112,10 +139,11 @@ module Memo
       index.close
     end
 
-    # Delete the index file (and its journal checkpoint) from disk.
+    # Delete the index file (and its journal checkpoint and lock) from disk.
     def delete_file(path : String)
-      File.delete(path) if File.exists?(path)
-      File.delete(checkpoint_path(path)) if File.exists?(checkpoint_path(path))
+      [path, checkpoint_path(path), "#{path}.lock"].each do |file|
+        File.delete(file) if File.exists?(file)
+      end
     end
 
     # Convert Float64 array to Float32 array for USearch.

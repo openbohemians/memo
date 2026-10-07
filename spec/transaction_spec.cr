@@ -74,6 +74,7 @@ describe Memo::Service do
         second = open.call
         second.delete(2_i64, "doc")
         second.db.close
+        second.@index_lock.close # a crash ends the process, releasing its lock
 
         # SQLite hands the freed rowid to the next embedding.
         third = open.call

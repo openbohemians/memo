@@ -254,7 +254,7 @@ module Memo
                     else
                       USearchIndex.index_path(db_path, config.format, config.model, config.dimensions)
                     end
-      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -343,7 +343,7 @@ module Memo
                     else
                       USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, config.format, config.model, config.dimensions)
                     end
-      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -710,6 +710,7 @@ module Memo
         # Unsaved index changes stay in the journal and replay on next open
       end
       @usearch_index.close
+      @index_lock.close
       return unless @owns_db
       @db.close
     rescue
@@ -870,6 +871,7 @@ module Memo
       # Save and close the current service's index
       save_index
       @usearch_index.close
+      @index_lock.close
 
       @provider = provider_instance
       @service_name = name
@@ -884,7 +886,7 @@ module Memo
                     else
                       USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, svc.format, svc.model, svc.dimensions)
                     end
-      @usearch_index, @index_recovery = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id)
     end
 
     # =========================================================================

@@ -4,9 +4,11 @@ private def open_service(db_path : String, service : String = "mock") : Memo::Se
   Memo::Service.new(db_path: db_path, service: service, chunking_max_tokens: 50)
 end
 
-# Stop without saving the index, as a crash would.
+# Stop without saving the index, as a crash would. A crash also ends the
+# process, which releases its index lock.
 private def crash(service : Memo::Service)
   service.db.close
+  service.@index_lock.close
 end
 
 private def count(service : Memo::Service, table : String) : Int64
@@ -278,6 +280,34 @@ describe Memo::IndexJournal do
       count(a, "memo_index_log").should eq 0
       count(a, "memo_index_state WHERE service_id <> #{a.service_id}").should eq 0
       a.close
+    end
+  end
+end
+
+describe Memo::USearchIndex do
+  it "refuses a second open of an index that is already open" do
+    with_test_db_path do |db_path|
+      first = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+      expect_raises(Memo::USearchIndex::InUse, /already open by process #{Process.pid}/) do
+        Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+      end
+
+      first.close
+      second = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+      second.close
+    end
+  end
+
+  it "holds a lock other processes see, until close" do
+    flock = Process.find_executable("flock")
+    pending!("needs the flock command (util-linux)") unless flock
+    with_test_db_path do |db_path|
+      service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+      lock_path = "#{service.index_path}.lock"
+      Process.run(flock, ["-n", lock_path, "true"]).success?.should be_false # held
+
+      service.close
+      Process.run(flock, ["-n", lock_path, "true"]).success?.should be_true # released
     end
   end
 end
