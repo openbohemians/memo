@@ -9,6 +9,11 @@ Semantic search and vector storage library for Crystal.
 - **Embedding storage** - Deduplication by content hash
 - **HNSW search** - Fast approximate nearest neighbor via USearch
 - **Text storage** - Optional persistent text with LIKE and FTS5 full-text search
+- **Crash-safe index** - Vectors and index changes are journaled in the database; a crash or lost index
+  file is recovered without calling the embedding API again
+- **SQLite or PostgreSQL** - For metadata, text and stored vectors
+- **Bus service** - `memo-arcana` serves memo over the [Arcana](https://github.com/trans/arcana) agent bus,
+  with any number of isolated namespaces
 
 ## Installation
 
@@ -289,7 +294,7 @@ All indexing goes through an embed queue with automatic retry support:
 ```crystal
 # Check queue status
 stats = memo.queue_stats
-puts "Pending: #{stats[:pending]}, Failed: #{stats[:failed]}"
+puts "Pending: #{stats.pending}, Failed: #{stats.failed}"
 
 # Process any pending/failed items in queue
 memo.process_queue
@@ -360,32 +365,122 @@ memo.close
 struct Memo::Search::Result
   getter chunk_id : Int64
   getter source_type : String
-  getter source_id : Int64
-  getter score : Float64
-  getter pair_id : Int64?
-  getter parent_id : Int64?
+  getter source_id : Memo::ExternalId?  # Int64, String or Bytes, as indexed
+  getter score : Float64                # Cosine similarity
+  getter pair_id : Memo::ExternalId?
+  getter parent_id : Memo::ExternalId?
   getter text : String?  # When include_text: true
 end
 ```
 
+### Search Notes
+
+- **`min_score` is a silent cutoff** (default 0.7): results scoring below it are dropped, so "nothing similar"
+  and "close but below 0.7" both return an empty list. If your application decides what counts as a match,
+  pass `min_score: -1.0` (no cutoff) and compare `score` yourself. Scores aren't comparable across
+  embedding models.
+- **Filters** (`source_type`, `like`, `match`, `sql_where`) are applied by searching first and checking the
+  nearest candidates against the filter; a filter that matches few rows is ranked exactly over its matches.
+- **`sql_where` is raw SQL** added to the query. Pass values with `?` placeholders and `sql_where_args`, and
+  never build it from untrusted input. On PostgreSQL every `?` outside quotes is a placeholder, so jsonb's
+  `?`, `?|` and `?&` operators can't be used; use `jsonb_exists()` and friends.
+- `track_matches: false` (Service option) stops searches from updating match counts, so searches don't write.
+
 ## Storage
 
-Memo stores data in a SQLite file at the specified `db_path` plus USearch index files alongside it:
+Memo keeps its data in the database (a SQLite file at `db_path`, or PostgreSQL) and an index file per
+embedding service beside it:
 
-- **SQLite**: Services, embeddings registry, chunks, texts, and queue
-- **USearch**: HNSW index files (one per service, e.g. `openai--text-embedding-3-small--1536.usearch`)
+- **Database**: services, embeddings (deduplicated by content hash), chunks, texts, the embed queue,
+  every embedding's vector (`memo_vectors`, 16-bit floats), and a journal of index changes
+  (`memo_index_log`)
+- **USearch index**: an HNSW index file per service (e.g. `memo.openai--text-embedding-3-small--1536.usearch`),
+  held in memory while open, with a `.checkpoint` and a `.lock` file beside it
 
-Vectors are stored in USearch HNSW indexes for fast approximate nearest neighbor search.
-The SQLite embeddings table serves as a deduplication registry (content hash tracking).
+The index is rebuilt from the database whenever it needs to be, so **backing up the database is enough**
+(e.g. Litestream for SQLite). Text storage can be disabled with `store_text: false` if you prefer to manage
+text separately.
 
-Text storage can be disabled with `store_text: false` if you prefer to manage text separately.
+### Durability and Recovery
+
+- Every vector and index change is written in the same transaction as the data it belongs to.
+- The index file is saved on a policy: once `index_save_changes` (default 10,000) changes are unsaved, or
+  any have been unsaved for `index_save_interval` (default 5 minutes). Saves run on a separate thread, so
+  searches continue. `memo.save_index_if_due` is cheap to call often; `memo.save_index` saves now, and
+  `memo.close` saves before closing.
+- Opening an index replays only the changes since its last save. A missing, corrupt or stale index file is
+  rebuilt from stored vectors. Neither calls the embedding API. `memo.index_recovery` reports what was done.
+- **One process per index.** Opening an index takes a lock; a second process (or a second `Memo::Service`)
+  opening the same one raises `Memo::USearchIndex::InUse`. That includes the memo CLI against a database a
+  running service has open.
+
+### Concurrency
+
+- A `Memo::Service` can be shared by fibers on Crystal's default, single-threaded execution context
+  (e.g. one per web request). It is not safe across threads.
+- On SQLite, memo's write transactions take the write lock up front (`BEGIN IMMEDIATE`), and memo's own
+  connections wait up to 5 s for a lock (`busy_timeout=5000`). If you pass memo your own connection
+  (`Memo::Service.new(db: ...)`), add `?busy_timeout=5000` to its URL too.
+- For your own atomic work with memo's tables, use `Memo::Database.transaction(db) { |cnn| ... }` and send
+  every statement through `cnn`: statements sent to the pool run on other connections and commit on their own.
+
+## PostgreSQL
+
+```crystal
+require "memo"
+require "memo/pg"
+
+memo = Memo::Service.new(
+  db_path: "postgres://user:pass@host/memo_db",
+  index_dir: "/var/lib/memo/indices",  # where the USearch index files go
+  service: "openai",
+  api_key: ENV["OPENAI_API_KEY"]
+)
+```
+
+## Bus Service (`memo-arcana`)
+
+`memo-arcana` serves memo's API at `memo:rag` on an Arcana bus, with each namespace (`ns`) an isolated
+database, index and embedding service. Namespaces are listed in `/etc/memo/namespaces.yaml` (or
+`MEMO_NAMESPACES`), with `${VAR}` expansion from the environment:
+
+```yaml
+namespaces:
+  - ns: notes
+    db: /var/lib/memo/notes.db
+    service: openai
+    api_key: ${OPENAI_API_KEY}
+    preload: true
+```
+
+| Variable | Default | |
+|---|---|---|
+| `ARCANA_HOST`, `ARCANA_PORT` | `127.0.0.1`, `19118` | The bus to join |
+| `MEMO_NAMESPACES` | `/etc/memo/namespaces.yaml` | Namespace config |
+| `MEMO_MAX_CONCURRENCY` | `32` | Requests handled at once |
+| `MEMO_MAX_WAITING` | 8x concurrency | Requests waiting for a turn; beyond that, memo answers with an error carrying `"code": "busy"`, which callers can retry |
+| `MEMO_SAVE_INTERVAL` | `60` | Seconds between checks for an index save that's due |
+
+Any client on the bus can open namespaces (including arbitrary database paths), so run it on a trusted bus.
+See [SECURITY.md](SECURITY.md).
 
 ## Providers
 
 Currently supported:
-- `openai` - OpenAI text-embedding-3-small (default), text-embedding-3-large
+- `openai` - OpenAI text-embedding-3-small (default), text-embedding-3-large. For text-embedding-3 models,
+  a service's `dimensions` is sent to the API, so smaller vectors work. Also works with OpenAI-compatible
+  APIs via `base_url`.
 - `voyage` - Voyage AI voyage-3 (default), voyage-3-lite, voyage-code-3
+- `arcana/openai`, `arcana/voyage` - The same APIs through [Arcana](https://github.com/trans/arcana)'s embedders
+- `bus/openai`, `bus/voyage` - Embeddings from an `openai:embed` / `voyage:embed` service on the Arcana bus
 - `mock` - Deterministic embeddings for testing
+
+The OpenAI and Voyage providers reuse connections and retry rate limits (429), server errors and network
+errors, waiting as `Retry-After` says. An exhausted OpenAI quota isn't retried.
+
+## Changes
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
