@@ -1,5 +1,18 @@
 require "./spec_helper"
 
+# Lets a spec make the next index update fail, as a USearch error would
+class Memo::USearchIndex::Pending
+  class_property fail_next = false
+
+  def apply(index : USearch::Index)
+    if Pending.fail_next
+      Pending.fail_next = false
+      raise "simulated index failure"
+    end
+    previous_def
+  end
+end
+
 private def open_service(db_path : String, service : String = "mock") : Memo::Service
   Memo::Service.new(db_path: db_path, service: service, chunking_max_tokens: 50)
 end
@@ -98,6 +111,26 @@ describe Memo::IndexJournal do
       service.save_index_if_due
       File.exists?(service.index_path).should be_true
       service.close
+    end
+  end
+
+  it "catches up after a failed index update and keeps pruning the journal" do
+    with_test_db_path do |db_path|
+      service = open_service(db_path)
+      service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      Memo::USearchIndex::Pending.fail_next = true
+      service.index(source_type: "doc", source_id: 2_i64, text: "tiny haunted robot") # committed, not indexed
+
+      service.save_index
+      finds?(service, "tiny haunted robot", 2_i64).should be_true
+      count(service, "memo_index_log").should eq 0 # checkpointed and pruned
+
+      service.index(source_type: "doc", source_id: 3_i64, text: "regal sleepy dragon")
+      service.save_index
+      count(service, "memo_index_log").should eq 0 # and still does later
+      service.close
+    ensure
+      Memo::USearchIndex::Pending.fail_next = false
     end
   end
 

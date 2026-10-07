@@ -132,7 +132,7 @@ module Memo
     @write_lock = Mutex.new
 
     # Set when applying committed changes to the index failed. The journal
-    # still has them; saves skip the checkpoint so they replay on next open.
+    # still has them; the next save replays them first (see save_index).
     @index_out_of_step = false
 
     # Index changes applied since the last save, and when that was. A save
@@ -671,6 +671,7 @@ module Memo
           @unsaved_changes += change_count
         rescue ex
           @index_out_of_step = true
+          schedule_save # catches the index up from the journal
           raise ex
         end
       end
@@ -678,6 +679,7 @@ module Memo
     end
 
     private def save_due? : Bool
+      return true if @index_out_of_step
       return false if @unsaved_changes == 0
       @unsaved_changes >= @index_save_changes || Time.instant - @saved_at >= @index_save_interval
     end
@@ -728,10 +730,12 @@ module Memo
         next if @usearch_index.closed? || (@unsaved_changes == 0 && !@index_out_of_step)
 
         if @index_out_of_step
-          USearchIndex.save_in_background(@usearch_index, @index_path)
-        else
-          IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
+          # A failed update left committed changes out of the index; the
+          # journal has them
+          IndexJournal.catch_up(@db, @usearch_index, @service_id, @index_path)
+          @index_out_of_step = false
         end
+        IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
         @unsaved_changes = 0
         @saved_at = Time.instant
       end
@@ -887,6 +891,9 @@ module Memo
                       USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, svc.format, svc.model, svc.dimensions)
                     end
       @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id)
+      @index_out_of_step = false
+      @unsaved_changes = 0
+      @saved_at = Time.instant
     end
 
     # =========================================================================

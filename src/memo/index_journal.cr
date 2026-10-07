@@ -138,6 +138,21 @@ module Memo
       end
     end
 
+    # Bring an open index back in step with the database after a failed
+    # update left committed changes out of it: replay the log since the
+    # file's checkpoint (or rebuild, if that part is already pruned). Replay
+    # is idempotent, so entries the index already has do no harm.
+    def catch_up(db : DB::Database, index : USearch::Index, service_id : Int64, path : String) : Nil
+      pruned_through = db.memo_queries.get_index_state(service_id).try(&.[0]) || 0_i64
+      saved_through = read_checkpoint(path) || 0_i64
+      if saved_through >= pruned_through
+        replay(db, index, service_id, saved_through)
+      else
+        index.clear
+        rebuild(db, index, service_id)
+      end
+    end
+
     # Apply each embedding logged after `checkpoint` to the index.
     private def replay(db : DB::Database, index : USearch::Index, service_id : Int64, checkpoint : Int64) : Int32
       q = db.memo_queries
