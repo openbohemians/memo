@@ -44,4 +44,23 @@ describe "Full-text index" do
       reopened.close
     end
   end
+
+  it "skips the migration if another process finished it first" do
+    with_test_service do |service|
+      service.index(source_type: "doc", source_id: 1_i64, text: "a purple gorilla")
+      # A row a rebuild would drop: proves the rebuild didn't run again
+      service.db.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) VALUES (999, 999, 'marker row')")
+
+      # As if this process passed migrate's check just before another
+      # process committed the migration
+      Memo::Dialect::SQLite.new.migrate_fts_rowids(service.db)
+      fts_rows(service).map(&.[0]).should contain(999_i64)
+    end
+  end
+
+  it "opens its own SQLite connections with a busy timeout" do
+    with_test_service do |service|
+      service.db.scalar("PRAGMA busy_timeout").as(Int64).should eq 5000
+    end
+  end
 end

@@ -57,14 +57,28 @@ module Memo
       end
 
       def migrate(db : DB::Database) : Nil
-        # Databases from before FTS rows were keyed by source_id: rebuild
-        # the FTS table from memo_texts once.
         return if db.query_one?("SELECT 1 FROM memo_meta WHERE key = 'fts_rowid_is_source_id'", as: Int32)
+        migrate_fts_rowids(db)
+      end
 
-        Memo::Database.transaction(db) do |cnn|
-          cnn.exec("DELETE FROM memo_texts_fts")
-          cnn.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) SELECT source_id, source_id, content FROM memo_texts")
-          cnn.exec("INSERT INTO memo_meta (key, value) VALUES ('fts_rowid_is_source_id', '1')")
+      # Databases from before FTS rows were keyed by source_id: rebuild the
+      # FTS table from memo_texts, once. BEGIN IMMEDIATE takes the write lock
+      # before re-checking, so a second process opening the same database
+      # waits for the first one's migration (busy_timeout), then skips it.
+      def migrate_fts_rowids(db : DB::Database) : Nil
+        db.using_connection do |cnn|
+          cnn.exec("BEGIN IMMEDIATE")
+          begin
+            unless cnn.query_one?("SELECT 1 FROM memo_meta WHERE key = 'fts_rowid_is_source_id'", as: Int32)
+              cnn.exec("DELETE FROM memo_texts_fts")
+              cnn.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) SELECT source_id, source_id, content FROM memo_texts")
+              cnn.exec("INSERT OR IGNORE INTO memo_meta (key, value) VALUES ('fts_rowid_is_source_id', '1')")
+            end
+            cnn.exec("COMMIT")
+          rescue ex
+            cnn.exec("ROLLBACK") rescue nil
+            raise ex
+          end
         end
       end
 

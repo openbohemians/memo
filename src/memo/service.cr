@@ -217,7 +217,7 @@ module Memo
         # SQLite: create parent directory and connect
         dir = File.dirname(db_path)
         Dir.mkdir_p(dir) unless dir.empty? || Dir.exists?(dir)
-        @db = DB.open("sqlite3://#{db_path}")
+        @db = DB.open(Database.sqlite_url(db_path))
         @db_path = db_path
       end
 

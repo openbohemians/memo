@@ -25,10 +25,17 @@ module Memo
         db = DB.open(path)
         db.memo_dialect = Dialect.for(path)
       else
-        db = DB.open("sqlite3:#{path}")
+        db = DB.open(sqlite_url(path))
       end
       init(db)
       db
+    end
+
+    # Connection URL for a SQLite file. busy_timeout makes a connection wait
+    # up to 5 s for another's write lock instead of failing at once.
+    def sqlite_url(path : String) : String
+      return "sqlite3://#{path}" if path.includes?("busy_timeout=")
+      "sqlite3://#{path}#{path.includes?('?') ? '&' : '?'}busy_timeout=5000"
     end
 
     # Load memo schema into the provided database (embedded mode)
