@@ -1,4 +1,4 @@
-require "../src/arcana/service"
+require "../src/arcana/listener"
 require "../src/memo/pg"
 require "arcana-core"
 
@@ -19,56 +19,7 @@ require "arcana-core"
 #   MEMO_MAX_CONCURRENCY  — Requests handled at once (default: 32)
 #   MEMO_SAVE_INTERVAL    — Seconds between checks for an index save that's due (default: 60)
 
-# ANSI color helpers
-DIM    = "\e[2m"
-BOLD   = "\e[1m"
-RESET  = "\e[0m"
-GREEN  = "\e[32m"
-YELLOW = "\e[33m"
-RED    = "\e[31m"
-CYAN   = "\e[36m"
-GRAY   = "\e[90m"
-
-def log(msg : String)
-  STDERR.puts "#{GRAY}#{Time.local.to_s("%H:%M:%S")}#{RESET} #{msg}"
-end
-
-def truncate(s : String, max : Int32 = 50) : String
-  s.size > max ? "#{s[0, max]}…" : s
-end
-
-SENSITIVE_KEYS = Set{"api_key", "password", "secret", "token", "key"}
-
-def sensitive?(key : String) : Bool
-  k = key.downcase
-  SENSITIVE_KEYS.any? { |s| k.includes?(s) }
-end
-
-def redact_db_url(url : String) : String
-  url.gsub(/(:\/\/[^:]+:)[^@]+(@)/, "\\1***\\2")
-end
-
-def summarize(data : JSON::Any) : String
-  return "" unless data.as_h?
-  parts = [] of String
-  data.as_h.each do |k, v|
-    next if k == "action"
-    val = if sensitive?(k)
-            "***"
-          else
-            case raw = v.raw
-            when String
-              display = k == "db" ? redact_db_url(raw) : raw
-              %("#{truncate(display, 40)}")
-            when Array then "[#{raw.size}]"
-            when Hash  then "{…}"
-            else            raw.to_s
-            end
-          end
-    parts << "#{k}=#{val}"
-  end
-  parts.join(" ")
-end
+include Memo::BusLog
 
 arcana_host = ENV["ARCANA_HOST"]? || "127.0.0.1"
 arcana_port = (ENV["ARCANA_PORT"]? || "19118").to_i
@@ -100,120 +51,21 @@ namespaces.services.each_key do |ns|
   log "#{GREEN}●#{RESET} preloaded #{BOLD}#{ns}#{RESET}"
 end
 
-handler = Memo::ArcanaService.new(namespaces)
-
 # Arcana::Client gives us join + correlation tracking + request/reply.
 # The same client is shared with Memo::Providers::Bus for outbound
 # embedding calls (bus/openai, bus/voyage formats).
 client = Arcana::Client.new(
   url: "ws://#{arcana_host}:#{arcana_port}/bus",
-  address: "memo:rag",
+  address: Memo::ArcanaListener::ADDRESS,
   name: "Memo RAG",
   description: "Multi-namespace retrieval-augmented generation service: semantic search, vector storage, embeddings",
   tags: ["rag", "search", "vectors", "embeddings"],
 )
 Memo::Providers::Bus.client = client
 
-# Requests run concurrently, up to max_concurrency at a time. The client
-# calls on_message from its WebSocket read loop, so handling a request there
-# would hold up every other request, and the replies that memo's own bus
-# calls (the bus/* embedding formats) are waiting for.
-slots = Channel(Nil).new(max_concurrency)
-client.on_message do |envelope|
-  spawn do
-    slots.send(nil)
-    begin
-      handle_request(client, handler, envelope)
-    ensure
-      slots.receive
-    end
-  end
-end
-
-# Memo saves an index on its own once enough changes are unsaved; this
-# also saves ones that have been unsaved too long without further writes.
-spawn do
-  loop do
-    sleep save_interval.seconds
-    namespaces.open_services.each do |ns, svc|
-      svc.save_index_if_due
-    rescue ex
-      log "#{RED}error#{RESET}      saving #{ns} index: #{ex.message}"
-    end
-  end
-end
-
-# Answer one request envelope.
-def handle_request(client : Arcana::Client, handler : Memo::ArcanaService, envelope : Arcana::Envelope)
-  payload = envelope.payload
-
-  # A reply (result, need, help, error) isn't a request: e.g. an embedding
-  # reply that arrived after memo stopped waiting for it. Answering it with
-  # an error could start an error ping-pong with the sender.
-  status = payload.as_h? ? Arcana::Protocol.status(payload) : nil
-  if status && status != "request"
-    log "#{DIM}ignored    #{envelope.from.ljust(12)} unexpected #{status} reply#{RESET}"
-    return
-  end
-
-  begin
-    data = if payload.as_h? && payload["_proto"]?
-             payload["data"]? || JSON::Any.new(nil)
-           else
-             payload
-           end
-
-    action = data["action"]?.try(&.as_s?) || "?"
-    from = envelope.from
-    t_start = Time.instant
-
-    # Help intent
-    if payload.as_h? && payload["_intent"]?.try(&.as_s?) == "help"
-      help_payload = JSON.parse(%({"_proto":"arcana/1","_status":"help","guide":#{Memo::ArcanaService::GUIDE.to_json},"schema":#{Memo::ArcanaService::SCHEMA.to_json}}))
-      client.send(envelope.reply(from: "memo:rag", payload: help_payload))
-      return
-    end
-
-    result = handler.handle(data)
-    elapsed_ms = (Time.instant - t_start).total_milliseconds.round(1)
-
-    status_color = elapsed_ms > 500 ? YELLOW : GREEN
-    summary = summarize(data)
-    extra = ""
-    if action == "search"
-      if t = result["timings"]?
-        cache = t["cache_hit"]?.try(&.as_bool?) ? "#{CYAN}cache#{RESET}" : ""
-        n = result["results"]?.try(&.as_a?.try(&.size)) || 0
-        extra = " #{DIM}→#{RESET} #{n} hit#{n == 1 ? "" : "s"} #{cache}"
-      end
-    elsif action == "stats" && result["embeddings"]?
-      extra = " #{DIM}→#{RESET} #{result["embeddings"]} emb / #{result["chunks"]} chunks"
-    elsif (action == "index" || action == "index_batch") && result["chunks"]?
-      extra = " #{DIM}→#{RESET} #{result["chunks"]} chunks"
-    end
-    log "#{status_color}#{action.ljust(11)}#{RESET} #{DIM}#{from.ljust(12)}#{RESET} #{summary}#{extra} #{DIM}(#{elapsed_ms}ms)#{RESET}"
-
-    result_payload = JSON::Any.new({
-      "_proto"  => JSON::Any.new("arcana/1"),
-      "_status" => JSON::Any.new("result"),
-      "data"    => result,
-    } of String => JSON::Any)
-
-    client.send(envelope.reply(from: "memo:rag", payload: result_payload))
-  rescue ex
-    error_payload = JSON::Any.new({
-      "_proto"  => JSON::Any.new("arcana/1"),
-      "_status" => JSON::Any.new("error"),
-      "message" => JSON::Any.new(ex.message || "Unknown error"),
-    } of String => JSON::Any)
-    begin
-      client.send(envelope.reply(from: "memo:rag", payload: error_payload))
-    rescue
-      # client may be closed
-    end
-    log "#{RED}error#{RESET}      #{ex.message}"
-  end
-end
+listener = Memo::ArcanaListener.new(client, namespaces, max_concurrency)
+listener.listen
+listener.save_periodically(save_interval.seconds)
 
 log "#{GREEN}●#{RESET} registered as #{BOLD}memo:rag#{RESET}, listening for requests"
 STDERR.puts ""
