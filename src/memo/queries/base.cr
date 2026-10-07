@@ -322,8 +322,6 @@ module Memo
 
     abstract def embedding_ids_without_vectors(service_id : Int64) : Array(Int64)
 
-    abstract def delete_embedding(embedding_id : Int64) : Nil
-
     abstract def log_index_change(service_id : Int64, embedding_id : Int64) : Nil
 
     # Distinct embedding ids logged after `seq`

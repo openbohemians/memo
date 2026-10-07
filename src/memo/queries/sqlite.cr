@@ -777,10 +777,6 @@ module Memo
       ids
     end
 
-    def delete_embedding(embedding_id : Int64) : Nil
-      @db.exec("DELETE FROM memo_embeddings WHERE rowid = ?", embedding_id)
-    end
-
     def log_index_change(service_id : Int64, embedding_id : Int64) : Nil
       @db.exec("INSERT INTO memo_index_log (service_id, embedding_id) VALUES (?, ?)", service_id, embedding_id)
     end
