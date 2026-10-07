@@ -26,6 +26,7 @@ module Memo
       @service_id : Int64 = 0,
     )
       @mutex = Mutex.new
+      @db_writes_since_check = 0
       @cache = {} of String => CacheEntry
       @order = Deque(String).new
       @hits = 0_i64
@@ -118,7 +119,13 @@ module Memo
       blob = Storage.serialize_embedding(embedding)
       db.memo_queries.upsert_query_cache(key, @service_id, blob, token_count, Time.utc.to_unix_ms)
 
-      # Prune if over limit (delete oldest entries beyond max)
+      # Prune if over limit (delete oldest entries beyond max). Counting
+      # scans the service's rows (~2 ms at 100K), so check once per 1% of
+      # max_db_entries writes; the table may run that far over in between.
+      @db_writes_since_check += 1
+      return if @db_writes_since_check < {@max_db_entries // 100, 1}.max
+      @db_writes_since_check = 0
+
       count = db.memo_queries.count_query_cache(@service_id)
       if count > @max_db_entries
         db.memo_queries.prune_query_cache(@service_id, count - @max_db_entries)
