@@ -4,6 +4,81 @@ module Memo
       Postgres.new(cnn)
     end
 
+    # Number the clauses' `?` placeholders $N, continuing after `after`.
+    # Returns the clauses and the last number used. Skips quoted strings
+    # ('...', "...", $tag$...$tag$) and comments, so a literal `?` in caller
+    # SQL (sql_where) isn't taken for a placeholder. That is also why the
+    # jsonb ?, ?| and ?& operators can't appear in sql_where on Postgres:
+    # use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.
+    def self.number_placeholders(clauses : Array(String), after : Int32) : {Array(String), Int32}
+      n = after
+      numbered = clauses.map do |clause|
+        bytes = clause.to_slice
+        String.build do |io|
+          i = 0
+          while i < bytes.size
+            skip_to = skip_quoted(bytes, i)
+            if skip_to > i
+              io.write(bytes[i, skip_to - i])
+              i = skip_to
+            elsif bytes[i] == '?'.ord
+              n += 1
+              io << '$' << n
+              i += 1
+            else
+              io.write_byte(bytes[i])
+              i += 1
+            end
+          end
+        end
+      end
+      {numbered, n}
+    end
+
+    # If a quoted string or comment starts at `i`, the index just past it;
+    # otherwise `i`. Works on bytes: no multi-byte UTF-8 character contains
+    # an ASCII byte, so quotes and `?` can't be mistaken.
+    private def self.skip_quoted(bytes : Bytes, i : Int32) : Int32
+      byte = bytes[i]
+      after = bytes[i + 1]?
+      if byte == '\''.ord || byte == '"'.ord # 'string' or "identifier"; doubled quote escapes
+        j = i + 1
+        while j < bytes.size
+          if bytes[j] == byte
+            return j + 1 unless bytes[j + 1]? == byte
+            j += 2
+          else
+            j += 1
+          end
+        end
+        bytes.size
+      elsif byte == '-'.ord && after == '-'.ord # -- comment, to end of line
+        (i...bytes.size).find { |j| bytes[j] == '\n'.ord } || bytes.size
+      elsif byte == '/'.ord && after == '*'.ord # /* comment */
+        j = i + 2
+        while j + 1 < bytes.size
+          return j + 2 if bytes[j] == '*'.ord && bytes[j + 1] == '/'.ord
+          j += 1
+        end
+        bytes.size
+      elsif byte == '$'.ord # $$ or $tag$ dollar quote ($1 is a parameter)
+        j = i + 1
+        while j < bytes.size && (bytes[j].unsafe_chr.ascii_alphanumeric? || bytes[j] == '_'.ord)
+          j += 1
+        end
+        return i unless j < bytes.size && bytes[j] == '$'.ord && !after.try(&.unsafe_chr.ascii_number?)
+        tag = bytes[i..j]
+        k = j + 1
+        while k + tag.size <= bytes.size
+          return k + tag.size if bytes[k, tag.size] == tag
+          k += 1
+        end
+        bytes.size
+      else
+        i
+      end
+    end
+
     # =========================================================================
     # Services
     # =========================================================================
@@ -596,11 +671,8 @@ module Memo
       text_join : String,
       fts_join : String,
     ) : Set(UInt64)
-      # Rewrite ? placeholders to $N, starting after $1 (service_id in JOIN)
-      n = 1 # $1 is service_id in the JOIN clause
-      pg_where = where_clauses.map do |clause|
-        clause.gsub("?") { n += 1; "$#{n}" }
-      end
+      # Rewrite ? placeholders to $N, after $1 (service_id in the JOIN)
+      pg_where, _ = Postgres.number_placeholders(where_clauses, after: 1)
 
       valid_rowids = Set(UInt64).new
       @db.query(
@@ -612,6 +684,7 @@ module Memo
           #{fts_join}
           WHERE #{pg_where.join(" AND ")}
         SQL
+
         args: [service_id] + params
       ) do |rs|
         rs.each { valid_rowids << rs.read(Int64).to_u64 }
@@ -631,11 +704,8 @@ module Memo
       return passing if candidate_ids.empty?
 
       # Candidates take $1..$n; rewrite the clauses' ? placeholders after them
-      n = 0
-      placeholders = candidate_ids.map { n += 1; "$#{n}" }.join(", ")
-      pg_where = where_clauses.map do |clause|
-        clause.gsub("?") { n += 1; "$#{n}" }
-      end
+      placeholders = (1..candidate_ids.size).join(", ") { |k| "$#{k}" }
+      pg_where, _ = Postgres.number_placeholders(where_clauses, after: candidate_ids.size)
 
       @db.query(
         <<-SQL,
@@ -646,6 +716,7 @@ module Memo
           #{fts_join}
           WHERE e.eid IN (#{placeholders}) AND #{pg_where.join(" AND ")}
         SQL
+
         args: candidate_ids.map(&.as(DB::Any)) + params
       ) do |rs|
         rs.each { passing << rs.read(Int64).to_u64 }
@@ -682,6 +753,7 @@ module Memo
           WHERE e.eid IN (#{placeholders})
             AND e.service_id = $#{service_param_idx}
         SQL
+
         args: rowids.map(&.as(DB::Any)) + [service_id.as(DB::Any)]
       ) do |rs|
         rs.each do
@@ -879,6 +951,7 @@ module Memo
           GROUP BY s.external_int, e.eid
           ORDER BY s.external_int, c."offset"
         SQL
+
         args: [service_id, source_type] + external_ids.map(&.as(DB::Any))
       ) do |rs|
         rs.each { results << {rs.read(Int64), rs.read(Int64)} }

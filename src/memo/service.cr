@@ -458,6 +458,9 @@ module Memo
     #   to filter by external database tables.
     #   Example: "c.source_id IN (SELECT id FROM main.artifact WHERE kind = 'goal')"
     #   Note: c.source_id here is the internal ID, not external.
+    #   Bind values with `?` (sql_where_args). On Postgres, a `?` outside
+    #   quotes is always a placeholder, so jsonb's ?, ?| and ?& operators
+    #   can't be used; use jsonb_exists() and friends.
     #
     # include_text: If true, includes text content in search results.
     #   Only works when text storage is enabled.
