@@ -1,3 +1,28 @@
+memo-rag (0.13.0-1) unstable; urgency=medium
+
+  * Database transactions are atomic. A failure partway through indexing
+    no longer leaves a source unsearchable while index() reports success.
+  * Vectors are stored in the database and index changes are journaled.
+    After a crash only unsaved changes are replayed; a lost or corrupt
+    index file is rebuilt from stored vectors, without the embedding API.
+    The first open of an existing database copies vectors out of its
+    index file.
+  * The index is saved on a policy (10,000 changes or 5 minutes), on a
+    separate thread, so searches don't stall during saves.
+  * memo-arcana handles requests concurrently (bus-routed embeddings no
+    longer hang), ignores stray replies, keeps other namespaces
+    responsive while one opens, and checks for due saves every
+    MEMO_SAVE_INTERVAL seconds. MEMO_MAX_CONCURRENCY caps requests in
+    flight (default 32).
+  * Filtered searches search first and filter second.
+  * Indexing cost no longer grows with collection size. Existing
+    databases rebuild their full-text table once on open.
+  * Only one process can open an index at a time.
+  * OpenAI and Voyage providers reuse connections and retry rate limits
+    and server errors.
+
+ -- trans <trans@github.com>  Tue, 06 Oct 2026 00:00:00 +0000
+
 memo-rag (0.12.1-1) unstable; urgency=medium
 
   * Rename Debian source/binary package from "memo" to "memo-rag"

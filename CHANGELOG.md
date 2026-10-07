@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-10-06
+
+### Upgrading
+- **The first open of an existing database migrates it once**: vectors are copied out of the
+  index file into the new `memo_vectors` table, and SQLite's full-text table is rebuilt so rows
+  are keyed by source id (0.3 s for 150K rows). Embeddings missing from both the database and the
+  index file are counted in `Service#index_recovery.missing`; indexing their sources again restores them.
+- **An index can only be open in one process at a time.** A second open raises
+  `Memo::USearchIndex::InUse`, including the memo CLI against a database a running service has open.
+- **Every statement inside a transaction must use the transaction's connection**
+  (`Memo::Database.transaction` yields it); statements sent to the pool commit on their own.
+
+### Added
+- **Index journal** (`Memo::IndexJournal`): vectors stored in `memo_vectors` (16-bit floats) and every
+  index change logged in `memo_index_log`, in the same transaction as the data. Opening an index
+  replays only changes after its checkpoint; a missing, corrupt or stale file is rebuilt from stored
+  vectors. `Service#index_recovery` reports what was done.
+- **Save policy**: the index saves itself once `index_save_changes` (10,000) changes are unsaved, or
+  any have been for `index_save_interval` (5 minutes). `Service#save_index_if_due` is cheap to call often;
+  `Service#save_index` saves at once. Saves write the file on a separate thread.
+- **`Memo::Database.transaction`** for atomic transactions, and `Memo::DBHandle` (pool or connection).
+- **`Memo::ArcanaListener`**: memo-arcana's request handling as a class, with specs on a private bus.
+- **memo-arcana settings**: `MEMO_MAX_CONCURRENCY` (default 32), `MEMO_SAVE_INTERVAL` (default 60 s).
+- **`Memo::Providers::HTTPPool`**: pooled connections and retries for the OpenAI and Voyage providers.
+
+### Changed
+- **Filtered searches search first and filter second**: unfiltered nearest neighbors are checked against
+  the filter by id, widening once if too few pass; narrow filters rank their few matches exactly.
+  At 20K vectors, a filter matching 90% of rows went from 10.3 ms to 1.2 ms.
+- **memo-arcana answers requests concurrently** and ignores reply envelopes instead of answering them.
+- **Opening one namespace no longer blocks requests to others**; replay and rebuild yield to other fibers.
+- **The persistent query cache checks its size once per 1% of its limit**, not on every write.
+
+### Fixed
+- **Transactions weren't atomic**: statements ran on other pool connections and committed one by one,
+  so a failure could leave a source unsearchable while `index` reported success.
+- **A crash lost every vector added since the last clean shutdown**, and they couldn't be re-added.
+- **Bus-routed embeddings (`bus/openai`, `bus/voyage`) hung in memo-arcana** until a 60 s timeout.
+- **Indexing slowed with every document**: deleting a full-text row scanned the whole FTS5 table
+  (28 ms per document at 150K; now a flat ~2 ms).
+- **SQLite inserts could read another connection's `last_insert_rowid`.**
+- **USearch rejected a new embedding** whose reused rowid a stale index file still held.
+
 ## [0.8.1] - 2026-02-09
 
 ### Added
