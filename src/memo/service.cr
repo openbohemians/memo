@@ -872,7 +872,7 @@ module Memo
       raise ArgumentError.new("Service '#{name}' not found") unless svc
 
       # Create provider instance from stored config
-      provider_instance = Providers::Registry.create(svc.format, api_key, svc.model, svc.base_url)
+      provider_instance = Providers::Registry.create(svc.format, api_key, svc.model, svc.base_url, svc.dimensions)
       raise ArgumentError.new("Unknown format: #{svc.format}") unless provider_instance
 
       # Save and close the current service's index
@@ -1648,7 +1648,7 @@ module Memo
         svc_id, svc_format, svc_base_url, svc_model, svc_dimensions, svc_max_tokens, svc_tokens_per_byte = svc
 
         # Create provider instance from stored config
-        provider_instance = Providers::Registry.create(svc_format, api_key, svc_model, svc_base_url)
+        provider_instance = Providers::Registry.create(svc_format, api_key, svc_model, svc_base_url, svc_dimensions)
         raise ArgumentError.new("Unknown format: #{svc_format}") unless provider_instance
 
         # Validate chunking doesn't exceed provider limits
@@ -1696,7 +1696,7 @@ module Memo
         end
 
         # Create provider instance
-        provider_instance = Providers::Registry.create(final_format, api_key, final_model, base_url)
+        provider_instance = Providers::Registry.create(final_format, api_key, final_model, base_url, final_dimensions)
         raise ArgumentError.new("Unknown format: #{final_format}") unless provider_instance
 
         # Register or get existing service in database (auto-generates name)
@@ -1717,7 +1717,7 @@ module Memo
         raise ArgumentError.new("No default service configured") unless default_svc
 
         # Create provider instance from default service config
-        provider_instance = Providers::Registry.create(default_svc.format, api_key, default_svc.model, default_svc.base_url)
+        provider_instance = Providers::Registry.create(default_svc.format, api_key, default_svc.model, default_svc.base_url, default_svc.dimensions)
         raise ArgumentError.new("Unknown format: #{default_svc.format}") unless provider_instance
 
         # Validate chunking doesn't exceed provider limits

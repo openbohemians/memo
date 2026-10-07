@@ -20,9 +20,16 @@ module Memo
       def initialize(
         @api_key : String,
         @model : String = "text-embedding-3-small",
-        @base_url : String = DEFAULT_BASE_URL
+        @base_url : String = DEFAULT_BASE_URL,
+        @dimensions : Int32? = nil,
       )
         @http = HTTPPool.new(@base_url)
+      end
+
+      # text-embedding-3 models can return shorter vectors (the `dimensions`
+      # parameter); older models such as ada-002 reject it.
+      def self.shortenable?(model : String) : Bool
+        model.starts_with?("text-embedding-3")
       end
 
       def embed_text(text : String, input_type : String? = nil) : {Array(Float64), Int32}
@@ -34,7 +41,7 @@ module Memo
         return EmbedResult.new([] of Array(Float64), [] of Int32, 0) if texts.empty?
 
         uri = URI.parse("#{@base_url}/embeddings")
-        body = Hash(String, String | Array(String)).new
+        body = Hash(String, String | Array(String) | Int32).new
         body["model"] = @model
         body["input"] = texts
         body["encoding_format"] = "float"
@@ -42,6 +49,10 @@ module Memo
         # memo sent it for months without error), but some OpenAI-compatible
         # APIs use it to embed queries and documents differently.
         body["input_type"] = input_type if input_type
+        # Ask for the size the service was set up with
+        if (dims = @dimensions) && OpenAI.shortenable?(@model)
+          body["dimensions"] = dims
+        end
 
         # Reuses connections and retries rate limits and transient errors
         response = @http.post(

@@ -13,7 +13,7 @@ module Memo
     #   format: "openai",
     #   api_key: "sk-...",
     #   model: "text-embedding-3-small",
-    #   base_url: "https://custom.api.com/v1"  # optional
+    #   base_url: "https://custom.api.com/v1" # optional
     # )
     # ```
     module Registry
@@ -24,13 +24,14 @@ module Memo
         format : String,
         api_key : String? = nil,
         model : String = "",
-        base_url : String? = nil
+        base_url : String? = nil,
+        dimensions : Int32? = nil,
       ) : Providers::Base?
         case format
         when "openai"
           raise ArgumentError.new("api_key required for openai format") unless api_key
           final_base_url = base_url || Providers::OpenAI::DEFAULT_BASE_URL
-          Providers::OpenAI.new(api_key, model, final_base_url)
+          Providers::OpenAI.new(api_key, model, final_base_url, dimensions)
         when "voyage"
           raise ArgumentError.new("api_key required for voyage format") unless api_key
           final_base_url = base_url || Providers::Voyage::DEFAULT_BASE_URL
@@ -43,7 +44,8 @@ module Memo
             model: model,
             endpoint: final_base_url
           )
-          Providers::Arcana.new(arcana_provider, model: model)
+          Providers::Arcana.new(arcana_provider, model: model,
+            dimensions: Providers::OpenAI.shortenable?(model) ? dimensions : nil)
         when "arcana/voyage"
           raise ArgumentError.new("api_key required for arcana/voyage format") unless api_key
           final_base_url = base_url || "https://api.voyageai.com/v1/embeddings"

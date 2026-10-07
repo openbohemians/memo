@@ -118,4 +118,16 @@ describe Memo::Providers::OpenAI do
       api.bodies.first.as_h.keys.sort.should eq ["encoding_format", "input", "input_type", "model"]
     end
   end
+
+  it "asks text-embedding-3 models for the service's dimensions" do
+    with_fake_api do |api, _|
+      large = Memo::Providers::OpenAI.new(api_key: "test", model: "text-embedding-3-large", base_url: api.base_url, dimensions: 1024)
+      large.embed_text("hello")
+      api.bodies.last["dimensions"].as_i.should eq 1024
+
+      ada = Memo::Providers::OpenAI.new(api_key: "test", model: "text-embedding-ada-002", base_url: api.base_url, dimensions: 1536)
+      ada.embed_text("hello")
+      api.bodies.last["dimensions"]?.should be_nil # ada-002 rejects it
+    end
+  end
 end
