@@ -17,7 +17,7 @@ Add to your `shard.yml`:
 ```yaml
 dependencies:
   memo:
-    github: trans/memo
+    github: openbohemians/memo
 ```
 
 Then run `shards install`.

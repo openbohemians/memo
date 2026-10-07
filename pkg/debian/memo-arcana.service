@@ -1,6 +1,6 @@
 [Unit]
 Description=Memo multi-namespace semantic search service on Arcana bus
-Documentation=https://github.com/trans/memo
+Documentation=https://github.com/openbohemians/memo
 After=network.target arcana.service postgresql.service
 Wants=arcana.service
 StartLimitIntervalSec=60

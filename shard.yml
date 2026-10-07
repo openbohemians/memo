@@ -8,7 +8,7 @@ description: |
 authors:
   - trans
 
-repository: https://github.com/trans/memo
+repository: https://github.com/openbohemians/memo
 
 crystal: ">= 1.19.1"
 

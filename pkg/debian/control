@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: trans <trans@github.com>
 Build-Depends: debhelper-compat (= 13), crystal, cmake, build-essential, libsqlite3-dev, libmagic-dev, libssl-dev, libpcre2-dev, libgc-dev, zlib1g-dev
 Standards-Version: 4.6.0
-Homepage: https://github.com/trans/memo
+Homepage: https://github.com/openbohemians/memo
 
 Package: memo-rag
 Architecture: amd64
