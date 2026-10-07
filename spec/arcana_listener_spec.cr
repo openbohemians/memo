@@ -14,7 +14,7 @@ private class TestBus
   @namespaces : Memo::Namespaces
   @memo : Arcana::Client
 
-  def initialize(db_path : String)
+  def initialize(db_path : String, max_concurrency = 32, max_waiting = 256)
     @port = free_port
     @server = Arcana::Server.new(Arcana::Bus.new, Arcana::Directory.new, host: "127.0.0.1", port: @port)
     @server.start_in_background
@@ -37,7 +37,7 @@ private class TestBus
     @namespaces.register(Memo::Namespaces::Config.new(ns: "game", db: db_path, service: "openai-bus"))
     @memo = connect(Memo::ArcanaListener::ADDRESS)
     Memo::Providers::Bus.client = @memo
-    Memo::ArcanaListener.new(@memo, @namespaces).listen
+    Memo::ArcanaListener.new(@memo, @namespaces, max_concurrency, max_waiting).listen
 
     @tester = connect("tester", listed: false)
     sleep 100.milliseconds # let every client's join reach the bus
@@ -76,9 +76,9 @@ private class TestBus
   end
 end
 
-private def with_test_bus(&)
+private def with_test_bus(max_concurrency = 32, max_waiting = 256, &)
   with_test_db_path do |db_path|
-    bus = TestBus.new(db_path)
+    bus = TestBus.new(db_path, max_concurrency, max_waiting)
     begin
       yield bus
     ensure
@@ -123,6 +123,20 @@ describe Memo::ArcanaListener do
     with_test_bus do |bus|
       stray = Arcana::Protocol.result(JSON::Any.new({"embeddings" => JSON::Any.new([] of JSON::Any)}))
       bus.send_to_memo(stray, timeout: 500.milliseconds).should be_nil
+    end
+  end
+
+  it "answers busy instead of queueing requests without limit" do
+    with_test_bus(max_concurrency: 1, max_waiting: 2) do |bus|
+      replies = Channel(Arcana::Envelope?).new
+      6.times { |i| spawn { replies.send(bus.ask(search("query #{i}"))) } }
+      payloads = Array.new(6) { replies.receive.not_nil!.payload }
+
+      busy = payloads.count { |p| p["code"]?.try(&.as_s) == "busy" }
+      answered = payloads.count { |p| Arcana::Protocol.status(p) == "result" }
+      busy.should be >= 1
+      answered.should be <= 3 # 1 running + 2 waiting at most
+      (busy + answered).should eq 6
     end
   end
 end

@@ -17,6 +17,7 @@ require "arcana-core"
 #   ARCANA_PORT           — Arcana server port (default: 19118)
 #   MEMO_NAMESPACES       — Path to namespaces config (default: /etc/memo/namespaces.yaml)
 #   MEMO_MAX_CONCURRENCY  — Requests handled at once (default: 32)
+#   MEMO_MAX_WAITING      — Requests waiting for a turn before memo answers "busy" (default: 8x concurrency)
 #   MEMO_SAVE_INTERVAL    — Seconds between checks for an index save that's due (default: 60)
 
 include Memo::BusLog
@@ -25,6 +26,7 @@ arcana_host = ENV["ARCANA_HOST"]? || "127.0.0.1"
 arcana_port = (ENV["ARCANA_PORT"]? || "19118").to_i
 config_path = ENV["MEMO_NAMESPACES"]? || "/etc/memo/namespaces.yaml"
 max_concurrency = (ENV["MEMO_MAX_CONCURRENCY"]? || "32").to_i
+max_waiting = (ENV["MEMO_MAX_WAITING"]?.try(&.to_i?)) || max_concurrency * 8
 save_interval = (ENV["MEMO_SAVE_INTERVAL"]? || "60").to_i
 
 namespaces = Memo::Namespaces.new
@@ -39,7 +41,7 @@ STDERR.puts "#{DIM}┌───────────────────�
 STDERR.puts "#{DIM}│#{RESET} config     #{DIM}│#{RESET} #{File.exists?(config_path) ? config_path : "(none)"}"
 STDERR.puts "#{DIM}│#{RESET} namespaces #{DIM}│#{RESET} #{namespaces.configs.size} registered"
 STDERR.puts "#{DIM}│#{RESET} bus        #{DIM}│#{RESET} #{arcana_host}:#{arcana_port}"
-STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurrency} at once"
+STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurrency} at once, #{max_waiting} waiting"
 STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} checked every #{save_interval}s (due after 10,000 changes or 5 min)"
 STDERR.puts "#{DIM}└──────────────────────────────────────────────────#{RESET}"
 
@@ -63,7 +65,7 @@ client = Arcana::Client.new(
 )
 Memo::Providers::Bus.client = client
 
-listener = Memo::ArcanaListener.new(client, namespaces, max_concurrency)
+listener = Memo::ArcanaListener.new(client, namespaces, max_concurrency, max_waiting)
 listener.listen
 listener.save_periodically(save_interval.seconds)
 
