@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Specs and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Crystal and libraries
+        run: |
+          curl -fsSL https://crystal-lang.org/install.sh | sudo bash
+          sudo apt-get install -y build-essential cmake sqlite3 libsqlite3-dev libmagic-dev \
+            libssl-dev libpcre2-dev libgc-dev zlib1g-dev
+          crystal --version
+
+      - name: Install shards
+        run: shards install
+
+      - name: Specs
+        run: crystal spec
+
+      - name: Lint
+        run: |
+          crystal build bin/ameba.cr -o bin/ameba
+          bin/ameba src bin spec
