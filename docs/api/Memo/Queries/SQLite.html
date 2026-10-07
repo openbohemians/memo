@@ -1,0 +1,3691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Crystal Docs 1.21.1">
+<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_name" content="memo">
+
+
+
+<link href="../../css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../js/doc.js"></script>
+
+  <meta name="repository-name" content="memo">
+  <title>Memo::Queries::SQLite - memo 0.13.0</title>
+  <script type="text/javascript">
+    CrystalDocs.base_path = "../../";
+  </script>
+</head>
+<body>
+
+<svg class="hidden">
+  <symbol id="octicon-link" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+  </symbol>
+</svg>
+<input type="checkbox" id="sidebar-btn">
+<label for="sidebar-btn" id="sidebar-btn-label">
+  <svg class="open" xmlns="http://www.w3.org/2000/svg" height="2em" width="2em" viewBox="0 0 512 512"><title>Open Sidebar</title><path fill="currentColor" d="M80 96v64h352V96H80zm0 112v64h352v-64H80zm0 112v64h352v-64H80z"></path></svg>
+  <svg class="close" xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 512 512"><title>Close Sidebar</title><path fill="currentColor" d="m118.6 73.4-45.2 45.2L210.7 256 73.4 393.4l45.2 45.2L256 301.3l137.4 137.3 45.2-45.2L301.3 256l137.3-137.4-45.2-45.2L256 210.7Z"></path></svg>
+</label>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search..." spellcheck="false" aria-label="Search">
+    </div>
+
+    <div class="project-summary">
+      <h1 class="project-name">
+        <a href="../../index.html">
+          memo
+        </a>
+      </h1>
+
+      <span class="project-version">
+        0.13.0
+      </span>
+    </div>
+  </div>
+
+  <div class="search-results hidden">
+    <ul class="search-list"></ul>
+  </div>
+
+  <div class="types-list">
+    <ul>
+  
+  <li class="parent open current" data-id="memo/Memo" data-name="memo">
+      <a href="../../Memo.html">Memo</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/ArcanaListener" data-name="memo::arcanalistener">
+      <a href="../../Memo/ArcanaListener.html">ArcanaListener</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ArcanaService" data-name="memo::arcanaservice">
+      <a href="../../Memo/ArcanaService.html">ArcanaService</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/BusLog" data-name="memo::buslog">
+      <a href="../../Memo/BusLog.html">BusLog</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Chunking" data-name="memo::chunking">
+      <a href="../../Memo/Chunking.html">Chunking</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/CLI" data-name="memo::cli">
+      <a href="../../Memo/CLI.html">CLI</a>
+      
+        <ul>
+  
+  <li class="parent " data-id="memo/Memo/CLI/Commands" data-name="memo::cli::commands">
+      <a href="../../Memo/CLI/Commands.html">Commands</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/BuildVocab" data-name="memo::cli::commands::buildvocab">
+      <a href="../../Memo/CLI/Commands/BuildVocab.html">BuildVocab</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Delete" data-name="memo::cli::commands::delete">
+      <a href="../../Memo/CLI/Commands/Delete.html">Delete</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/IndexFiles" data-name="memo::cli::commands::indexfiles">
+      <a href="../../Memo/CLI/Commands/IndexFiles.html">IndexFiles</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/IndexText" data-name="memo::cli::commands::indextext">
+      <a href="../../Memo/CLI/Commands/IndexText.html">IndexText</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Search" data-name="memo::cli::commands::search">
+      <a href="../../Memo/CLI/Commands/Search.html">Search</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceCreate" data-name="memo::cli::commands::servicecreate">
+      <a href="../../Memo/CLI/Commands/ServiceCreate.html">ServiceCreate</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceDelete" data-name="memo::cli::commands::servicedelete">
+      <a href="../../Memo/CLI/Commands/ServiceDelete.html">ServiceDelete</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Services" data-name="memo::cli::commands::services">
+      <a href="../../Memo/CLI/Commands/Services.html">Services</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceUse" data-name="memo::cli::commands::serviceuse">
+      <a href="../../Memo/CLI/Commands/ServiceUse.html">ServiceUse</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Stats" data-name="memo::cli::commands::stats">
+      <a href="../../Memo/CLI/Commands/Stats.html">Stats</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Terms" data-name="memo::cli::commands::terms">
+      <a href="../../Memo/CLI/Commands/Terms.html">Terms</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Input" data-name="memo::cli::input">
+      <a href="../../Memo/CLI/Input.html">Input</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Clustering" data-name="memo::clustering">
+      <a href="../../Memo/Clustering.html">Clustering</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Clustering/Cluster" data-name="memo::clustering::cluster">
+      <a href="../../Memo/Clustering/Cluster.html">Cluster</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Config" data-name="memo::config">
+      <a href="../../Memo/Config.html">Config</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Config/Chunking" data-name="memo::config::chunking">
+      <a href="../../Memo/Config/Chunking.html">Chunking</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/EmbeddingService" data-name="memo::config::embeddingservice">
+      <a href="../../Memo/Config/EmbeddingService.html">EmbeddingService</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/Queue" data-name="memo::config::queue">
+      <a href="../../Memo/Config/Queue.html">Queue</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/Search" data-name="memo::config::search">
+      <a href="../../Memo/Config/Search.html">Search</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Database" data-name="memo::database">
+      <a href="../../Memo/Database.html">Database</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/DBHandle" data-name="memo::dbhandle">
+      <a href="../../Memo/DBHandle.html">DBHandle</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Dialect" data-name="memo::dialect">
+      <a href="../../Memo/Dialect.html">Dialect</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Dialect/Base" data-name="memo::dialect::base">
+      <a href="../../Memo/Dialect/Base.html">Base</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Dialect/Postgres" data-name="memo::dialect::postgres">
+      <a href="../../Memo/Dialect/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Dialect/SQLite" data-name="memo::dialect::sqlite">
+      <a href="../../Memo/Dialect/SQLite.html">SQLite</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Document" data-name="memo::document">
+      <a href="../../Memo/Document.html">Document</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ExternalId" data-name="memo::externalid">
+      <a href="../../Memo/ExternalId.html">ExternalId</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Files" data-name="memo::files">
+      <a href="../../Memo/Files.html">Files</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Files/FileInfo" data-name="memo::files::fileinfo">
+      <a href="../../Memo/Files/FileInfo.html">FileInfo</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Files/FileRecord" data-name="memo::files::filerecord">
+      <a href="../../Memo/Files/FileRecord.html">FileRecord</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/IndexJournal" data-name="memo::indexjournal">
+      <a href="../../Memo/IndexJournal.html">IndexJournal</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
+      <a href="../../Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Namespaces" data-name="memo::namespaces">
+      <a href="../../Memo/Namespaces.html">Namespaces</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Namespaces/Config" data-name="memo::namespaces::config">
+      <a href="../../Memo/Namespaces/Config.html">Config</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Providers" data-name="memo::providers">
+      <a href="../../Memo/Providers.html">Providers</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Providers/Arcana" data-name="memo::providers::arcana">
+      <a href="../../Memo/Providers/Arcana.html">Arcana</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Base" data-name="memo::providers::base">
+      <a href="../../Memo/Providers/Base.html">Base</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Bus" data-name="memo::providers::bus">
+      <a href="../../Memo/Providers/Bus.html">Bus</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/EmbedResult" data-name="memo::providers::embedresult">
+      <a href="../../Memo/Providers/EmbedResult.html">EmbedResult</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/HTTPPool" data-name="memo::providers::httppool">
+      <a href="../../Memo/Providers/HTTPPool.html">HTTPPool</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Mock" data-name="memo::providers::mock">
+      <a href="../../Memo/Providers/Mock.html">Mock</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/OpenAI" data-name="memo::providers::openai">
+      <a href="../../Memo/Providers/OpenAI.html">OpenAI</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Registry" data-name="memo::providers::registry">
+      <a href="../../Memo/Providers/Registry.html">Registry</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Voyage" data-name="memo::providers::voyage">
+      <a href="../../Memo/Providers/Voyage.html">Voyage</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent open current" data-id="memo/Memo/Queries" data-name="memo::queries">
+      <a href="../../Memo/Queries.html">Queries</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Queries/Postgres" data-name="memo::queries::postgres">
+      <a href="../../Memo/Queries/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" current" data-id="memo/Memo/Queries/SQLite" data-name="memo::queries::sqlite">
+      <a href="../../Memo/Queries/SQLite.html">SQLite</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/QueryCache" data-name="memo::querycache">
+      <a href="../../Memo/QueryCache.html">QueryCache</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/RRF" data-name="memo::rrf">
+      <a href="../../Memo/RRF.html">RRF</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/RRF/Item" data-name="memo::rrf::item">
+      <a href="../../Memo/RRF/Item.html">Item</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Search" data-name="memo::search">
+      <a href="../../Memo/Search.html">Search</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Search/Filters" data-name="memo::search::filters">
+      <a href="../../Memo/Search/Filters.html">Filters</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Search/Result" data-name="memo::search::result">
+      <a href="../../Memo/Search/Result.html">Result</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Search/Timings" data-name="memo::search::timings">
+      <a href="../../Memo/Search/Timings.html">Timings</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Service" data-name="memo::service">
+      <a href="../../Memo/Service.html">Service</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Service/QueueStats" data-name="memo::service::queuestats">
+      <a href="../../Memo/Service/QueueStats.html">QueueStats</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/ServiceProvider" data-name="memo::serviceprovider">
+      <a href="../../Memo/ServiceProvider.html">ServiceProvider</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/ServiceProvider/Info" data-name="memo::serviceprovider::info">
+      <a href="../../Memo/ServiceProvider/Info.html">Info</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ServiceProvider/Stats" data-name="memo::serviceprovider::stats">
+      <a href="../../Memo/ServiceProvider/Stats.html">Stats</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/SourceRegistry" data-name="memo::sourceregistry">
+      <a href="../../Memo/SourceRegistry.html">SourceRegistry</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Stats" data-name="memo::stats">
+      <a href="../../Memo/Stats.html">Stats</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Storage" data-name="memo::storage">
+      <a href="../../Memo/Storage.html">Storage</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/USearchIndex" data-name="memo::usearchindex">
+      <a href="../../Memo/USearchIndex.html">USearchIndex</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/USearchIndex/InUse" data-name="memo::usearchindex::inuse">
+      <a href="../../Memo/USearchIndex/InUse.html">InUse</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/USearchIndex/Pending" data-name="memo::usearchindex::pending">
+      <a href="../../Memo/USearchIndex/Pending.html">Pending</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Vocab" data-name="memo::vocab">
+      <a href="../../Memo/Vocab.html">Vocab</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Vocab/Result" data-name="memo::vocab::result">
+      <a href="../../Memo/Vocab/Result.html">Result</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Vocab/WordFrequency" data-name="memo::vocab::wordfrequency">
+      <a href="../../Memo/Vocab/WordFrequency.html">WordFrequency</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+  </div>
+</div>
+
+
+<div class="main-content">
+<h1 class="type-name">
+
+  <span class="kind">
+    class
+  </span> Memo::<wbr>Queries::<wbr>SQLite
+
+</h1>
+
+
+  <ul class="superclass-hierarchy"><li class="superclass"><a href="../../Memo/Queries/SQLite.html">Memo::Queries::SQLite</a></li><li class="superclass"><a href="../../Memo/Queries.html">Memo::Queries</a></li><li class="superclass">Reference</li><li class="superclass">Object</li></ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="defined-in" class="anchor" href="#defined-in">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Defined in:
+  </h2>
+  
+    
+      <a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L2" target="_blank">
+        memo/queries/sqlite.cr
+      </a>
+    
+    <br/>
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <h2>
+    <a id="instance-method-summary" class="anchor" href="#instance-method-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#clear_completed_queue%3AInt32-instance-method" class="signature"><strong>#clear_completed_queue</strong> : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#clear_default_service%3ANil-instance-method" class="signature"><strong>#clear_default_service</strong> : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#clear_query_cache%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#clear_query_cache</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#clear_queue%3AInt32-instance-method" class="signature"><strong>#clear_queue</strong> : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_chunks_by_hash%28hash%3ABytes%29%3AInt64-instance-method" class="signature"><strong>#count_chunks_by_hash</strong>(hash : Bytes) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_chunks_for_service%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_chunks_for_service</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_embeddings_for_service%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_embeddings_for_service</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_files%3AInt64-instance-method" class="signature"><strong>#count_files</strong> : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_query_cache%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_query_cache</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_service_chunks%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_service_chunks</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_service_embeddings%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_service_embeddings</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_service_sources%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_service_sources</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_services%3AInt64-instance-method" class="signature"><strong>#count_services</strong> : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_vectors%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_vectors</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_vocab%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#count_vocab</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_chunks%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%29%3AInt32-instance-method" class="signature"><strong>#delete_chunks</strong>(hash : Bytes, source_id : Int64, source_type : String) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_chunks%28hash%3ABytes%2Csource_id%3AInt64%29%3AInt32-instance-method" class="signature"><strong>#delete_chunks</strong>(hash : Bytes, source_id : Int64) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_chunks_by_hash%28hash%3ABytes%29%3ANil-instance-method" class="signature"><strong>#delete_chunks_by_hash</strong>(hash : Bytes) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_embeddings_by_hash%28hash%3ABytes%29%3ANil-instance-method" class="signature"><strong>#delete_embeddings_by_hash</strong>(hash : Bytes) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_embeddings_by_service%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_embeddings_by_service</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_file%28source_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#delete_file</strong>(source_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_index_data%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_index_data</strong>(service_id : Int64) : Nil</a>
+        
+          <div class="summary"><p>Remove a service's vectors, journal entries and journal state</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_service%28id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_service</strong>(id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64-instance-method" class="signature"><strong>#delete_source_blob</strong>(source_type : String, external_id : Bytes) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_source_by_id%28internal_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#delete_source_by_id</strong>(internal_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#delete_source_int</strong>(source_type : String, external_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64-instance-method" class="signature"><strong>#delete_source_text</strong>(source_type : String, external_id : String) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_text</strong>(source_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vector</strong>(embedding_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vocab</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#embedding_ids_for_hash%28hash%3ABytes%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method" class="signature"><strong>#embedding_ids_for_hash</strong>(hash : Bytes) : Array(Tuple(Int64, Int64))</a>
+        
+          <div class="summary"><p>{embedding id, service id} for every service's embedding of a hash</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#embedding_ids_without_vectors%28service_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="signature"><strong>#embedding_ids_without_vectors</strong>(service_id : Int64) : Array(Int64)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#enqueue%28source_id%3AInt64%2Ctext%3AString%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#enqueue</strong>(source_id : Int64, text : String, created_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="signature"><strong>#fetch_search_results</strong>(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#filter_candidates</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)</a>
+        
+          <div class="summary"><p>Which of <code>candidate_ids</code> pass the filter clauses (looked up by id, so the cost depends on the number of candidates, not the collection)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_service_id%28name%3AString%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_service_id</strong>(name : String) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_blob</strong>(source_type : String, external_id : Bytes) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_blob_any_type%28external_id%3ABytes%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_blob_any_type</strong>(external_id : Bytes) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_int</strong>(source_type : String, external_id : Int64) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_int_any_type%28external_id%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_int_any_type</strong>(external_id : Int64) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_text</strong>(source_type : String, external_id : String) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_source_text_any_type%28external_id%3AString%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_source_text_any_type</strong>(external_id : String) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#for_connection%28cnn%3ADB%3A%3AConnection%29%3AQueries-instance-method" class="signature"><strong>#for_connection</strong>(cnn : DB::Connection) : Queries</a>
+        
+          <div class="summary"><p>Same queries, run on one connection (for use inside a transaction).</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_all_texts%3AArray%28String%29-instance-method" class="signature"><strong>#get_all_texts</strong> : Array(String)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_chunk_hashes%28source_id%3AInt64%2Csource_type%3AString%7CNil%29%3AArray%28Bytes%29-instance-method" class="signature"><strong>#get_chunk_hashes</strong>(source_id : Int64, source_type : String | Nil) : Array(Bytes)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_chunk_id%28source_id%3AInt64%2Coffset%3AInt32%7CNil%29%3AInt64-instance-method" class="signature"><strong>#get_chunk_id</strong>(source_id : Int64, offset : Int32 | Nil) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_chunks_for_reindex%28source_type%3AString%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CInt64%7CNil%2CInt64%7CNil%29%29-instance-method" class="signature"><strong>#get_chunks_for_reindex</strong>(source_type : String, service_id : Int64) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Int64 | Nil, Int64 | Nil))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_default_service%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="signature"><strong>#get_default_service</strong> : ServiceProvider::Info | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_embedding_hashes_for_service%28service_id%3AInt64%29%3AArray%28Bytes%29-instance-method" class="signature"><strong>#get_embedding_hashes_for_service</strong>(service_id : Int64) : Array(Bytes)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_embedding_rowid%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#get_embedding_rowid</strong>(hash : Bytes, service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_embedding_rowid%3F%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#get_embedding_rowid?</strong>(hash : Bytes, service_id : Int64) : Int64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_existing_words%28service_id%3AInt64%2Cwords%3AArray%28String%29%29%3ASet%28String%29-instance-method" class="signature"><strong>#get_existing_words</strong>(service_id : Int64, words : Array(String)) : Set(String)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_file_by_hash%28hash%3ABytes%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="signature"><strong>#get_file_by_hash</strong>(hash : Bytes) : Files::FileRecord | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_file_by_path%28path%3AString%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="signature"><strong>#get_file_by_path</strong>(path : String) : Files::FileRecord | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_file_by_source%28source_id%3AInt64%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="signature"><strong>#get_file_by_source</strong>(source_id : Int64) : Files::FileRecord | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_index_state%28service_id%3AInt64%29%3ATuple%28Int64%2CBool%29%7CNil-instance-method" class="signature"><strong>#get_index_state</strong>(service_id : Int64) : Tuple(Int64, Bool) | Nil</a>
+        
+          <div class="summary"><p>{pruned_through, vectors_backfilled}</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method" class="signature"><strong>#get_pending_queue</strong>(limit : Int32) : Array(Tuple(Int64, Int64, String))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_query_cache%28query%3AString%2Cservice_id%3AInt64%29%3ATuple%28Bytes%2CInt32%29%7CNil-instance-method" class="signature"><strong>#get_query_cache</strong>(query : String, service_id : Int64) : Tuple(Bytes, Int32) | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method" class="signature"><strong>#get_queue_attempts</strong>(id : Int64) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_queue_item%28source_id%3AInt64%29%3ATuple%28Int64%2CString%29%7CNil-instance-method" class="signature"><strong>#get_queue_item</strong>(source_id : Int64) : Tuple(Int64, String) | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_recent_query_cache%28service_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28String%2CBytes%2CInt32%29%29-instance-method" class="signature"><strong>#get_recent_query_cache</strong>(service_id : Int64, limit : Int32) : Array(Tuple(String, Bytes, Int32))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_service_by_format_model%28format%3AString%2Cmodel%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method" class="signature"><strong>#get_service_by_format_model</strong>(format : String, model : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_service_by_name%28name%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method" class="signature"><strong>#get_service_by_name</strong>(name : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_service_info%28id%3AInt64%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="signature"><strong>#get_service_info</strong>(id : Int64) : ServiceProvider::Info | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_service_info_by_name%28name%3AString%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="signature"><strong>#get_service_info_by_name</strong>(name : String) : ServiceProvider::Info | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_service_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method" class="signature"><strong>#get_service_tokens_per_byte</strong>(service_id : Int64) : Float64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_source_external%28internal_id%3AInt64%29%3ATuple%28String%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%7CNil-instance-method" class="signature"><strong>#get_source_external</strong>(internal_id : Int64) : Tuple(String, Int64 | Nil, String | Nil, Bytes | Nil) | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="signature"><strong>#get_text</strong>(source_id : Int64) : String | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method" class="signature"><strong>#get_text_hash</strong>(source_id : Int64) : Bytes | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_texts_for_reindex%28source_type%3AString%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CInt64%7CNil%2CString%29%29-instance-method" class="signature"><strong>#get_texts_for_reindex</strong>(source_type : String) : Array(Tuple(Int64, Int64 | Nil, Int64 | Nil, String))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method" class="signature"><strong>#get_tokens_per_byte</strong>(service_id : Int64) : Float64 | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_vector%28embedding_id%3AInt64%29%3ABytes%7CNil-instance-method" class="signature"><strong>#get_vector</strong>(embedding_id : Int64) : Bytes | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get_vocab%28service_id%3AInt64%2C%26block%3ADB%3A%3AResultSet-%3E%29%3ANil-instance-method" class="signature"><strong>#get_vocab</strong>(service_id : Int64, &block : DB::ResultSet -> ) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#increment_match_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method" class="signature"><strong>#increment_match_count</strong>(chunk_ids : Array(Int64)) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#increment_read_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method" class="signature"><strong>#increment_read_count</strong>(chunk_ids : Array(Int64)) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#index_changes_since%28service_id%3AInt64%2Cseq%3AInt64%29%3AArray%28Int64%29-instance-method" class="signature"><strong>#index_changes_since</strong>(service_id : Int64, seq : Int64) : Array(Int64)</a>
+        
+          <div class="summary"><p>Distinct embedding ids logged after <code>seq</code></p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_embedding_ignore%28hash%3ABytes%2Cservice_id%3AInt64%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_embedding_ignore</strong>(hash : Bytes, service_id : Int64, token_count : Int32, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_service%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_service</strong>(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_service_full%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Cis_default%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_service_full</strong>(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, is_default : Int32, created_at : Int64) : Int64</a>
+        
+          <div class="summary"><p>Insert service with is_default and return ID (for ServiceProvider.create)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_source%28source_type%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source</strong>(source_type : String, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method" class="signature"><strong>#list_files</strong>(limit : Int32, offset : Int32) : Array(Files::FileRecord)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#list_services%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method" class="signature"><strong>#list_services</strong> : Array(ServiceProvider::Info)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#list_services_by_format%28format%3AString%29%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method" class="signature"><strong>#list_services_by_format</strong>(format : String) : Array(ServiceProvider::Info)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#list_sources%28source_type%3AString%2Climit%3AInt32%2Coffset%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%29-instance-method" class="signature"><strong>#list_sources</strong>(source_type : String, limit : Int32, offset : Int32) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Bytes | Nil))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#load_embedding_rowids%28service_id%3AInt64%2Csource_type%3AString%2Cexternal_ids%3AArray%28Int64%29%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method" class="signature"><strong>#load_embedding_rowids</strong>(service_id : Int64, source_type : String, external_ids : Array(Int64)) : Array(Tuple(Int64, Int64))</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#log_index_change%28service_id%3AInt64%2Cembedding_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#log_index_change</strong>(service_id : Int64, embedding_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#max_index_log_seq%28service_id%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#max_index_log_seq</strong>(service_id : Int64) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#prune_index_log%28service_id%3AInt64%2Cthrough%3AInt64%29%3ANil-instance-method" class="signature"><strong>#prune_index_log</strong>(service_id : Int64, through : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#prune_query_cache%28service_id%3AInt64%2Ccount%3AInt64%29%3ANil-instance-method" class="signature"><strong>#prune_query_cache</strong>(service_id : Int64, count : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#queue_stats%3ATuple%28Int64%2CInt64%29-instance-method" class="signature"><strong>#queue_stats</strong> : Tuple(Int64, Int64)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#search_filtered_rowids</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#service_exists%3F%28id%3AInt64%29%3ABool-instance-method" class="signature"><strong>#service_exists?</strong>(id : Int64) : Bool</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_default_service%28id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_default_service</strong>(id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_index_pruned_through%28service_id%3AInt64%2Cseq%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_index_pruned_through</strong>(service_id : Int64, seq : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_vectors_backfilled</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#update_service%28id%3AInt64%2Cupdates%3AArray%28String%29%2Cparams%3AArray%28DB%3A%3AAny%29%29%3AInt64-instance-method" class="signature"><strong>#update_service</strong>(id : Int64, updates : Array(String), params : Array(DB::Any)) : Int64</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#update_tokens_per_byte%28tokens_per_byte%3AFloat64%2Cservice_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#update_tokens_per_byte</strong>(tokens_per_byte : Float64, service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#update_word_frequency%28count%3AInt32%2Cword%3AString%2Cservice_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#update_word_frequency</strong>(count : Int32, word : String, service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_file</strong>(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_query_cache</strong>(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#upsert_vector%28embedding_id%3AInt64%2Cservice_id%3AInt64%2Cvector%3ABytes%29%3ANil-instance-method" class="signature"><strong>#upsert_vector</strong>(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#upsert_vocab%28word%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Cfrequency%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_vocab</strong>(word : String, service_id : Int64, embedding : Bytes, frequency : Int32, created_at : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#vectors_after%28service_id%3AInt64%2Cafter_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CBytes%29%29-instance-method" class="signature"><strong>#vectors_after</strong>(service_id : Int64, after_id : Int64, limit : Int32) : Array(Tuple(Int64, Bytes))</a>
+        
+          <div class="summary"><p>Up to <code>limit</code> {embedding id, vector} pairs with ids above <code>after_id</code>, in id order</p></div>
+        
+      </li>
+    
+  </ul>
+
+
+
+  <div class="methods-inherited">
+    
+      
+
+  <h3>Instance methods inherited from class <code><a href="../../Memo/Queries.html">Memo::Queries</a></code></h3>
+  
+  
+    <a href="../../Memo/Queries.html#clear_completed_queue%3AInt32-instance-method" class="tooltip">
+      <span>clear_completed_queue : Int32</span>
+    clear_completed_queue</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#clear_default_service%3ANil-instance-method" class="tooltip">
+      <span>clear_default_service : Nil</span>
+    clear_default_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#clear_query_cache%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>clear_query_cache(service_id : Int64) : Nil</span>
+    clear_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#clear_queue%3AInt32-instance-method" class="tooltip">
+      <span>clear_queue : Int32</span>
+    clear_queue</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_chunks_by_hash%28hash%3ABytes%29%3AInt64-instance-method" class="tooltip">
+      <span>count_chunks_by_hash(hash : Bytes) : Int64</span>
+    count_chunks_by_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_chunks_for_service%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_chunks_for_service(service_id : Int64) : Int64</span>
+    count_chunks_for_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_embeddings_for_service%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_embeddings_for_service(service_id : Int64) : Int64</span>
+    count_embeddings_for_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_files%3AInt64-instance-method" class="tooltip">
+      <span>count_files : Int64</span>
+    count_files</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_query_cache%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_query_cache(service_id : Int64) : Int64</span>
+    count_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_service_chunks%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_service_chunks(service_id : Int64) : Int64</span>
+    count_service_chunks</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_service_embeddings%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_service_embeddings(service_id : Int64) : Int64</span>
+    count_service_embeddings</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_service_sources%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_service_sources(service_id : Int64) : Int64</span>
+    count_service_sources</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_services%3AInt64-instance-method" class="tooltip">
+      <span>count_services : Int64</span>
+    count_services</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_vectors%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_vectors(service_id : Int64) : Int64</span>
+    count_vectors</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#count_vocab%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>count_vocab(service_id : Int64) : Int64</span>
+    count_vocab</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#db%3ADBHandle-instance-method" class="tooltip">
+      <span>db : DBHandle</span>
+    db</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_chunks%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%29%3AInt32-instance-method" class="tooltip">
+      <span>delete_chunks(hash : Bytes, source_id : Int64, source_type : String) : Int32<br/>delete_chunks(hash : Bytes, source_id : Int64) : Int32</span>
+    delete_chunks</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_chunks_by_hash%28hash%3ABytes%29%3ANil-instance-method" class="tooltip">
+      <span>delete_chunks_by_hash(hash : Bytes) : Nil</span>
+    delete_chunks_by_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_embeddings_by_hash%28hash%3ABytes%29%3ANil-instance-method" class="tooltip">
+      <span>delete_embeddings_by_hash(hash : Bytes) : Nil</span>
+    delete_embeddings_by_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_embeddings_by_service%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_embeddings_by_service(service_id : Int64) : Nil</span>
+    delete_embeddings_by_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_file%28source_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>delete_file(source_id : Int64) : Int64</span>
+    delete_file</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_index_data%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_index_data(service_id : Int64) : Nil</span>
+    delete_index_data</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_service%28id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_service(id : Int64) : Nil</span>
+    delete_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64-instance-method" class="tooltip">
+      <span>delete_source_blob(source_type : String, external_id : Bytes) : Int64</span>
+    delete_source_blob</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_source_by_id%28internal_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>delete_source_by_id(internal_id : Int64) : Int64</span>
+    delete_source_by_id</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>delete_source_int(source_type : String, external_id : Int64) : Int64</span>
+    delete_source_int</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64-instance-method" class="tooltip">
+      <span>delete_source_text(source_type : String, external_id : String) : Int64</span>
+    delete_source_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_text%28source_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_text(source_id : Int64) : Nil</span>
+    delete_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_vector(embedding_id : Int64) : Nil</span>
+    delete_vector</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_vocab(service_id : Int64) : Nil</span>
+    delete_vocab</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#embedding_ids_for_hash%28hash%3ABytes%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method" class="tooltip">
+      <span>embedding_ids_for_hash(hash : Bytes) : Array(Tuple(Int64, Int64))</span>
+    embedding_ids_for_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#embedding_ids_without_vectors%28service_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="tooltip">
+      <span>embedding_ids_without_vectors(service_id : Int64) : Array(Int64)</span>
+    embedding_ids_without_vectors</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#enqueue%28source_id%3AInt64%2Ctext%3AString%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>enqueue(source_id : Int64, text : String, created_at : Int64) : Nil</span>
+    enqueue</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="tooltip">
+      <span>fetch_search_results(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</span>
+    fetch_search_results</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method" class="tooltip">
+      <span>filter_candidates(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)</span>
+    filter_candidates</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_service_id%28name%3AString%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_service_id(name : String) : Int64 | Nil</span>
+    find_service_id</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_blob(source_type : String, external_id : Bytes) : Int64 | Nil</span>
+    find_source_blob</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_blob_any_type%28external_id%3ABytes%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_blob_any_type(external_id : Bytes) : Int64 | Nil</span>
+    find_source_blob_any_type</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_int(source_type : String, external_id : Int64) : Int64 | Nil</span>
+    find_source_int</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_int_any_type%28external_id%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_int_any_type(external_id : Int64) : Int64 | Nil</span>
+    find_source_int_any_type</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_text(source_type : String, external_id : String) : Int64 | Nil</span>
+    find_source_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_source_text_any_type%28external_id%3AString%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_source_text_any_type(external_id : String) : Int64 | Nil</span>
+    find_source_text_any_type</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#for_connection%28cnn%3ADB%3A%3AConnection%29%3AQueries-instance-method" class="tooltip">
+      <span>for_connection(cnn : DB::Connection) : Queries</span>
+    for_connection</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_all_texts%3AArray%28String%29-instance-method" class="tooltip">
+      <span>get_all_texts : Array(String)</span>
+    get_all_texts</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_chunk_hashes%28source_id%3AInt64%2Csource_type%3AString%7CNil%29%3AArray%28Bytes%29-instance-method" class="tooltip">
+      <span>get_chunk_hashes(source_id : Int64, source_type : String | Nil) : Array(Bytes)</span>
+    get_chunk_hashes</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_chunk_id%28source_id%3AInt64%2Coffset%3AInt32%7CNil%29%3AInt64-instance-method" class="tooltip">
+      <span>get_chunk_id(source_id : Int64, offset : Int32 | Nil) : Int64</span>
+    get_chunk_id</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_chunks_for_reindex%28source_type%3AString%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CInt64%7CNil%2CInt64%7CNil%29%29-instance-method" class="tooltip">
+      <span>get_chunks_for_reindex(source_type : String, service_id : Int64) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Int64 | Nil, Int64 | Nil))</span>
+    get_chunks_for_reindex</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_default_service%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="tooltip">
+      <span>get_default_service : ServiceProvider::Info | Nil</span>
+    get_default_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_embedding_hashes_for_service%28service_id%3AInt64%29%3AArray%28Bytes%29-instance-method" class="tooltip">
+      <span>get_embedding_hashes_for_service(service_id : Int64) : Array(Bytes)</span>
+    get_embedding_hashes_for_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_embedding_rowid%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>get_embedding_rowid(hash : Bytes, service_id : Int64) : Int64</span>
+    get_embedding_rowid</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_embedding_rowid%3F%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>get_embedding_rowid?(hash : Bytes, service_id : Int64) : Int64 | Nil</span>
+    get_embedding_rowid?</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_existing_words%28service_id%3AInt64%2Cwords%3AArray%28String%29%29%3ASet%28String%29-instance-method" class="tooltip">
+      <span>get_existing_words(service_id : Int64, words : Array(String)) : Set(String)</span>
+    get_existing_words</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_file_by_hash%28hash%3ABytes%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="tooltip">
+      <span>get_file_by_hash(hash : Bytes) : Files::FileRecord | Nil</span>
+    get_file_by_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_file_by_path%28path%3AString%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="tooltip">
+      <span>get_file_by_path(path : String) : Files::FileRecord | Nil</span>
+    get_file_by_path</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_file_by_source%28source_id%3AInt64%29%3AFiles%3A%3AFileRecord%7CNil-instance-method" class="tooltip">
+      <span>get_file_by_source(source_id : Int64) : Files::FileRecord | Nil</span>
+    get_file_by_source</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_index_state%28service_id%3AInt64%29%3ATuple%28Int64%2CBool%29%7CNil-instance-method" class="tooltip">
+      <span>get_index_state(service_id : Int64) : Tuple(Int64, Bool) | Nil</span>
+    get_index_state</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method" class="tooltip">
+      <span>get_pending_queue(limit : Int32) : Array(Tuple(Int64, Int64, String))</span>
+    get_pending_queue</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_query_cache%28query%3AString%2Cservice_id%3AInt64%29%3ATuple%28Bytes%2CInt32%29%7CNil-instance-method" class="tooltip">
+      <span>get_query_cache(query : String, service_id : Int64) : Tuple(Bytes, Int32) | Nil</span>
+    get_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method" class="tooltip">
+      <span>get_queue_attempts(id : Int64) : Int32</span>
+    get_queue_attempts</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_queue_item%28source_id%3AInt64%29%3ATuple%28Int64%2CString%29%7CNil-instance-method" class="tooltip">
+      <span>get_queue_item(source_id : Int64) : Tuple(Int64, String) | Nil</span>
+    get_queue_item</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_recent_query_cache%28service_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28String%2CBytes%2CInt32%29%29-instance-method" class="tooltip">
+      <span>get_recent_query_cache(service_id : Int64, limit : Int32) : Array(Tuple(String, Bytes, Int32))</span>
+    get_recent_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_service_by_format_model%28format%3AString%2Cmodel%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method" class="tooltip">
+      <span>get_service_by_format_model(format : String, model : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil</span>
+    get_service_by_format_model</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_service_by_name%28name%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method" class="tooltip">
+      <span>get_service_by_name(name : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil</span>
+    get_service_by_name</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_service_info%28id%3AInt64%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="tooltip">
+      <span>get_service_info(id : Int64) : ServiceProvider::Info | Nil</span>
+    get_service_info</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_service_info_by_name%28name%3AString%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method" class="tooltip">
+      <span>get_service_info_by_name(name : String) : ServiceProvider::Info | Nil</span>
+    get_service_info_by_name</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_service_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method" class="tooltip">
+      <span>get_service_tokens_per_byte(service_id : Int64) : Float64 | Nil</span>
+    get_service_tokens_per_byte</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_source_external%28internal_id%3AInt64%29%3ATuple%28String%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%7CNil-instance-method" class="tooltip">
+      <span>get_source_external(internal_id : Int64) : Tuple(String, Int64 | Nil, String | Nil, Bytes | Nil) | Nil</span>
+    get_source_external</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="tooltip">
+      <span>get_text(source_id : Int64) : String | Nil</span>
+    get_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method" class="tooltip">
+      <span>get_text_hash(source_id : Int64) : Bytes | Nil</span>
+    get_text_hash</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_texts_for_reindex%28source_type%3AString%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CInt64%7CNil%2CString%29%29-instance-method" class="tooltip">
+      <span>get_texts_for_reindex(source_type : String) : Array(Tuple(Int64, Int64 | Nil, Int64 | Nil, String))</span>
+    get_texts_for_reindex</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method" class="tooltip">
+      <span>get_tokens_per_byte(service_id : Int64) : Float64 | Nil</span>
+    get_tokens_per_byte</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_vector%28embedding_id%3AInt64%29%3ABytes%7CNil-instance-method" class="tooltip">
+      <span>get_vector(embedding_id : Int64) : Bytes | Nil</span>
+    get_vector</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#get_vocab%28service_id%3AInt64%2C%26block%3ADB%3A%3AResultSet-%3E%29%3ANil-instance-method" class="tooltip">
+      <span>get_vocab(service_id : Int64, &block : DB::ResultSet -> ) : Nil</span>
+    get_vocab</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#increment_match_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method" class="tooltip">
+      <span>increment_match_count(chunk_ids : Array(Int64)) : Nil</span>
+    increment_match_count</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#increment_read_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method" class="tooltip">
+      <span>increment_read_count(chunk_ids : Array(Int64)) : Nil</span>
+    increment_read_count</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#index_changes_since%28service_id%3AInt64%2Cseq%3AInt64%29%3AArray%28Int64%29-instance-method" class="tooltip">
+      <span>index_changes_since(service_id : Int64, seq : Int64) : Array(Int64)</span>
+    index_changes_since</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_chunk_ignore(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</span>
+    insert_chunk_ignore</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_embedding_ignore%28hash%3ABytes%2Cservice_id%3AInt64%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_embedding_ignore(hash : Bytes, service_id : Int64, token_count : Int32, created_at : Int64) : Int64</span>
+    insert_embedding_ignore</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_service%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_service(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64) : Int64</span>
+    insert_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_service_full%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Cis_default%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_service_full(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, is_default : Int32, created_at : Int64) : Int64</span>
+    insert_service_full</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_source%28source_type%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_source(source_type : String, created_at : Int64) : Int64</span>
+    insert_source</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64</span>
+    insert_source_blob</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64</span>
+    insert_source_int</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64</span>
+    insert_source_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method" class="tooltip">
+      <span>list_files(limit : Int32, offset : Int32) : Array(Files::FileRecord)</span>
+    list_files</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#list_services%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method" class="tooltip">
+      <span>list_services : Array(ServiceProvider::Info)</span>
+    list_services</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#list_services_by_format%28format%3AString%29%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method" class="tooltip">
+      <span>list_services_by_format(format : String) : Array(ServiceProvider::Info)</span>
+    list_services_by_format</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#list_sources%28source_type%3AString%2Climit%3AInt32%2Coffset%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%29-instance-method" class="tooltip">
+      <span>list_sources(source_type : String, limit : Int32, offset : Int32) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Bytes | Nil))</span>
+    list_sources</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#load_embedding_rowids%28service_id%3AInt64%2Csource_type%3AString%2Cexternal_ids%3AArray%28Int64%29%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method" class="tooltip">
+      <span>load_embedding_rowids(service_id : Int64, source_type : String, external_ids : Array(Int64)) : Array(Tuple(Int64, Int64))</span>
+    load_embedding_rowids</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#log_index_change%28service_id%3AInt64%2Cembedding_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>log_index_change(service_id : Int64, embedding_id : Int64) : Nil</span>
+    log_index_change</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_failed(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</span>
+    mark_queue_failed</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_item_success(id : Int64, processed_at : Int64, attempts : Int32) : Nil</span>
+    mark_queue_item_success</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_retry(id : Int64, attempts : Int32, error_message : String | Nil) : Nil</span>
+    mark_queue_retry</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_success(id : Int64, processed_at : Int64) : Nil</span>
+    mark_queue_success</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#max_index_log_seq%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>max_index_log_seq(service_id : Int64) : Int64</span>
+    max_index_log_seq</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#prune_index_log%28service_id%3AInt64%2Cthrough%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>prune_index_log(service_id : Int64, through : Int64) : Nil</span>
+    prune_index_log</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#prune_query_cache%28service_id%3AInt64%2Ccount%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>prune_query_cache(service_id : Int64, count : Int64) : Nil</span>
+    prune_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#queue_stats%3ATuple%28Int64%2CInt64%29-instance-method" class="tooltip">
+      <span>queue_stats : Tuple(Int64, Int64)</span>
+    queue_stats</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method" class="tooltip">
+      <span>search_filtered_rowids(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)</span>
+    search_filtered_rowids</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#service_exists%3F%28id%3AInt64%29%3ABool-instance-method" class="tooltip">
+      <span>service_exists?(id : Int64) : Bool</span>
+    service_exists?</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#set_default_service%28id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>set_default_service(id : Int64) : Nil</span>
+    set_default_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#set_index_pruned_through%28service_id%3AInt64%2Cseq%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>set_index_pruned_through(service_id : Int64, seq : Int64) : Nil</span>
+    set_index_pruned_through</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>set_vectors_backfilled(service_id : Int64) : Nil</span>
+    set_vectors_backfilled</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#update_service%28id%3AInt64%2Cupdates%3AArray%28String%29%2Cparams%3AArray%28DB%3A%3AAny%29%29%3AInt64-instance-method" class="tooltip">
+      <span>update_service(id : Int64, updates : Array(String), params : Array(DB::Any)) : Int64</span>
+    update_service</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#update_tokens_per_byte%28tokens_per_byte%3AFloat64%2Cservice_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>update_tokens_per_byte(tokens_per_byte : Float64, service_id : Int64) : Nil</span>
+    update_tokens_per_byte</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#update_word_frequency%28count%3AInt32%2Cword%3AString%2Cservice_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>update_word_frequency(count : Int32, word : String, service_id : Int64) : Nil</span>
+    update_word_frequency</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>upsert_file(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil</span>
+    upsert_file</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>upsert_query_cache(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil</span>
+    upsert_query_cache</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>upsert_text(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil</span>
+    upsert_text</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#upsert_vector%28embedding_id%3AInt64%2Cservice_id%3AInt64%2Cvector%3ABytes%29%3ANil-instance-method" class="tooltip">
+      <span>upsert_vector(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil</span>
+    upsert_vector</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#upsert_vocab%28word%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Cfrequency%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>upsert_vocab(word : String, service_id : Int64, embedding : Bytes, frequency : Int32, created_at : Int64) : Nil</span>
+    upsert_vocab</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#vectors_after%28service_id%3AInt64%2Cafter_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CBytes%29%29-instance-method" class="tooltip">
+      <span>vectors_after(service_id : Int64, after_id : Int64, limit : Int32) : Array(Tuple(Int64, Bytes))</span>
+    vectors_after</a>
+    
+  
+
+
+      
+
+  <h3>Constructor methods inherited from class <code><a href="../../Memo/Queries.html">Memo::Queries</a></code></h3>
+  
+  
+    <a href="../../Memo/Queries.html#for%28db%3ADB%3A%3ADatabase%2Cconnection_string%3AString%29%3AQueries-class-method" class="tooltip">
+      <span>for(db : DB::Database, connection_string : String) : Queries</span>
+    for</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#new%28db%3ADBHandle%29-class-method" class="tooltip">
+      <span>new(db : DBHandle)</span>
+    new</a>
+    
+  
+
+
+      
+
+  <h3>Class methods inherited from class <code><a href="../../Memo/Queries.html">Memo::Queries</a></code></h3>
+  
+  
+    <a href="../../Memo/Queries.html#register_pg%28%26factory%3ADB%3A%3ADatabase-%3EQueries%29-class-method" class="tooltip">
+      <span>register_pg(&factory : DB::Database -> Queries)</span>
+    register_pg</a>
+    
+  
+
+
+      
+
+
+    
+      
+
+
+      
+
+
+      
+
+
+      
+
+
+    
+      
+
+
+      
+
+
+      
+
+
+      
+
+
+    
+  </div>
+
+  
+
+  
+
+  
+
+  
+  <h2>
+    <a id="instance-method-detail" class="anchor" href="#instance-method-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Detail
+  </h2>
+  
+    <div class="entry-detail" id="clear_completed_queue:Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>clear_completed_queue</strong> : Int32
+
+        <a class="method-permalink" href="#clear_completed_queue%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L473" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="clear_default_service:Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>clear_default_service</strong> : Nil
+
+        <a class="method-permalink" href="#clear_default_service%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L73" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="clear_query_cache(service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>clear_query_cache</strong>(service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#clear_query_cache%28service_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L708" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="clear_queue:Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>clear_queue</strong> : Int32
+
+        <a class="method-permalink" href="#clear_queue%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L477" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_chunks_by_hash(hash:Bytes):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_chunks_by_hash</strong>(hash : Bytes) : Int64
+
+        <a class="method-permalink" href="#count_chunks_by_hash%28hash%3ABytes%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L232" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_chunks_for_service(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_chunks_for_service</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_chunks_for_service%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L129" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_embeddings_for_service(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_embeddings_for_service</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_embeddings_for_service%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L125" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_files:Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_files</strong> : Int64
+
+        <a class="method-permalink" href="#count_files%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L363" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_query_cache(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_query_cache</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_query_cache%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L696" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_service_chunks(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_service_chunks</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_service_chunks%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L524" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_service_embeddings(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_service_embeddings</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_service_embeddings%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L520" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_service_sources(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_service_sources</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_service_sources%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L531" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_services:Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_services</strong> : Int64
+
+        <a class="method-permalink" href="#count_services%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L140" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_vectors(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_vectors</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_vectors%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L743" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_vocab(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>count_vocab</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#count_vocab%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L407" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_chunks(hash:Bytes,source_id:Int64,source_type:String):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_chunks</strong>(hash : Bytes, source_id : Int64, source_type : String) : Int32
+
+        <a class="method-permalink" href="#delete_chunks%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L224" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_chunks(hash:Bytes,source_id:Int64):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_chunks</strong>(hash : Bytes, source_id : Int64) : Int32
+
+        <a class="method-permalink" href="#delete_chunks%28hash%3ABytes%2Csource_id%3AInt64%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L228" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_chunks_by_hash(hash:Bytes):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_chunks_by_hash</strong>(hash : Bytes) : Nil
+
+        <a class="method-permalink" href="#delete_chunks_by_hash%28hash%3ABytes%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L113" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_embeddings_by_hash(hash:Bytes):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_embeddings_by_hash</strong>(hash : Bytes) : Nil
+
+        <a class="method-permalink" href="#delete_embeddings_by_hash%28hash%3ABytes%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L236" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_embeddings_by_service(service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_embeddings_by_service</strong>(service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_embeddings_by_service%28service_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L117" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_file(source_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_file</strong>(source_id : Int64) : Int64
+
+        <a class="method-permalink" href="#delete_file%28source_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L351" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_index_data(service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_index_data</strong>(service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_index_data%28service_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Remove a service's vectors, journal entries and journal state</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L826" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_service(id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_service</strong>(id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_service%28id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L121" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_source_blob(source_type:String,external_id:Bytes):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_source_blob</strong>(source_type : String, external_id : Bytes) : Int64
+
+        <a class="method-permalink" href="#delete_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L301" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_source_by_id(internal_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_source_by_id</strong>(internal_id : Int64) : Int64
+
+        <a class="method-permalink" href="#delete_source_by_id%28internal_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L305" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_source_int(source_type:String,external_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_source_int</strong>(source_type : String, external_id : Int64) : Int64
+
+        <a class="method-permalink" href="#delete_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L293" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_source_text(source_type:String,external_id:String):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_source_text</strong>(source_type : String, external_id : String) : Int64
+
+        <a class="method-permalink" href="#delete_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L297" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_text(source_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_text</strong>(source_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L496" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_vector(embedding_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_vector</strong>(embedding_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L739" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_vocab(service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_vocab</strong>(service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L403" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="embedding_ids_for_hash(hash:Bytes):Array(Tuple(Int64,Int64))-instance-method">
+      <div class="signature">
+        
+        def <strong>embedding_ids_for_hash</strong>(hash : Bytes) : Array(Tuple(Int64, Int64))
+
+        <a class="method-permalink" href="#embedding_ids_for_hash%28hash%3ABytes%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>{embedding id, service id} for every service's embedding of a hash</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L759" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="embedding_ids_without_vectors(service_id:Int64):Array(Int64)-instance-method">
+      <div class="signature">
+        
+        def <strong>embedding_ids_without_vectors</strong>(service_id : Int64) : Array(Int64)
+
+        <a class="method-permalink" href="#embedding_ids_without_vectors%28service_id%3AInt64%29%3AArray%28Int64%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L767" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="enqueue(source_id:Int64,text:String,created_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>enqueue</strong>(source_id : Int64, text : String, created_at : Int64) : Nil
+
+        <a class="method-permalink" href="#enqueue%28source_id%3AInt64%2Ctext%3AString%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L415" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="fetch_search_results(rowids:Array(Int64),service_id:Int64,include_text:Bool):Array(Tuple(UInt64,Int64,Bytes,String,Int64,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int32|Nil,Int32,Int32,Int32,String|Nil))-instance-method">
+      <div class="signature">
+        
+        def <strong>fetch_search_results</strong>(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))
+
+        <a class="method-permalink" href="#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L633" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="filter_candidates(service_id:Int64,params:Array(DB::Any),where_clauses:Array(String),text_join:String,fts_join:String,candidate_ids:Array(Int64)):Set(UInt64)-instance-method">
+      <div class="signature">
+        
+        def <strong>filter_candidates</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)
+
+        <a class="method-permalink" href="#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Which of <code>candidate_ids</code> pass the filter clauses (looked up by id, so the
+cost depends on the number of candidates, not the collection)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L601" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_service_id(name:String):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_service_id</strong>(name : String) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_service_id%28name%3AString%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L11" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_blob(source_type:String,external_id:Bytes):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_blob</strong>(source_type : String, external_id : Bytes) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L268" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_blob_any_type(external_id:Bytes):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_blob_any_type</strong>(external_id : Bytes) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_blob_any_type%28external_id%3ABytes%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L280" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_int(source_type:String,external_id:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_int</strong>(source_type : String, external_id : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_int%28source_type%3AString%2Cexternal_id%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L260" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_int_any_type(external_id:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_int_any_type</strong>(external_id : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_int_any_type%28external_id%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L272" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_text(source_type:String,external_id:String):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_text</strong>(source_type : String, external_id : String) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_text%28source_type%3AString%2Cexternal_id%3AString%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L264" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_source_text_any_type(external_id:String):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_source_text_any_type</strong>(external_id : String) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_source_text_any_type%28external_id%3AString%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L276" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="for_connection(cnn:DB::Connection):Queries-instance-method">
+      <div class="signature">
+        
+        def <strong>for_connection</strong>(cnn : <a href="../../DB/Connection.html">DB::Connection</a>) : <a href="../../Memo/Queries.html">Queries</a>
+
+        <a class="method-permalink" href="#for_connection%28cnn%3ADB%3A%3AConnection%29%3AQueries-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Same queries, run on one connection (for use inside a transaction).</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L3" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_all_texts:Array(String)-instance-method">
+      <div class="signature">
+        
+        def <strong>get_all_texts</strong> : Array(String)
+
+        <a class="method-permalink" href="#get_all_texts%3AArray%28String%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L504" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_chunk_hashes(source_id:Int64,source_type:String|Nil):Array(Bytes)-instance-method">
+      <div class="signature">
+        
+        def <strong>get_chunk_hashes</strong>(source_id : Int64, source_type : String | Nil) : Array(Bytes)
+
+        <a class="method-permalink" href="#get_chunk_hashes%28source_id%3AInt64%2Csource_type%3AString%7CNil%29%3AArray%28Bytes%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L210" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_chunk_id(source_id:Int64,offset:Int32|Nil):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>get_chunk_id</strong>(source_id : Int64, offset : Int32 | Nil) : Int64
+
+        <a class="method-permalink" href="#get_chunk_id%28source_id%3AInt64%2Coffset%3AInt32%7CNil%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L194" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_chunks_for_reindex(source_type:String,service_id:Int64):Array(Tuple(Int64,Int64|Nil,String|Nil,Int64|Nil,Int64|Nil))-instance-method">
+      <div class="signature">
+        
+        def <strong>get_chunks_for_reindex</strong>(source_type : String, service_id : Int64) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Int64 | Nil, Int64 | Nil))
+
+        <a class="method-permalink" href="#get_chunks_for_reindex%28source_type%3AString%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CInt64%7CNil%2CInt64%7CNil%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L558" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_default_service:ServiceProvider::Info|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_default_service</strong> : <a href="../../Memo/ServiceProvider/Info.html">ServiceProvider::Info</a> | Nil
+
+        <a class="method-permalink" href="#get_default_service%3AServiceProvider%3A%3AInfo%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L66" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_embedding_hashes_for_service(service_id:Int64):Array(Bytes)-instance-method">
+      <div class="signature">
+        
+        def <strong>get_embedding_hashes_for_service</strong>(service_id : Int64) : Array(Bytes)
+
+        <a class="method-permalink" href="#get_embedding_hashes_for_service%28service_id%3AInt64%29%3AArray%28Bytes%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L105" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_embedding_rowid(hash:Bytes,service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>get_embedding_rowid</strong>(hash : Bytes, service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#get_embedding_rowid%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L168" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_embedding_rowid?(hash:Bytes,service_id:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_embedding_rowid?</strong>(hash : Bytes, service_id : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#get_embedding_rowid%3F%28hash%3ABytes%2Cservice_id%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L172" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_existing_words(service_id:Int64,words:Array(String)):Set(String)-instance-method">
+      <div class="signature">
+        
+        def <strong>get_existing_words</strong>(service_id : Int64, words : Array(String)) : Set(String)
+
+        <a class="method-permalink" href="#get_existing_words%28service_id%3AInt64%2Cwords%3AArray%28String%29%29%3ASet%28String%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L385" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_file_by_hash(hash:Bytes):Files::FileRecord|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_file_by_hash</strong>(hash : Bytes) : <a href="../../Memo/Files/FileRecord.html">Files::FileRecord</a> | Nil
+
+        <a class="method-permalink" href="#get_file_by_hash%28hash%3ABytes%29%3AFiles%3A%3AFileRecord%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L339" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_file_by_path(path:String):Files::FileRecord|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_file_by_path</strong>(path : String) : <a href="../../Memo/Files/FileRecord.html">Files::FileRecord</a> | Nil
+
+        <a class="method-permalink" href="#get_file_by_path%28path%3AString%29%3AFiles%3A%3AFileRecord%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L333" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_file_by_source(source_id:Int64):Files::FileRecord|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_file_by_source</strong>(source_id : Int64) : <a href="../../Memo/Files/FileRecord.html">Files::FileRecord</a> | Nil
+
+        <a class="method-permalink" href="#get_file_by_source%28source_id%3AInt64%29%3AFiles%3A%3AFileRecord%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L345" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_index_state(service_id:Int64):Tuple(Int64,Bool)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_index_state</strong>(service_id : Int64) : Tuple(Int64, Bool) | Nil
+
+        <a class="method-permalink" href="#get_index_state%28service_id%3AInt64%29%3ATuple%28Int64%2CBool%29%7CNil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>{pruned_through, vectors_backfilled}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L803" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_pending_queue(limit:Int32):Array(Tuple(Int64,Int64,String))-instance-method">
+      <div class="signature">
+        
+        def <strong>get_pending_queue</strong>(limit : Int32) : Array(Tuple(Int64, Int64, String))
+
+        <a class="method-permalink" href="#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L429" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_query_cache(query:String,service_id:Int64):Tuple(Bytes,Int32)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_query_cache</strong>(query : String, service_id : Int64) : Tuple(Bytes, Int32) | Nil
+
+        <a class="method-permalink" href="#get_query_cache%28query%3AString%2Cservice_id%3AInt64%29%3ATuple%28Bytes%2CInt32%29%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L681" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_queue_attempts(id:Int64):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>get_queue_attempts</strong>(id : Int64) : Int32
+
+        <a class="method-permalink" href="#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L444" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_queue_item(source_id:Int64):Tuple(Int64,String)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_queue_item</strong>(source_id : Int64) : Tuple(Int64, String) | Nil
+
+        <a class="method-permalink" href="#get_queue_item%28source_id%3AInt64%29%3ATuple%28Int64%2CString%29%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L459" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_recent_query_cache(service_id:Int64,limit:Int32):Array(Tuple(String,Bytes,Int32))-instance-method">
+      <div class="signature">
+        
+        def <strong>get_recent_query_cache</strong>(service_id : Int64, limit : Int32) : Array(Tuple(String, Bytes, Int32))
+
+        <a class="method-permalink" href="#get_recent_query_cache%28service_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28String%2CBytes%2CInt32%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L712" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_service_by_format_model(format:String,model:String):Tuple(Int64,String,String|Nil,String,Int32,Int32,Float64)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_service_by_format_model</strong>(format : String, model : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil
+
+        <a class="method-permalink" href="#get_service_by_format_model%28format%3AString%2Cmodel%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L35" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_service_by_name(name:String):Tuple(Int64,String,String|Nil,String,Int32,Int32,Float64)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_service_by_name</strong>(name : String) : Tuple(Int64, String, String | Nil, String, Int32, Int32, Float64) | Nil
+
+        <a class="method-permalink" href="#get_service_by_name%28name%3AString%29%3ATuple%28Int64%2CString%2CString%7CNil%2CString%2CInt32%2CInt32%2CFloat64%29%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L26" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_service_info(id:Int64):ServiceProvider::Info|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_service_info</strong>(id : Int64) : <a href="../../Memo/ServiceProvider/Info.html">ServiceProvider::Info</a> | Nil
+
+        <a class="method-permalink" href="#get_service_info%28id%3AInt64%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L52" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_service_info_by_name(name:String):ServiceProvider::Info|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_service_info_by_name</strong>(name : String) : <a href="../../Memo/ServiceProvider/Info.html">ServiceProvider::Info</a> | Nil
+
+        <a class="method-permalink" href="#get_service_info_by_name%28name%3AString%29%3AServiceProvider%3A%3AInfo%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L59" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_service_tokens_per_byte(service_id:Int64):Float64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_service_tokens_per_byte</strong>(service_id : Int64) : Float64 | Nil
+
+        <a class="method-permalink" href="#get_service_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L512" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_source_external(internal_id:Int64):Tuple(String,Int64|Nil,String|Nil,Bytes|Nil)|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_source_external</strong>(internal_id : Int64) : Tuple(String, Int64 | Nil, String | Nil, Bytes | Nil) | Nil
+
+        <a class="method-permalink" href="#get_source_external%28internal_id%3AInt64%29%3ATuple%28String%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L284" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_text(source_id:Int64):String|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_text</strong>(source_id : Int64) : String | Nil
+
+        <a class="method-permalink" href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L500" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_text_hash(source_id:Int64):Bytes|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_text_hash</strong>(source_id : Int64) : Bytes | Nil
+
+        <a class="method-permalink" href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L492" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_texts_for_reindex(source_type:String):Array(Tuple(Int64,Int64|Nil,Int64|Nil,String))-instance-method">
+      <div class="signature">
+        
+        def <strong>get_texts_for_reindex</strong>(source_type : String) : Array(Tuple(Int64, Int64 | Nil, Int64 | Nil, String))
+
+        <a class="method-permalink" href="#get_texts_for_reindex%28source_type%3AString%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CInt64%7CNil%2CString%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L542" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_tokens_per_byte(service_id:Int64):Float64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_tokens_per_byte</strong>(service_id : Int64) : Float64 | Nil
+
+        <a class="method-permalink" href="#get_tokens_per_byte%28service_id%3AInt64%29%3AFloat64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L44" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_vector(embedding_id:Int64):Bytes|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_vector</strong>(embedding_id : Int64) : Bytes | Nil
+
+        <a class="method-permalink" href="#get_vector%28embedding_id%3AInt64%29%3ABytes%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L735" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_vocab(service_id:Int64,&amp;block:DB::ResultSet-&gt;):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_vocab</strong>(service_id : Int64, &block : DB::ResultSet -> ) : Nil
+
+        <a class="method-permalink" href="#get_vocab%28service_id%3AInt64%2C%26block%3ADB%3A%3AResultSet-%3E%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L371" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="increment_match_count(chunk_ids:Array(Int64)):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>increment_match_count</strong>(chunk_ids : Array(Int64)) : Nil
+
+        <a class="method-permalink" href="#increment_match_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L198" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="increment_read_count(chunk_ids:Array(Int64)):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>increment_read_count</strong>(chunk_ids : Array(Int64)) : Nil
+
+        <a class="method-permalink" href="#increment_read_count%28chunk_ids%3AArray%28Int64%29%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L204" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="index_changes_since(service_id:Int64,seq:Int64):Array(Int64)-instance-method">
+      <div class="signature">
+        
+        def <strong>index_changes_since</strong>(service_id : Int64, seq : Int64) : Array(Int64)
+
+        <a class="method-permalink" href="#index_changes_since%28service_id%3AInt64%2Cseq%3AInt64%29%3AArray%28Int64%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Distinct embedding ids logged after <code>seq</code></p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L784" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_chunk_ignore(hash:Bytes,source_id:Int64,source_type:String,pair_id:Int64|Nil,parent_id:Int64|Nil,offset:Int32|Nil,size:Int32,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L180" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_embedding_ignore(hash:Bytes,service_id:Int64,token_count:Int32,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_embedding_ignore</strong>(hash : Bytes, service_id : Int64, token_count : Int32, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_embedding_ignore%28hash%3ABytes%2Cservice_id%3AInt64%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L160" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_service(name:String,format:String,base_url:String|Nil,model:String,dimensions:Int32,max_tokens:Int32,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_service</strong>(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_service%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L15" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_service_full(name:String,format:String,base_url:String|Nil,model:String,dimensions:Int32,max_tokens:Int32,is_default:Int32,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_service_full</strong>(name : String, format : String, base_url : String | Nil, model : String, dimensions : Int32, max_tokens : Int32, is_default : Int32, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_service_full%28name%3AString%2Cformat%3AString%2Cbase_url%3AString%7CNil%2Cmodel%3AString%2Cdimensions%3AInt32%2Cmax_tokens%3AInt32%2Cis_default%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Insert service with is_default and return ID (for ServiceProvider.create)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L144" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_source(source_type:String,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_source</strong>(source_type : String, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_source%28source_type%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L244" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_source_blob(source_type:String,external_id:Bytes,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L256" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_source_int(source_type:String,external_id:Int64,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L248" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_source_text(source_type:String,external_id:String,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L252" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="list_files(limit:Int32,offset:Int32):Array(Files::FileRecord)-instance-method">
+      <div class="signature">
+        
+        def <strong>list_files</strong>(limit : Int32, offset : Int32) : Array(<a href="../../Memo/Files/FileRecord.html">Files::FileRecord</a>)
+
+        <a class="method-permalink" href="#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L355" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="list_services:Array(ServiceProvider::Info)-instance-method">
+      <div class="signature">
+        
+        def <strong>list_services</strong> : Array(<a href="../../Memo/ServiceProvider/Info.html">ServiceProvider::Info</a>)
+
+        <a class="method-permalink" href="#list_services%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L81" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="list_services_by_format(format:String):Array(ServiceProvider::Info)-instance-method">
+      <div class="signature">
+        
+        def <strong>list_services_by_format</strong>(format : String) : Array(<a href="../../Memo/ServiceProvider/Info.html">ServiceProvider::Info</a>)
+
+        <a class="method-permalink" href="#list_services_by_format%28format%3AString%29%3AArray%28ServiceProvider%3A%3AInfo%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L90" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="list_sources(source_type:String,limit:Int32,offset:Int32):Array(Tuple(Int64,Int64|Nil,String|Nil,Bytes|Nil))-instance-method">
+      <div class="signature">
+        
+        def <strong>list_sources</strong>(source_type : String, limit : Int32, offset : Int32) : Array(Tuple(Int64, Int64 | Nil, String | Nil, Bytes | Nil))
+
+        <a class="method-permalink" href="#list_sources%28source_type%3AString%2Climit%3AInt32%2Coffset%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L309" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="load_embedding_rowids(service_id:Int64,source_type:String,external_ids:Array(Int64)):Array(Tuple(Int64,Int64))-instance-method">
+      <div class="signature">
+        
+        def <strong>load_embedding_rowids</strong>(service_id : Int64, source_type : String, external_ids : Array(Int64)) : Array(Tuple(Int64, Int64))
+
+        <a class="method-permalink" href="#load_embedding_rowids%28service_id%3AInt64%2Csource_type%3AString%2Cexternal_ids%3AArray%28Int64%29%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L836" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="log_index_change(service_id:Int64,embedding_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>log_index_change</strong>(service_id : Int64, embedding_id : Int64) : Nil
+
+        <a class="method-permalink" href="#log_index_change%28service_id%3AInt64%2Cembedding_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L780" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="mark_queue_failed(id:Int64,error_message:String|Nil,attempts:Int32,processed_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil
+
+        <a class="method-permalink" href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L448" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="mark_queue_item_success(id:Int64,processed_at:Int64,attempts:Int32):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil
+
+        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L463" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="mark_queue_retry(id:Int64,attempts:Int32,error_message:String|Nil):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil
+
+        <a class="method-permalink" href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L455" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="mark_queue_success(id:Int64,processed_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil
+
+        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L440" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="max_index_log_seq(service_id:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>max_index_log_seq</strong>(service_id : Int64) : Int64
+
+        <a class="method-permalink" href="#max_index_log_seq%28service_id%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L795" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="prune_index_log(service_id:Int64,through:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>prune_index_log</strong>(service_id : Int64, through : Int64) : Nil
+
+        <a class="method-permalink" href="#prune_index_log%28service_id%3AInt64%2Cthrough%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L799" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="prune_query_cache(service_id:Int64,count:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>prune_query_cache</strong>(service_id : Int64, count : Int64) : Nil
+
+        <a class="method-permalink" href="#prune_query_cache%28service_id%3AInt64%2Ccount%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L700" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="queue_stats:Tuple(Int64,Int64)-instance-method">
+      <div class="signature">
+        
+        def <strong>queue_stats</strong> : Tuple(Int64, Int64)
+
+        <a class="method-permalink" href="#queue_stats%3ATuple%28Int64%2CInt64%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L467" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="search_filtered_rowids(service_id:Int64,params:Array(DB::Any),where_clauses:Array(String),text_join:String,fts_join:String):Set(UInt64)-instance-method">
+      <div class="signature">
+        
+        def <strong>search_filtered_rowids</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)
+
+        <a class="method-permalink" href="#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L577" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="service_exists?(id:Int64):Bool-instance-method">
+      <div class="signature">
+        
+        def <strong>service_exists?</strong>(id : Int64) : Bool
+
+        <a class="method-permalink" href="#service_exists%3F%28id%3AInt64%29%3ABool-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L136" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_default_service(id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_default_service</strong>(id : Int64) : Nil
+
+        <a class="method-permalink" href="#set_default_service%28id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L77" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_index_pruned_through(service_id:Int64,seq:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_index_pruned_through</strong>(service_id : Int64, seq : Int64) : Nil
+
+        <a class="method-permalink" href="#set_index_pruned_through%28service_id%3AInt64%2Cseq%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L810" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_vectors_backfilled(service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_vectors_backfilled</strong>(service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L818" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="update_service(id:Int64,updates:Array(String),params:Array(DB::Any)):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>update_service</strong>(id : Int64, updates : Array(String), params : Array(DB::Any)) : Int64
+
+        <a class="method-permalink" href="#update_service%28id%3AInt64%2Cupdates%3AArray%28String%29%2Cparams%3AArray%28DB%3A%3AAny%29%29%3AInt64-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L99" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="update_tokens_per_byte(tokens_per_byte:Float64,service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>update_tokens_per_byte</strong>(tokens_per_byte : Float64, service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#update_tokens_per_byte%28tokens_per_byte%3AFloat64%2Cservice_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L48" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="update_word_frequency(count:Int32,word:String,service_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>update_word_frequency</strong>(count : Int32, word : String, service_id : Int64) : Nil
+
+        <a class="method-permalink" href="#update_word_frequency%28count%3AInt32%2Cword%3AString%2Cservice_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L399" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_file(source_id:Int64,path:String,content_hash:Bytes,mtime:Int64,size:Int64,created_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_file</strong>(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil
+
+        <a class="method-permalink" href="#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L325" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_query_cache(query:String,service_id:Int64,embedding:Bytes,token_count:Int32,created_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_query_cache</strong>(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil
+
+        <a class="method-permalink" href="#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L688" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_text(source_id:Int64,content:String,content_hash:Bytes|Nil,created_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil
+
+        <a class="method-permalink" href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L485" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_vector(embedding_id:Int64,service_id:Int64,vector:Bytes):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_vector</strong>(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil
+
+        <a class="method-permalink" href="#upsert_vector%28embedding_id%3AInt64%2Cservice_id%3AInt64%2Cvector%3ABytes%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L728" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_vocab(word:String,service_id:Int64,embedding:Bytes,frequency:Int32,created_at:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_vocab</strong>(word : String, service_id : Int64, embedding : Bytes, frequency : Int32, created_at : Int64) : Nil
+
+        <a class="method-permalink" href="#upsert_vocab%28word%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Cfrequency%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L377" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="vectors_after(service_id:Int64,after_id:Int64,limit:Int32):Array(Tuple(Int64,Bytes))-instance-method">
+      <div class="signature">
+        
+        def <strong>vectors_after</strong>(service_id : Int64, after_id : Int64, limit : Int32) : Array(Tuple(Int64, Bytes))
+
+        <a class="method-permalink" href="#vectors_after%28service_id%3AInt64%2Cafter_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CBytes%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Up to <code>limit</code> {embedding id, vector} pairs with ids above <code>after_id</code>, in id order</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/sqlite.cr#L747" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+
+</div>
+
+</body>
+</html>

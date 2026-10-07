@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Crystal Docs 1.21.1">
+<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_name" content="memo">
+
+
+
+<link href="../css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/doc.js"></script>
+
+  <meta name="repository-name" content="memo">
+  <title>Memo::Namespaces - memo 0.13.0</title>
+  <script type="text/javascript">
+    CrystalDocs.base_path = "../";
+  </script>
+</head>
+<body>
+
+<svg class="hidden">
+  <symbol id="octicon-link" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+  </symbol>
+</svg>
+<input type="checkbox" id="sidebar-btn">
+<label for="sidebar-btn" id="sidebar-btn-label">
+  <svg class="open" xmlns="http://www.w3.org/2000/svg" height="2em" width="2em" viewBox="0 0 512 512"><title>Open Sidebar</title><path fill="currentColor" d="M80 96v64h352V96H80zm0 112v64h352v-64H80zm0 112v64h352v-64H80z"></path></svg>
+  <svg class="close" xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 512 512"><title>Close Sidebar</title><path fill="currentColor" d="m118.6 73.4-45.2 45.2L210.7 256 73.4 393.4l45.2 45.2L256 301.3l137.4 137.3 45.2-45.2L301.3 256l137.3-137.4-45.2-45.2L256 210.7Z"></path></svg>
+</label>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search..." spellcheck="false" aria-label="Search">
+    </div>
+
+    <div class="project-summary">
+      <h1 class="project-name">
+        <a href="../index.html">
+          memo
+        </a>
+      </h1>
+
+      <span class="project-version">
+        0.13.0
+      </span>
+    </div>
+  </div>
+
+  <div class="search-results hidden">
+    <ul class="search-list"></ul>
+  </div>
+
+  <div class="types-list">
+    <ul>
+  
+  <li class="parent open current" data-id="memo/Memo" data-name="memo">
+      <a href="../Memo.html">Memo</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/ArcanaListener" data-name="memo::arcanalistener">
+      <a href="../Memo/ArcanaListener.html">ArcanaListener</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ArcanaService" data-name="memo::arcanaservice">
+      <a href="../Memo/ArcanaService.html">ArcanaService</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/BusLog" data-name="memo::buslog">
+      <a href="../Memo/BusLog.html">BusLog</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Chunking" data-name="memo::chunking">
+      <a href="../Memo/Chunking.html">Chunking</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/CLI" data-name="memo::cli">
+      <a href="../Memo/CLI.html">CLI</a>
+      
+        <ul>
+  
+  <li class="parent " data-id="memo/Memo/CLI/Commands" data-name="memo::cli::commands">
+      <a href="../Memo/CLI/Commands.html">Commands</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/BuildVocab" data-name="memo::cli::commands::buildvocab">
+      <a href="../Memo/CLI/Commands/BuildVocab.html">BuildVocab</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Delete" data-name="memo::cli::commands::delete">
+      <a href="../Memo/CLI/Commands/Delete.html">Delete</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/IndexFiles" data-name="memo::cli::commands::indexfiles">
+      <a href="../Memo/CLI/Commands/IndexFiles.html">IndexFiles</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/IndexText" data-name="memo::cli::commands::indextext">
+      <a href="../Memo/CLI/Commands/IndexText.html">IndexText</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Search" data-name="memo::cli::commands::search">
+      <a href="../Memo/CLI/Commands/Search.html">Search</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceCreate" data-name="memo::cli::commands::servicecreate">
+      <a href="../Memo/CLI/Commands/ServiceCreate.html">ServiceCreate</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceDelete" data-name="memo::cli::commands::servicedelete">
+      <a href="../Memo/CLI/Commands/ServiceDelete.html">ServiceDelete</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Services" data-name="memo::cli::commands::services">
+      <a href="../Memo/CLI/Commands/Services.html">Services</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/ServiceUse" data-name="memo::cli::commands::serviceuse">
+      <a href="../Memo/CLI/Commands/ServiceUse.html">ServiceUse</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Stats" data-name="memo::cli::commands::stats">
+      <a href="../Memo/CLI/Commands/Stats.html">Stats</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Commands/Terms" data-name="memo::cli::commands::terms">
+      <a href="../Memo/CLI/Commands/Terms.html">Terms</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/CLI/Input" data-name="memo::cli::input">
+      <a href="../Memo/CLI/Input.html">Input</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Clustering" data-name="memo::clustering">
+      <a href="../Memo/Clustering.html">Clustering</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Clustering/Cluster" data-name="memo::clustering::cluster">
+      <a href="../Memo/Clustering/Cluster.html">Cluster</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Config" data-name="memo::config">
+      <a href="../Memo/Config.html">Config</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Config/Chunking" data-name="memo::config::chunking">
+      <a href="../Memo/Config/Chunking.html">Chunking</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/EmbeddingService" data-name="memo::config::embeddingservice">
+      <a href="../Memo/Config/EmbeddingService.html">EmbeddingService</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/Queue" data-name="memo::config::queue">
+      <a href="../Memo/Config/Queue.html">Queue</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Config/Search" data-name="memo::config::search">
+      <a href="../Memo/Config/Search.html">Search</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Database" data-name="memo::database">
+      <a href="../Memo/Database.html">Database</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/DBHandle" data-name="memo::dbhandle">
+      <a href="../Memo/DBHandle.html">DBHandle</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Dialect" data-name="memo::dialect">
+      <a href="../Memo/Dialect.html">Dialect</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Dialect/Base" data-name="memo::dialect::base">
+      <a href="../Memo/Dialect/Base.html">Base</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Dialect/Postgres" data-name="memo::dialect::postgres">
+      <a href="../Memo/Dialect/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Dialect/SQLite" data-name="memo::dialect::sqlite">
+      <a href="../Memo/Dialect/SQLite.html">SQLite</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Document" data-name="memo::document">
+      <a href="../Memo/Document.html">Document</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ExternalId" data-name="memo::externalid">
+      <a href="../Memo/ExternalId.html">ExternalId</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Files" data-name="memo::files">
+      <a href="../Memo/Files.html">Files</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Files/FileInfo" data-name="memo::files::fileinfo">
+      <a href="../Memo/Files/FileInfo.html">FileInfo</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Files/FileRecord" data-name="memo::files::filerecord">
+      <a href="../Memo/Files/FileRecord.html">FileRecord</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/IndexJournal" data-name="memo::indexjournal">
+      <a href="../Memo/IndexJournal.html">IndexJournal</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
+      <a href="../Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent open current" data-id="memo/Memo/Namespaces" data-name="memo::namespaces">
+      <a href="../Memo/Namespaces.html">Namespaces</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Namespaces/Config" data-name="memo::namespaces::config">
+      <a href="../Memo/Namespaces/Config.html">Config</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Providers" data-name="memo::providers">
+      <a href="../Memo/Providers.html">Providers</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Providers/Arcana" data-name="memo::providers::arcana">
+      <a href="../Memo/Providers/Arcana.html">Arcana</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Base" data-name="memo::providers::base">
+      <a href="../Memo/Providers/Base.html">Base</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Bus" data-name="memo::providers::bus">
+      <a href="../Memo/Providers/Bus.html">Bus</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/EmbedResult" data-name="memo::providers::embedresult">
+      <a href="../Memo/Providers/EmbedResult.html">EmbedResult</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/HTTPPool" data-name="memo::providers::httppool">
+      <a href="../Memo/Providers/HTTPPool.html">HTTPPool</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Mock" data-name="memo::providers::mock">
+      <a href="../Memo/Providers/Mock.html">Mock</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/OpenAI" data-name="memo::providers::openai">
+      <a href="../Memo/Providers/OpenAI.html">OpenAI</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Registry" data-name="memo::providers::registry">
+      <a href="../Memo/Providers/Registry.html">Registry</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Providers/Voyage" data-name="memo::providers::voyage">
+      <a href="../Memo/Providers/Voyage.html">Voyage</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Queries" data-name="memo::queries">
+      <a href="../Memo/Queries.html">Queries</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Queries/Postgres" data-name="memo::queries::postgres">
+      <a href="../Memo/Queries/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Queries/SQLite" data-name="memo::queries::sqlite">
+      <a href="../Memo/Queries/SQLite.html">SQLite</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/QueryCache" data-name="memo::querycache">
+      <a href="../Memo/QueryCache.html">QueryCache</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/RRF" data-name="memo::rrf">
+      <a href="../Memo/RRF.html">RRF</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/RRF/Item" data-name="memo::rrf::item">
+      <a href="../Memo/RRF/Item.html">Item</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Search" data-name="memo::search">
+      <a href="../Memo/Search.html">Search</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Search/Filters" data-name="memo::search::filters">
+      <a href="../Memo/Search/Filters.html">Filters</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Search/Result" data-name="memo::search::result">
+      <a href="../Memo/Search/Result.html">Result</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Search/Timings" data-name="memo::search::timings">
+      <a href="../Memo/Search/Timings.html">Timings</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Service" data-name="memo::service">
+      <a href="../Memo/Service.html">Service</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Service/QueueStats" data-name="memo::service::queuestats">
+      <a href="../Memo/Service/QueueStats.html">QueueStats</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/ServiceProvider" data-name="memo::serviceprovider">
+      <a href="../Memo/ServiceProvider.html">ServiceProvider</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/ServiceProvider/Info" data-name="memo::serviceprovider::info">
+      <a href="../Memo/ServiceProvider/Info.html">Info</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/ServiceProvider/Stats" data-name="memo::serviceprovider::stats">
+      <a href="../Memo/ServiceProvider/Stats.html">Stats</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/SourceRegistry" data-name="memo::sourceregistry">
+      <a href="../Memo/SourceRegistry.html">SourceRegistry</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Stats" data-name="memo::stats">
+      <a href="../Memo/Stats.html">Stats</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Storage" data-name="memo::storage">
+      <a href="../Memo/Storage.html">Storage</a>
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/USearchIndex" data-name="memo::usearchindex">
+      <a href="../Memo/USearchIndex.html">USearchIndex</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/USearchIndex/InUse" data-name="memo::usearchindex::inuse">
+      <a href="../Memo/USearchIndex/InUse.html">InUse</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/USearchIndex/Pending" data-name="memo::usearchindex::pending">
+      <a href="../Memo/USearchIndex/Pending.html">Pending</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Vocab" data-name="memo::vocab">
+      <a href="../Memo/Vocab.html">Vocab</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Vocab/Result" data-name="memo::vocab::result">
+      <a href="../Memo/Vocab/Result.html">Result</a>
+      
+    </li>
+  
+  <li class=" " data-id="memo/Memo/Vocab/WordFrequency" data-name="memo::vocab::wordfrequency">
+      <a href="../Memo/Vocab/WordFrequency.html">WordFrequency</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+  </div>
+</div>
+
+
+<div class="main-content">
+<h1 class="type-name">
+
+  <span class="kind">
+    class
+  </span> Memo::<wbr>Namespaces
+
+</h1>
+
+
+  <ul class="superclass-hierarchy"><li class="superclass"><a href="../Memo/Namespaces.html">Memo::Namespaces</a></li><li class="superclass">Reference</li><li class="superclass">Object</li></ul>
+
+
+
+
+  <h2>
+    <a id="overview" class="anchor" href="#overview">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Overview
+  </h2>
+
+  <p>Registry of Memo::Service instances keyed by namespace (ns).</p>
+<p>Each ns has its own database, embedding service, and USearch index —
+providing true isolation between projects sharing one memo-arcana
+process.</p>
+<p>Namespaces can be opened explicitly via <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> or listed in a config
+file for preloading at boot. Once opened, services are cached in
+memory until explicitly closed (or the process exits).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="defined-in" class="anchor" href="#defined-in">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Defined in:
+  </h2>
+  
+    
+      <a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L15" target="_blank">
+        arcana/namespaces.cr
+      </a>
+    
+    <br/>
+  
+
+
+
+
+
+  
+  <h2>
+    <a id="constructors" class="anchor" href="#constructors">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Constructors
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#new-class-method" class="signature"><strong>.new</strong></a>
+        
+      </li>
+    
+  </ul>
+
+
+  
+
+  
+
+  
+  <h2>
+    <a id="instance-method-summary" class="anchor" href="#instance-method-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#close%28ns%3AString%29%3ABool-instance-method" class="signature"><strong>#close</strong>(ns : String) : Bool</a>
+        
+          <div class="summary"><p>Close and remove a namespace.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#close_all-instance-method" class="signature"><strong>#close_all</strong></a>
+        
+          <div class="summary"><p>Close all open services (called on shutdown), each after its in-flight requests finish.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#configs%3AHash%28String%2CConfig%29-instance-method" class="signature"><strong>#configs</strong> : Hash(String, Config)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#get%28ns%3AString%29%3AMemo%3A%3AService-instance-method" class="signature"><strong>#get</strong>(ns : String) : Memo::Service</a>
+        
+          <div class="summary"><p>Get the Memo::Service for a namespace, opening it lazily if needed.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#list%3AArray%28Tuple%28String%2CBool%29%29-instance-method" class="signature"><strong>#list</strong> : Array(Tuple(String, Bool))</a>
+        
+          <div class="summary"><p>List all registered namespaces with their open status.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#load_config%28path%3AString%29-instance-method" class="signature"><strong>#load_config</strong>(path : String)</a>
+        
+          <div class="summary"><p>Load namespace configs from a YAML-ish config file.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method" class="signature"><strong>#open</strong>(config : Config) : Memo::Service</a>
+        
+          <div class="summary"><p>Register and immediately open a namespace.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#open_services%3AArray%28Tuple%28String%2CMemo%3A%3AService%29%29-instance-method" class="signature"><strong>#open_services</strong> : Array(Tuple(String, Memo::Service))</a>
+        
+          <div class="summary"><p>Snapshot of the open services, for work done outside the lock (e.g.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#preload_all-instance-method" class="signature"><strong>#preload_all</strong></a>
+        
+          <div class="summary"><p>Preload all namespaces marked with preload: true in their config.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#register%28config%3AConfig%29-instance-method" class="signature"><strong>#register</strong>(config : Config)</a>
+        
+          <div class="summary"><p>Register a namespace config (without opening).</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#services%3AHash%28String%2CMemo%3A%3AService%29-instance-method" class="signature"><strong>#services</strong> : Hash(String, Memo::Service)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#use%28ns%3AString%2C%26%29-instance-method" class="signature"><strong>#use</strong>(ns : String, &)</a>
+        
+          <div class="summary"><p>Run the block with the namespace's service, opening it if needed.</p></div>
+        
+      </li>
+    
+  </ul>
+
+
+
+  <div class="methods-inherited">
+    
+      
+
+
+      
+
+
+      
+
+
+      
+
+
+    
+      
+
+
+      
+
+
+      
+
+
+      
+
+
+    
+  </div>
+
+  
+  <h2>
+    <a id="constructor-detail" class="anchor" href="#constructor-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Constructor Detail
+  </h2>
+  
+    <div class="entry-detail" id="new-class-method">
+      <div class="signature">
+        
+        def self.<strong>new</strong>
+
+        <a class="method-permalink" href="#new-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L45" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+  
+
+  
+
+  
+  <h2>
+    <a id="instance-method-detail" class="anchor" href="#instance-method-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Detail
+  </h2>
+  
+    <div class="entry-detail" id="close(ns:String):Bool-instance-method">
+      <div class="signature">
+        
+        def <strong>close</strong>(ns : String) : Bool
+
+        <a class="method-permalink" href="#close%28ns%3AString%29%3ABool-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Close and remove a namespace. Waits for an open in progress, and for
+requests already using the service (see use). New requests wait, then
+open it afresh.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L99" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="close_all-instance-method">
+      <div class="signature">
+        
+        def <strong>close_all</strong>
+
+        <a class="method-permalink" href="#close_all-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Close all open services (called on shutdown), each after its
+in-flight requests finish.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L137" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="configs:Hash(String,Config)-instance-method">
+      <div class="signature">
+        
+        def <strong>configs</strong> : Hash(String, <a href="../Memo/Namespaces/Config.html">Config</a>)
+
+        <a class="method-permalink" href="#configs%3AHash%28String%2CConfig%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L42" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get(ns:String):Memo::Service-instance-method">
+      <div class="signature">
+        
+        def <strong>get</strong>(ns : String) : <a href="../Memo/Service.html">Memo::Service</a>
+
+        <a class="method-permalink" href="#get%28ns%3AString%29%3AMemo%3A%3AService-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Get the Memo::Service for a namespace, opening it lazily if needed.
+Raises if the namespace isn't registered.</p>
+<p>Opening can be slow (it may replay or rebuild the index), so it holds
+only that namespace's open lock; requests for other namespaces carry on.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L71" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="list:Array(Tuple(String,Bool))-instance-method">
+      <div class="signature">
+        
+        def <strong>list</strong> : Array(Tuple(String, Bool))
+
+        <a class="method-permalink" href="#list%3AArray%28Tuple%28String%2CBool%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>List all registered namespaces with their open status.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L111" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="load_config(path:String)-instance-method">
+      <div class="signature">
+        
+        def <strong>load_config</strong>(path : String)
+
+        <a class="method-permalink" href="#load_config%28path%3AString%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Load namespace configs from a YAML-ish config file.</p>
+<p>Format (very simple, one block per namespace):</p>
+<p>namespaces:
+- ns: wow
+db: postgres://wow:wow@localhost/wow_dev
+service: openai
+preload: true
+- ns: notes
+db: /var/lib/memo/notes.db
+service: mock</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L153" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="open(config:Config):Memo::Service-instance-method">
+      <div class="signature">
+        
+        def <strong>open</strong>(config : <a href="../Memo/Namespaces/Config.html">Config</a>) : <a href="../Memo/Service.html">Memo::Service</a>
+
+        <a class="method-permalink" href="#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Register and immediately open a namespace. Returns the Service.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L61" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="open_services:Array(Tuple(String,Memo::Service))-instance-method">
+      <div class="signature">
+        
+        def <strong>open_services</strong> : Array(Tuple(String, <a href="../Memo/Service.html">Memo::Service</a>))
+
+        <a class="method-permalink" href="#open_services%3AArray%28Tuple%28String%2CMemo%3A%3AService%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Snapshot of the open services, for work done outside the lock
+(e.g. periodic index saves).</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L119" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="preload_all-instance-method">
+      <div class="signature">
+        
+        def <strong>preload_all</strong>
+
+        <a class="method-permalink" href="#preload_all-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Preload all namespaces marked with preload: true in their config.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L124" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="register(config:Config)-instance-method">
+      <div class="signature">
+        
+        def <strong>register</strong>(config : <a href="../Memo/Namespaces/Config.html">Config</a>)
+
+        <a class="method-permalink" href="#register%28config%3AConfig%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Register a namespace config (without opening).</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="services:Hash(String,Memo::Service)-instance-method">
+      <div class="signature">
+        
+        def <strong>services</strong> : Hash(String, <a href="../Memo/Service.html">Memo::Service</a>)
+
+        <a class="method-permalink" href="#services%3AHash%28String%2CMemo%3A%3AService%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L43" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="use(ns:String,&amp;)-instance-method">
+      <div class="signature">
+        
+        def <strong>use</strong>(ns : String, &)
+
+        <a class="method-permalink" href="#use%28ns%3AString%2C%26%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Run the block with the namespace's service, opening it if needed.
+close waits for blocks already running before it closes the service.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/arcana/namespaces.cr#L87" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+
+</div>
+
+</body>
+</html>
