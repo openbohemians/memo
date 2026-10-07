@@ -57,12 +57,35 @@ module Memo
         return
       end
 
-      db.transaction do |tx|
-        cnn = tx.connection
-        cnn.memo_dialect = db.memo_dialect
-        cnn.memo_queries = db.memo_queries.for_connection(cnn)
-        yield cnn
+      unless db.memo_dialect.is_a?(Dialect::SQLite)
+        db.transaction do |tx|
+          yield configure(db, tx.connection)
+        end
+        return
       end
+
+      # On SQLite, BEGIN IMMEDIATE takes the write lock up front, where
+      # busy_timeout applies. A plain (deferred) BEGIN asks for it at the
+      # first write, and if another connection or process holds it then,
+      # SQLite fails at once rather than risk a deadlock.
+      db.using_connection do |cnn|
+        configure(db, cnn).exec("BEGIN IMMEDIATE")
+        begin
+          yield cnn
+          cnn.exec("COMMIT")
+        rescue DB::Rollback
+          cnn.exec("ROLLBACK")
+        rescue ex
+          cnn.exec("ROLLBACK") rescue nil
+          raise ex
+        end
+      end
+    end
+
+    private def configure(db : DB::Database, cnn : DB::Connection) : DB::Connection
+      cnn.memo_dialect = db.memo_dialect
+      cnn.memo_queries = db.memo_queries.for_connection(cnn)
+      cnn
     end
   end
 end

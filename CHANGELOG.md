@@ -42,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The persistent query cache checks its size once per 1% of its limit** (and on each instance's first
   write), not on every write.
 - **memo's own SQLite connections wait up to 5 s for a lock** (`busy_timeout=5000`) instead of failing at once.
+- **SQLite write transactions begin `IMMEDIATE`**, taking the write lock up front where the busy timeout
+  applies. A deferred `BEGIN` failed at once ("database is locked") when another process held the lock.
 
 ### Fixed
 - **Transactions weren't atomic**: statements ran on other pool connections and committed one by one,
