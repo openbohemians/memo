@@ -27,7 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Service#save_index` saves at once. Saves write the file on a separate thread.
 - **`Memo::Database.transaction`** for atomic transactions, and `Memo::DBHandle` (pool or connection).
 - **`Memo::ArcanaListener`**: memo-arcana's request handling as a class, with specs on a private bus.
-- **memo-arcana settings**: `MEMO_MAX_CONCURRENCY` (default 32), `MEMO_SAVE_INTERVAL` (default 60 s).
+- **memo-arcana settings**: `MEMO_MAX_CONCURRENCY` (default 32), `MEMO_MAX_WAITING` (default 8x concurrency),
+  `MEMO_SAVE_INTERVAL` (default 60 s). Beyond the waiting limit, requests get an immediate error with
+  `"code": "busy"`, which callers can retry.
+- **`Memo::Namespaces#use`**: run a block with a namespace's service; closing the namespace waits for it.
 - **`Memo::Providers::HTTPPool`**: pooled connections and retries for the OpenAI and Voyage providers.
 
 ### Changed
@@ -36,7 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   At 20K vectors, a filter matching 90% of rows went from 10.3 ms to 1.2 ms.
 - **memo-arcana answers requests concurrently** and ignores reply envelopes instead of answering them.
 - **Opening one namespace no longer blocks requests to others**; replay and rebuild yield to other fibers.
-- **The persistent query cache checks its size once per 1% of its limit**, not on every write.
+- **The persistent query cache checks its size once per 1% of its limit** (and on each instance's first
+  write), not on every write.
+- **memo's own SQLite connections wait up to 5 s for a lock** (`busy_timeout=5000`) instead of failing at once.
 
 ### Fixed
 - **Transactions weren't atomic**: statements ran on other pool connections and committed one by one,
@@ -47,6 +52,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (28 ms per document at 150K; now a flat ~2 ms).
 - **SQLite inserts could read another connection's `last_insert_rowid`.**
 - **USearch rejected a new embedding** whose reused rowid a stale index file still held.
+- **Postgres numbered `?` inside quoted strings** in `sql_where` as a parameter, shifting the rest. Quoted
+  strings, identifiers, comments and dollar quotes are now skipped. jsonb's `?`, `?|` and `?&` operators
+  can't be used in `sql_where` on Postgres; use `jsonb_exists` and friends.
 
 ## [0.8.1] - 2026-02-09
 
