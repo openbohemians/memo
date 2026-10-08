@@ -1,6 +1,15 @@
 require "spec"
 require "../src/memo"
 
+# Delete a test database and every file beside it named after it: SQLite's
+# -wal/-shm/-journal, and memo's index with its checkpoint and lock. Only
+# this test's files: other programs may keep index files in the same
+# temp directory.
+def delete_test_files(db_path : String)
+  stem = File.basename(db_path, File.extname(db_path))
+  Dir.glob(File.join(File.dirname(db_path), "#{stem}*")).each { |f| File.delete(f) rescue nil }
+end
+
 # Helper to create a test database connection (for low-level API tests)
 def with_test_db(&block : DB::Database ->)
   # Use file-based temp database to avoid connection pool isolation issues
@@ -13,9 +22,7 @@ def with_test_db(&block : DB::Database ->)
     yield db
   ensure
     db.close
-    File.delete(temp_file) if File.exists?(temp_file)
-    # Clean up USearch index files
-    Dir.glob("#{File.dirname(temp_file)}/*.usearch").each { |f| File.delete(f) rescue nil }
+    delete_test_files(temp_file)
   end
 end
 
@@ -37,10 +44,7 @@ def with_test_db_path(&block : String ->)
   begin
     yield db_path
   ensure
-    File.delete(db_path) if File.exists?(db_path)
-    # Clean up USearch index files and their journal checkpoints
-    Dir.glob("#{File.dirname(db_path)}/*.usearch").each { |f| File.delete(f) rescue nil }
-    Dir.glob("#{File.dirname(db_path)}/*.usearch.checkpoint").each { |f| File.delete(f) rescue nil }
+    delete_test_files(db_path)
   end
 end
 
@@ -50,7 +54,7 @@ def with_test_service(&block : Memo::Service ->)
     service = Memo::Service.new(
       db_path: db_path,
       service: "mock",
-      chunking_max_tokens: 50  # Mock provider has max_tokens of 100
+      chunking_max_tokens: 50 # Mock provider has max_tokens of 100
     )
 
     begin
