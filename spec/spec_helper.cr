@@ -1,5 +1,6 @@
 require "spec"
 require "../src/memo"
+require "file_utils"
 
 # Delete a test database and every file beside it named after it: SQLite's
 # -wal/-shm/-journal, and memo's index with its checkpoint and lock. Only
@@ -8,6 +9,30 @@ require "../src/memo"
 def delete_test_files(db_path : String)
   stem = File.basename(db_path, File.extname(db_path))
   Dir.glob(File.join(File.dirname(db_path), "#{stem}*")).each { |f| File.delete(f) rescue nil }
+end
+
+# PostgreSQL server for the Postgres specs (MEMO_TEST_PG), as a URL without a
+# database name, e.g. postgres://postgres:postgres@localhost:5432. Without
+# it, those specs are pending.
+PG_TEST_SERVER = ENV["MEMO_TEST_PG"]?.try(&.rstrip('/'))
+
+# Yields the URL of a fresh, empty PostgreSQL database and a directory for
+# its index files; drops both afterwards.
+def with_pg_database(&)
+  server = PG_TEST_SERVER
+  pending!("set MEMO_TEST_PG to run the Postgres specs") unless server
+  name = "memo_test_#{Random::Secure.hex(6)}"
+  index_dir = File.tempname("memo_pg_index")
+  Dir.mkdir_p(index_dir)
+  admin = DB.open("#{server}/postgres")
+  admin.exec("CREATE DATABASE #{name}")
+  begin
+    yield "#{server}/#{name}", index_dir
+  ensure
+    admin.exec("DROP DATABASE IF EXISTS #{name} WITH (FORCE)")
+    admin.close
+    FileUtils.rm_rf(index_dir)
+  end
 end
 
 # Helper to create a test database connection (for low-level API tests)

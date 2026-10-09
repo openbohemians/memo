@@ -9,6 +9,21 @@ jobs:
   test:
     name: Specs and lint
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Runs spec/postgres_spec.cr against the service above (pending without it)
+      MEMO_TEST_PG: postgres://postgres:postgres@localhost:5432
     steps:
       - uses: actions/checkout@v4
 
