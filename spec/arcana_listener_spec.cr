@@ -1,23 +1,21 @@
 require "./spec_helper"
-require "arcana"
+require "arcana-core"
+require "./support/bus_relay"
 require "../src/arcana/listener"
 
 Memo::BusLog.output = IO::Memory.new
 
-# A private Arcana bus with a fake `openai:embed` service (answers after
+# A private Arcana bus (BusRelay) with a fake `openai:embed` service (answers after
 # 200 ms) and a memo listener serving one namespace that embeds over it.
 private class TestBus
   getter tester : Arcana::Client
-  @port : Int32
-  @server : Arcana::Server
+  @relay : BusRelay
   @embed : Arcana::Client
   @namespaces : Memo::Namespaces
   @memo : Arcana::Client
 
   def initialize(db_path : String, max_concurrency = 32, max_waiting = 256)
-    @port = free_port
-    @server = Arcana::Server.new(Arcana::Bus.new, Arcana::Directory.new, host: "127.0.0.1", port: @port)
-    @server.start_in_background
+    @relay = BusRelay.new
 
     @embed = connect("openai:embed")
     @embed.on_message do |envelope|
@@ -58,21 +56,16 @@ private class TestBus
     @namespaces.close_all
     Memo::Providers::Bus.client = nil
     {@tester, @memo, @embed}.each(&.close)
-    @server.stop
+    @relay.close
   end
 
   private def connect(address : String, listed = true) : Arcana::Client
-    client = Arcana::Client.new(url: "ws://127.0.0.1:#{@port}/bus", address: address, listed: listed)
+    client = Arcana::Client.new(url: "ws://127.0.0.1:#{@relay.port}/bus", address: address, listed: listed)
     spawn { client.connect }
     until client.connected?
       sleep 10.milliseconds
     end
     client
-  end
-
-  private def free_port : Int32
-    server = TCPServer.new("127.0.0.1", 0)
-    server.local_address.port.tap { server.close }
   end
 end
 

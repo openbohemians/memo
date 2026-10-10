@@ -39,7 +39,7 @@ module Memo
         when "arcana", "arcana/openai"
           raise ArgumentError.new("api_key required for arcana format") unless api_key
           final_base_url = base_url || "https://api.openai.com/v1/embeddings"
-          arcana_provider = ::Arcana::Embed::OpenAI.new(
+          arcana_provider = ::Arcana::AI::Embed::OpenAI.new(
             api_key: api_key,
             model: model,
             endpoint: final_base_url
@@ -49,7 +49,7 @@ module Memo
         when "arcana/voyage"
           raise ArgumentError.new("api_key required for arcana/voyage format") unless api_key
           final_base_url = base_url || "https://api.voyageai.com/v1/embeddings"
-          arcana_provider = ::Arcana::Embed::Voyage.new(
+          arcana_provider = ::Arcana::AI::Embed::Voyage.new(
             api_key: api_key,
             model: model,
             endpoint: final_base_url

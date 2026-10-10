@@ -28,18 +28,18 @@ dependencies:
   usearch:
     github: trans/usearch.cr
     version: ~> 0.1
-  arcana:
-    github: trans/arcana
-    version: ~> 0.17.0
   arcana-core:
     github: trans/arcana-core
-    version: ~> 0.5.1
+    version: ~> 0.16.0
+  arcana-ai:
+    github: trans/arcana-ai
+    version: ~> 0.4.0
   markterm:
     github: ralsina/markterm
     version: 0.6.3
   pg:
     github: will/crystal-pg
-    branch: master
+    version: ~> 0.30.0
 
 targets:
   memo:

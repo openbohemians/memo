@@ -34,6 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Memo::Providers::HTTPPool`**: pooled connections and retries for the OpenAI and Voyage providers.
 
 ### Changed
+- **Dependencies**: embeddings come from [arcana-ai](https://github.com/trans/arcana-ai)
+  (`Arcana::AI::Embed`, ~> 0.4) and the bus types from arcana-core ~> 0.16; memo no longer depends
+  on arcana itself (the listener specs run on a small relay in `spec/support/bus_relay.cr`). `pg` is
+  pinned to ~> 0.30.0 (crystal-db 0.14) instead of following master.
 - **Filtered searches search first and filter second**: unfiltered nearest neighbors are checked against
   the filter by id, widening once if too few pass; narrow filters rank their few matches exactly.
   At 20K vectors, a filter matching 90% of rows went from 10.3 ms to 1.2 ms.

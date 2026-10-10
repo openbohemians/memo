@@ -471,7 +471,7 @@ Currently supported:
   a service's `dimensions` is sent to the API, so smaller vectors work. Also works with OpenAI-compatible
   APIs via `base_url`.
 - `voyage` - Voyage AI voyage-3 (default), voyage-3-lite, voyage-code-3
-- `arcana/openai`, `arcana/voyage` - The same APIs through [Arcana](https://github.com/trans/arcana)'s embedders
+- `arcana/openai`, `arcana/voyage` - The same APIs through [arcana-ai](https://github.com/trans/arcana-ai)'s embedders
 - `bus/openai`, `bus/voyage` - Embeddings from an `openai:embed` / `voyage:embed` service on the Arcana bus
 - `mock` - Deterministic embeddings for testing
 
