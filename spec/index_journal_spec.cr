@@ -101,13 +101,15 @@ describe Memo::IndexJournal do
 
   it "saves when due, not on every call" do
     with_test_db_path do |db_path|
+      # The interval runs from the start of Service.new: long enough that
+      # opening and indexing finish within it on a slow CI runner
       service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50,
-        index_save_changes: 100, index_save_interval: 50.milliseconds)
+        index_save_changes: 100, index_save_interval: 300.milliseconds)
       service.index(source_type: "doc", source_id: 1_i64, text: "document 1")
       service.save_index_if_due
       File.exists?(service.index_path).should be_false
 
-      sleep 60.milliseconds # one change, unsaved past the interval
+      sleep 310.milliseconds # one change, unsaved past the interval
       service.save_index_if_due
       File.exists?(service.index_path).should be_true
       service.close
