@@ -393,16 +393,14 @@ result = service.db.query_one(
       end
     end
 
-    it "stores text in texts table" do
+    it "stores text in the contents table" do
       with_test_service do |service|
         service.index(source_type: "event", source_id: 1_i64, text: "Stored text content")
 
-        # Verify text was stored (keyed by internal source_id)
-        # Join with sources to find by external ID
-        
-content = service.db.query_one?(
-          "SELECT t.content FROM memo_texts t
-           JOIN memo_sources s ON t.source_id = s.id
+        # Verify text was stored, and the source points at it
+        content = service.db.query_one?(
+          "SELECT t.content FROM memo_sources s
+           JOIN memo_contents t ON t.id = s.content_id
            WHERE s.source_type = ? AND s.external_int = ?",
           "event", 1_i64,
           as: String
@@ -411,16 +409,14 @@ content = service.db.query_one?(
       end
     end
 
-    it "stores one entry per source" do
+    it "stores a text two sources share once" do
       with_test_service do |service|
         # Index same text for two different sources
         service.index(source_type: "event", source_id: 1_i64, text: "Same text")
         service.index(source_type: "event", source_id: 2_i64, text: "Same text")
 
-        # Should have two text entries (one per source)
-        
-count = service.db.scalar("SELECT COUNT(*) FROM memo_texts").as(Int64)
-        count.should eq(2)
+        count = service.db.scalar("SELECT COUNT(*) FROM memo_contents").as(Int64)
+        count.should eq(1)
       end
     end
 
@@ -431,13 +427,12 @@ count = service.db.scalar("SELECT COUNT(*) FROM memo_texts").as(Int64)
         service.index(source_type: "event", source_id: 1_i64, text: "Updated text")
 
         # Should still have one entry with updated content
-        
-count = service.db.scalar("SELECT COUNT(*) FROM memo_texts").as(Int64)
+        count = service.db.scalar("SELECT COUNT(*) FROM memo_contents").as(Int64)
         count.should eq(1)
 
         content = service.db.query_one?(
-          "SELECT t.content FROM memo_texts t
-           JOIN memo_sources s ON t.source_id = s.id
+          "SELECT t.content FROM memo_sources s
+           JOIN memo_contents t ON t.id = s.content_id
            WHERE s.source_type = ? AND s.external_int = ?",
           "event", 1_i64,
           as: String

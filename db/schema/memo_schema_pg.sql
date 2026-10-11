@@ -93,7 +93,50 @@ CREATE TABLE IF NOT EXISTS memo_embeddings (
 CREATE INDEX IF NOT EXISTS memo_idx_embeddings_service ON memo_embeddings(service_id);
 
 -- =============================================================================
+-- Contents
+--
+-- One row per distinct text, keyed by its hash. Sources with the same text
+-- share a row. content is NULL when the application keeps its own text
+-- (store_text: false): the hash alone still tells memo whether a source's
+-- text has changed. content_tsv indexes the text for full-text search.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS memo_contents (
+    id BIGSERIAL PRIMARY KEY,
+    hash BYTEA NOT NULL UNIQUE,
+    content TEXT,
+    content_tsv TSVECTOR,
+    created_at BIGINT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS memo_idx_contents_fts ON memo_contents USING GIN(content_tsv);
+
+-- Auto-populate tsvector on insert/update
+CREATE OR REPLACE FUNCTION memo_contents_tsv_trigger() RETURNS trigger AS $$
+BEGIN
+    NEW.content_tsv := to_tsvector('english', NEW.content);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'memo_trg_contents_tsv'
+    ) THEN
+        CREATE TRIGGER memo_trg_contents_tsv
+            BEFORE INSERT OR UPDATE OF content ON memo_contents
+            FOR EACH ROW EXECUTE FUNCTION memo_contents_tsv_trigger();
+    END IF;
+END;
+$$;
+
+-- =============================================================================
 -- Sources table
+--
+-- A source is the application's handle on one item: its type and external
+-- id. content_id points at its latest text, set as soon as the text is
+-- indexed or queued.
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS memo_sources (
@@ -102,6 +145,7 @@ CREATE TABLE IF NOT EXISTS memo_sources (
     external_int BIGINT,
     external_text TEXT,
     external_blob BYTEA,
+    content_id BIGINT REFERENCES memo_contents(id),
     created_at BIGINT NOT NULL,
 
     UNIQUE(source_type, external_int),
@@ -116,8 +160,19 @@ CREATE INDEX IF NOT EXISTS memo_idx_sources_type_text ON memo_sources(source_typ
 CREATE INDEX IF NOT EXISTS memo_idx_sources_type_blob ON memo_sources(source_type, external_blob)
     WHERE external_blob IS NOT NULL;
 
+-- Databases from before 0.13 lack content_id
+ALTER TABLE memo_sources ADD COLUMN IF NOT EXISTS content_id BIGINT REFERENCES memo_contents(id);
+
+CREATE INDEX IF NOT EXISTS memo_idx_sources_content ON memo_sources(content_id)
+    WHERE content_id IS NOT NULL;
+
 -- =============================================================================
 -- Chunks table
+--
+-- A source's chunks: each is the part of a text (content_id) at offset and
+-- size, and its hash keys the embedding. The rows are per source, so
+-- filters can name c.source_id, while the texts and embeddings they point
+-- at are shared.
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS memo_chunks (
@@ -126,6 +181,7 @@ CREATE TABLE IF NOT EXISTS memo_chunks (
 
     source_id BIGINT NOT NULL REFERENCES memo_sources(id),
     source_type TEXT NOT NULL,
+    content_id BIGINT REFERENCES memo_contents(id),
 
     pair_id BIGINT REFERENCES memo_sources(id),
     parent_id BIGINT REFERENCES memo_sources(id),
@@ -146,6 +202,11 @@ CREATE INDEX IF NOT EXISTS memo_idx_chunks_source ON memo_chunks(source_type, so
 CREATE INDEX IF NOT EXISTS memo_idx_chunks_pair ON memo_chunks(pair_id) WHERE pair_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS memo_idx_chunks_parent ON memo_chunks(parent_id) WHERE parent_id IS NOT NULL;
 
+-- Databases from before 0.13 lack content_id
+ALTER TABLE memo_chunks ADD COLUMN IF NOT EXISTS content_id BIGINT REFERENCES memo_contents(id);
+
+CREATE INDEX IF NOT EXISTS memo_idx_chunks_content ON memo_chunks(content_id);
+
 -- =============================================================================
 -- Embedding queue
 -- =============================================================================
@@ -165,40 +226,6 @@ CREATE TABLE IF NOT EXISTS memo_embed_queue (
 
 CREATE INDEX IF NOT EXISTS memo_idx_queue_pending ON memo_embed_queue(status) WHERE status = -1;
 CREATE INDEX IF NOT EXISTS memo_idx_queue_retries ON memo_embed_queue(status, attempts) WHERE status > 0;
-
--- =============================================================================
--- Text storage with tsvector for full-text search
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS memo_texts (
-    source_id BIGINT PRIMARY KEY REFERENCES memo_sources(id),
-    content TEXT NOT NULL,
-    content_hash BYTEA,
-    content_tsv TSVECTOR,
-    created_at BIGINT NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS memo_idx_texts_fts ON memo_texts USING GIN(content_tsv);
-
--- Auto-populate tsvector on insert/update
-CREATE OR REPLACE FUNCTION memo_texts_tsv_trigger() RETURNS trigger AS $$
-BEGIN
-    NEW.content_tsv := to_tsvector('english', NEW.content);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger WHERE tgname = 'memo_trg_texts_tsv'
-    ) THEN
-        CREATE TRIGGER memo_trg_texts_tsv
-            BEFORE INSERT OR UPDATE OF content ON memo_texts
-            FOR EACH ROW EXECUTE FUNCTION memo_texts_tsv_trigger();
-    END IF;
-END;
-$$;
 
 -- =============================================================================
 -- Vocabulary table
@@ -261,6 +288,12 @@ CREATE INDEX IF NOT EXISTS memo_idx_query_cache_service ON memo_query_cache(serv
 -- entries newer than the index file's checkpoint. memo_index_state tracks how
 -- far the log has been pruned and whether older vectors have been backfilled.
 -- =============================================================================
+
+-- The schema version (see Memo::Migration)
+CREATE TABLE IF NOT EXISTS memo_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS memo_vectors (
     embedding_id BIGINT PRIMARY KEY, -- memo_embeddings eid

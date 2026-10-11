@@ -109,7 +109,9 @@ module Memo
       source_id = parse_source_id(data["source_id"]?)
 
       chunks = memo.index(source_type: source_type, source_id: source_id, text: text)
-      JSON::Any.new({"ok" => JSON::Any.new(true), "chunks" => JSON::Any.new(chunks.to_i64)})
+      reply = {"ok" => JSON::Any.new(true), "chunks" => JSON::Any.new({chunks, 0}.max.to_i64)}
+      reply["unchanged"] = JSON::Any.new(true) if chunks == -1 # already indexed with this text
+      JSON::Any.new(reply)
     end
 
     private def handle_index_batch(memo : Memo::Service, data : JSON::Any) : JSON::Any

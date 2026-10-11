@@ -94,8 +94,9 @@ module Memo
       size : Int32,
       pair_id : Int64? = nil,
       parent_id : Int64? = nil,
+      content_id : Int64? = nil,
     ) : Int64
-      db.memo_queries.insert_chunk_ignore(hash, source_id, source_type, pair_id, parent_id, offset, size, Time.utc.to_unix_ms)
+      db.memo_queries.insert_chunk_ignore(hash, source_id, source_type, content_id, pair_id, parent_id, offset, size, Time.utc.to_unix_ms)
     end
 
     # Increment match_count for chunks

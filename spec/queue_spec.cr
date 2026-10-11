@@ -211,8 +211,8 @@ describe Memo::Service do
 
           # Text should be in the texts table even before process_queue
           content = service.db.query_one?(
-            "SELECT t.content FROM memo_texts t
-             JOIN memo_sources s ON t.source_id = s.id
+            "SELECT t.content FROM memo_sources s
+             JOIN memo_contents t ON t.id = s.content_id
              WHERE s.source_type = ? AND s.external_int = ?",
             "event", 1_i64,
             as: String

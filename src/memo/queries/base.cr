@@ -106,7 +106,7 @@ module Memo
     # =========================================================================
 
     abstract def insert_chunk_ignore(
-      hash : Bytes, source_id : Int64, source_type : String,
+      hash : Bytes, source_id : Int64, source_type : String, content_id : Int64?,
       pair_id : Int64?, parent_id : Int64?,
       offset : Int32?, size : Int32, created_at : Int64,
     ) : Int64
@@ -122,6 +122,18 @@ module Memo
     abstract def delete_chunks(hash : Bytes, source_id : Int64, source_type : String) : Int32
 
     abstract def delete_chunks(hash : Bytes, source_id : Int64) : Int32
+
+    # The texts a source's chunks were cut from
+    abstract def chunk_content_ids(source_id : Int64) : Array(Int64)
+
+    # Per chunk of a source: {content_id, pair_id, parent_id, source_type,
+    # whether its hash has an embedding, with a stored vector, for the
+    # service}
+    abstract def chunk_states(source_id : Int64, service_id : Int64) : Array({Int64?, Int64?, Int64?, String, Bool})
+
+    # Which of `hashes` have an embedding for the service with a stored
+    # vector (one without has been lost: embed it again)
+    abstract def embedded_hashes(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)
 
     abstract def count_chunks_by_hash(hash : Bytes) : Int64
 
@@ -205,17 +217,20 @@ module Memo
 
     abstract def get_pending_queue(limit : Int32) : Array({Int64, Int64, String})
 
-    abstract def mark_queue_success(id : Int64, processed_at : Int64) : Nil
+    # The mark_queue_* methods take the item's text as it was read, and do
+    # nothing if it has changed since: the source was queued again, and the
+    # newer text still needs embedding.
+    abstract def mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil
 
     abstract def get_queue_attempts(id : Int64) : Int32
 
-    abstract def mark_queue_failed(id : Int64, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
+    abstract def mark_queue_failed(id : Int64, text : String, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
 
-    abstract def mark_queue_retry(id : Int64, attempts : Int32, error_message : String?) : Nil
+    abstract def mark_queue_retry(id : Int64, text : String, attempts : Int32, error_message : String?) : Nil
 
     abstract def get_queue_item(source_id : Int64) : {Int64, String}?
 
-    abstract def mark_queue_item_success(id : Int64, processed_at : Int64, attempts : Int32) : Nil
+    abstract def mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
 
     abstract def queue_stats : {Int64, Int64}
 
@@ -223,19 +238,44 @@ module Memo
 
     abstract def clear_queue : Int32
 
+    # Drop the text of finished items (from before memo did so itself)
+    abstract def clear_completed_queue_texts : Nil
+
     # =========================================================================
-    # Texts
+    # Contents
     # =========================================================================
 
-    abstract def upsert_text(source_id : Int64, content : String, content_hash : Bytes?, created_at : Int64) : Nil
+    # The id of the text with this hash, storing it if new. `content` nil
+    # stores the hash alone.
+    abstract def upsert_content(hash : Bytes, content : String?, created_at : Int64) : Int64
 
-    abstract def get_text_hash(source_id : Int64) : Bytes?
+    abstract def find_content_id(hash : Bytes) : Int64?
 
-    abstract def delete_text(source_id : Int64) : Nil
+    # Delete a text unless a source or chunk still points at it
+    abstract def release_content(content_id : Int64) : Nil
 
-    abstract def get_text(source_id : Int64) : String?
+    abstract def source_content_id(source_id : Int64) : Int64?
 
+    abstract def set_source_content(source_id : Int64, content_id : Int64?) : Nil
+
+    abstract def set_chunks_content(source_id : Int64, content_id : Int64) : Nil
+
+    # A source's latest text (nil if not stored)
+    abstract def get_source_text(source_id : Int64) : String?
+
+    # Every source's stored text (a text shared by several, once for each)
     abstract def get_all_texts : Array(String)
+
+    # memo_texts rows (databases from before 0.13): {source_id, content, content_hash}
+    abstract def legacy_texts_after(source_id : Int64, limit : Int32) : Array({Int64, String, Bytes?})
+
+    # =========================================================================
+    # Meta
+    # =========================================================================
+
+    abstract def get_meta(key : String) : String?
+
+    abstract def set_meta(key : String, value : String) : Nil
 
     abstract def get_service_tokens_per_byte(service_id : Int64) : Float64?
 

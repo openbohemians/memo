@@ -6,7 +6,9 @@ Semantic search and vector storage library for Crystal.
 
 - **CLI tool** - Index, search, and manage from the command line
 - **Text chunking** - Smart segmentation into optimal-sized pieces
-- **Embedding storage** - Deduplication by content hash
+- **Content-addressed storage** - Each distinct text and each chunk's embedding is stored once, however many
+  sources share it; only chunks with no stored embedding are sent to the API, so re-indexing unchanged or
+  partly edited text costs little or nothing
 - **HNSW search** - Fast approximate nearest neighbor via USearch
 - **Text storage** - Optional persistent text with LIKE and FTS5 full-text search
 - **Crash-safe index** - Vectors and index changes are journaled in the database; a crash or lost index
@@ -203,7 +205,7 @@ memo = Memo::Service.new(
   api_key: "sk-...",             # API key for provider
   model: nil,                    # Optional: override default model
   dimensions: nil,               # Optional: embedding dimensions (provider default)
-  store_text: true,              # Optional: enable text storage (default true)
+  store_text: true,              # Optional: store text in memo (default true; false keeps only its hash)
   chunking_max_tokens: 2000      # Optional: max tokens per chunk
 )
 ```
@@ -391,15 +393,28 @@ end
 Memo keeps its data in the database (a SQLite file at `db_path`, or PostgreSQL) and an index file per
 embedding service beside it:
 
-- **Database**: services, embeddings (deduplicated by content hash), chunks, texts, the embed queue,
-  every embedding's vector (`memo_vectors`, 16-bit floats), and a journal of index changes
-  (`memo_index_log`)
+- **Database**: services, sources, texts (`memo_contents`: each distinct text once, by hash), chunks,
+  embeddings (one per distinct chunk and service), the embed queue, every embedding's vector
+  (`memo_vectors`, 16-bit floats), and a journal of index changes (`memo_index_log`)
 - **USearch index**: an HNSW index file per service (e.g. `memo.openai--text-embedding-3-small--1536.usearch`),
   held in memory while open, with a `.checkpoint` and a `.lock` file beside it
 
 The index is rebuilt from the database whenever it needs to be, so **backing up the database is enough**
 (e.g. Litestream for SQLite). Text storage can be disabled with `store_text: false` if you prefer to manage
-text separately.
+text separately: memo then keeps only each text's hash, which is enough to tell an unchanged text.
+
+### Reading memo's tables
+
+Applications sharing memo's database can join its tables in their own SQL and in `sql_where`:
+
+- `memo_sources`: one row per indexed item (`source_type` and `external_int`, `external_text` or
+  `external_blob`). `content_id` points at its latest text, set as soon as it is indexed or queued.
+- `memo_chunks` (`c` in `sql_where`): a source's chunks. `c.source_id` is the internal source id, and
+  `c.content_id` the text the chunk was cut from (`offset`, `size`), which differs from the source's
+  while a new text waits in the queue.
+- `memo_contents`: the texts, by `id` and `hash`. `content` is NULL when stored with `store_text: false`.
+
+A source's text, for example: `SELECT ct.content FROM memo_sources s JOIN memo_contents ct ON ct.id = s.content_id`.
 
 ### Durability and Recovery
 

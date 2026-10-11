@@ -36,21 +36,31 @@ module Memo
         nil
       end
 
-      def fts_upsert(db : DBHandle, source_id : Int64, content : String)
-        # No-op: the memo_trg_texts_tsv trigger auto-populates content_tsv
-      end
-
-      def fts_delete(db : DBHandle, source_id : Int64)
-        # No-op: content_tsv is a column on memo_texts, deleted with the row
-      end
-
       def fts_join_sql : String
-        "JOIN memo_texts fts_t ON c.source_id = fts_t.source_id"
+        "JOIN memo_contents fts_t ON fts_t.id = c.content_id"
       end
 
       def fts_where_sql : String
         "fts_t.content_tsv @@ plainto_tsquery('english', ?)"
       end
+
+      def table_exists?(db : DBHandle, table : String) : Bool
+        db.scalar("SELECT to_regclass($1) IS NOT NULL", table).as(Bool)
+      end
+
+      def drop_legacy_texts(db : DBHandle) : Nil
+        db.exec("DROP TABLE IF EXISTS memo_texts")
+        db.exec("DROP FUNCTION IF EXISTS memo_texts_tsv_trigger()")
+      end
+
+      # Two processes opening the database at once would otherwise both
+      # migrate it. The lock is released when the transaction ends.
+      def lock_for_migration(db : DB::Connection) : Nil
+        db.exec("SELECT pg_advisory_xact_lock(#{MIGRATION_LOCK})")
+      end
+
+      # Any constant shared by every memo process ("memo" in ASCII)
+      MIGRATION_LOCK = 0x6d656d6f_i64
 
       # Split SQL into statements, respecting $$ delimited blocks
       private def split_statements(sql : String) : Array(String)

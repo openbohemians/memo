@@ -259,7 +259,7 @@ module Memo
       fts_join = ""
 
       if like && !like.empty?
-        text_join = "JOIN memo_texts st ON c.source_id = st.source_id"
+        text_join = "JOIN memo_contents st ON st.id = c.content_id"
         like.each do |pattern|
           where_clauses << "st.content LIKE ?"
           params << pattern

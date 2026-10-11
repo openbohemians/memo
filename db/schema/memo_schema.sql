@@ -81,7 +81,51 @@ CREATE TABLE IF NOT EXISTS memo_embeddings (
 CREATE INDEX IF NOT EXISTS memo_idx_embeddings_service ON memo_embeddings(service_id);
 
 -- =============================================================================
+-- Contents
+--
+-- One row per distinct text, keyed by its hash. Sources with the same text
+-- share a row. content is NULL when the application keeps its own text
+-- (store_text: false): the hash alone still tells memo whether a source's
+-- text has changed. The FTS table indexes the stored texts without keeping
+-- a second copy (external content), and the triggers keep it in step.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS memo_contents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hash BLOB NOT NULL UNIQUE,
+    content TEXT,
+    created_at INTEGER NOT NULL
+);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS memo_contents_fts
+USING fts5(content, content='memo_contents', content_rowid='id');
+
+CREATE TRIGGER IF NOT EXISTS memo_trg_contents_insert AFTER INSERT ON memo_contents
+WHEN new.content IS NOT NULL
+BEGIN
+    INSERT INTO memo_contents_fts (rowid, content) VALUES (new.id, new.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS memo_trg_contents_delete AFTER DELETE ON memo_contents
+WHEN old.content IS NOT NULL
+BEGIN
+    INSERT INTO memo_contents_fts (memo_contents_fts, rowid, content) VALUES ('delete', old.id, old.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS memo_trg_contents_update AFTER UPDATE OF content ON memo_contents
+BEGIN
+    INSERT INTO memo_contents_fts (memo_contents_fts, rowid, content)
+        SELECT 'delete', old.id, old.content WHERE old.content IS NOT NULL;
+    INSERT INTO memo_contents_fts (rowid, content)
+        SELECT new.id, new.content WHERE new.content IS NOT NULL;
+END;
+
+-- =============================================================================
 -- Sources table
+--
+-- A source is the application's handle on one item: its type and external
+-- id. content_id points at its latest text, set as soon as the text is
+-- indexed or queued.
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS memo_sources (
@@ -90,6 +134,7 @@ CREATE TABLE IF NOT EXISTS memo_sources (
     external_int INTEGER,
     external_text TEXT,
     external_blob BLOB,
+    content_id INTEGER REFERENCES memo_contents(id),
     created_at INTEGER NOT NULL,
 
     UNIQUE(source_type, external_int),
@@ -103,9 +148,16 @@ CREATE INDEX IF NOT EXISTS memo_idx_sources_type_text ON memo_sources(source_typ
     WHERE external_text IS NOT NULL;
 CREATE INDEX IF NOT EXISTS memo_idx_sources_type_blob ON memo_sources(source_type, external_blob)
     WHERE external_blob IS NOT NULL;
+CREATE INDEX IF NOT EXISTS memo_idx_sources_content ON memo_sources(content_id)
+    WHERE content_id IS NOT NULL;
 
 -- =============================================================================
 -- Chunks table
+--
+-- A source's chunks: each is the part of a text (content_id) at offset and
+-- size, and its hash keys the embedding. The rows are per source, so
+-- filters can name c.source_id, while the texts and embeddings they point
+-- at are shared.
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS memo_chunks (
@@ -114,6 +166,7 @@ CREATE TABLE IF NOT EXISTS memo_chunks (
 
     source_id INTEGER NOT NULL REFERENCES memo_sources(id),
     source_type TEXT NOT NULL,
+    content_id INTEGER REFERENCES memo_contents(id),
 
     pair_id INTEGER REFERENCES memo_sources(id),
     parent_id INTEGER REFERENCES memo_sources(id),
@@ -133,6 +186,7 @@ CREATE INDEX IF NOT EXISTS memo_idx_chunks_hash ON memo_chunks(hash);
 CREATE INDEX IF NOT EXISTS memo_idx_chunks_source ON memo_chunks(source_type, source_id);
 CREATE INDEX IF NOT EXISTS memo_idx_chunks_pair ON memo_chunks(pair_id) WHERE pair_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS memo_idx_chunks_parent ON memo_chunks(parent_id) WHERE parent_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS memo_idx_chunks_content ON memo_chunks(content_id);
 
 -- =============================================================================
 -- Embedding queue
@@ -153,21 +207,6 @@ CREATE TABLE IF NOT EXISTS memo_embed_queue (
 
 CREATE INDEX IF NOT EXISTS memo_idx_queue_pending ON memo_embed_queue(status) WHERE status = -1;
 CREATE INDEX IF NOT EXISTS memo_idx_queue_retries ON memo_embed_queue(status, attempts) WHERE status > 0;
-
--- =============================================================================
--- Text storage
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS memo_texts (
-    source_id INTEGER PRIMARY KEY REFERENCES memo_sources(id),
-    content TEXT NOT NULL,
-    content_hash BLOB,
-    created_at INTEGER NOT NULL
-);
-
--- FTS5 virtual table for full-text search
-CREATE VIRTUAL TABLE IF NOT EXISTS memo_texts_fts
-USING fts5(source_id UNINDEXED, content);
 
 -- =============================================================================
 -- Vocabulary table
@@ -231,7 +270,7 @@ CREATE INDEX IF NOT EXISTS memo_idx_query_cache_service ON memo_query_cache(serv
 -- far the log has been pruned and whether older vectors have been backfilled.
 -- =============================================================================
 
--- One-time migrations memo has applied to this database
+-- The schema version (see Memo::Migration)
 CREATE TABLE IF NOT EXISTS memo_meta (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL

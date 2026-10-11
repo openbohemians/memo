@@ -36,9 +36,20 @@ module Memo
       # Get schema DDL statements.
       abstract def schema_statements : Array(String)
 
-      # One-time data migrations, run by Database.init after the schema.
-      def migrate(db : DB::Database) : Nil
+      # Bring existing tables up to date before the schema runs, where its
+      # statements depend on columns older databases lack.
+      def prepare(db : DB::Database) : Nil
       end
+
+      abstract def table_exists?(db : DBHandle, table : String) : Bool
+
+      # Drop the tables content-addressed storage replaced (memo_texts and
+      # its full-text index).
+      abstract def drop_legacy_texts(db : DBHandle) : Nil
+
+      # Inside a migration's transaction: keep other processes from
+      # migrating the same database at the same time.
+      abstract def lock_for_migration(db : DB::Connection) : Nil
 
       # Get the database file path from a connection, if applicable.
       #
@@ -46,13 +57,7 @@ module Memo
       # PostgreSQL: returns nil (no local file)
       abstract def db_file_path(db : DB::Database) : String?
 
-      # Insert or update FTS index for a source.
-      abstract def fts_upsert(db : DBHandle, source_id : Int64, content : String)
-
-      # Delete FTS index entry for a source.
-      abstract def fts_delete(db : DBHandle, source_id : Int64)
-
-      # Build FTS JOIN clause for search queries.
+      # Build FTS JOIN clause for search queries (joining a chunk's text).
       abstract def fts_join_sql : String
 
       # Build FTS WHERE clause for match queries.

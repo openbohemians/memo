@@ -260,14 +260,14 @@ module Memo
     # =========================================================================
 
     def insert_chunk_ignore(
-      hash : Bytes, source_id : Int64, source_type : String,
+      hash : Bytes, source_id : Int64, source_type : String, content_id : Int64?,
       pair_id : Int64?, parent_id : Int64?,
       offset : Int32?, size : Int32, created_at : Int64,
     ) : Int64
       result = @db.exec(
-        "INSERT INTO memo_chunks (hash, source_id, source_type, pair_id, parent_id, \"offset\", size, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT DO NOTHING",
-        hash, source_id, source_type, pair_id, parent_id, offset, size, created_at
+        "INSERT INTO memo_chunks (hash, source_id, source_type, content_id, pair_id, parent_id, \"offset\", size, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT DO NOTHING",
+        hash, source_id, source_type, content_id, pair_id, parent_id, offset, size, created_at
       )
       return 0_i64 if result.rows_affected == 0
       @db.query_one("SELECT id FROM memo_chunks WHERE source_id = $1 AND \"offset\" IS NOT DISTINCT FROM $2", source_id, offset, as: Int64)
@@ -309,6 +309,36 @@ module Memo
 
     def delete_chunks(hash : Bytes, source_id : Int64) : Int32
       @db.exec("DELETE FROM memo_chunks WHERE hash = $1 AND source_id = $2", hash, source_id).rows_affected.to_i
+    end
+
+    def chunk_content_ids(source_id : Int64) : Array(Int64)
+      @db.query_all("SELECT DISTINCT content_id FROM memo_chunks WHERE source_id = $1 AND content_id IS NOT NULL", source_id, as: Int64)
+    end
+
+    def chunk_states(source_id : Int64, service_id : Int64) : Array({Int64?, Int64?, Int64?, String, Bool})
+      @db.query_all(
+        "SELECT c.content_id, c.pair_id, c.parent_id, c.source_type, v.embedding_id IS NOT NULL
+         FROM memo_chunks c
+         LEFT JOIN memo_embeddings e ON e.hash = c.hash AND e.service_id = $1
+         LEFT JOIN memo_vectors v ON v.embedding_id = e.eid
+         WHERE c.source_id = $2",
+        service_id, source_id
+      ) { |rs| {rs.read(Int64?), rs.read(Int64?), rs.read(Int64?), rs.read(String), rs.read(Bool)} }
+    end
+
+    def embedded_hashes(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)
+      found = Set(Bytes).new
+      hashes.each_slice(500) do |slice|
+        placeholders = (2..slice.size + 1).join(", ") { |k| "$#{k}" }
+        @db.query(
+          "SELECT e.hash FROM memo_embeddings e JOIN memo_vectors v ON v.embedding_id = e.eid
+           WHERE e.service_id = $1 AND e.hash IN (#{placeholders})",
+          args: [service_id.as(DB::Any)] + slice.map(&.as(DB::Any))
+        ) do |rs|
+          rs.each { found << rs.read(Bytes) }
+        end
+      end
+      found
     end
 
     def count_chunks_by_hash(hash : Bytes) : Int64
@@ -524,31 +554,31 @@ module Memo
       items
     end
 
-    def mark_queue_success(id : Int64, processed_at : Int64) : Nil
-      @db.exec("UPDATE memo_embed_queue SET status = 0, processed_at = $1, attempts = attempts + 1 WHERE id = $2", processed_at, id)
+    def mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil
+      @db.exec("UPDATE memo_embed_queue SET status = 0, text = NULL, processed_at = $1, attempts = attempts + 1 WHERE id = $2 AND text = $3", processed_at, id, text)
     end
 
     def get_queue_attempts(id : Int64) : Int32
       @db.query_one("SELECT attempts FROM memo_embed_queue WHERE id = $1", id, as: Int32)
     end
 
-    def mark_queue_failed(id : Int64, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
+    def mark_queue_failed(id : Int64, text : String, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
       @db.exec(
-        "UPDATE memo_embed_queue SET status = 1, error_message = $1, attempts = $2, processed_at = $3 WHERE id = $4",
-        error_message, attempts, processed_at, id
+        "UPDATE memo_embed_queue SET status = 1, error_message = $1, attempts = $2, processed_at = $3 WHERE id = $4 AND text = $5",
+        error_message, attempts, processed_at, id, text
       )
     end
 
-    def mark_queue_retry(id : Int64, attempts : Int32, error_message : String?) : Nil
-      @db.exec("UPDATE memo_embed_queue SET attempts = $1, error_message = $2 WHERE id = $3", attempts, error_message, id)
+    def mark_queue_retry(id : Int64, text : String, attempts : Int32, error_message : String?) : Nil
+      @db.exec("UPDATE memo_embed_queue SET attempts = $1, error_message = $2 WHERE id = $3 AND text = $4", attempts, error_message, id, text)
     end
 
     def get_queue_item(source_id : Int64) : {Int64, String}?
       @db.query_one?("SELECT id, text FROM memo_embed_queue WHERE source_id = $1 AND status = -1", source_id, as: {Int64, String})
     end
 
-    def mark_queue_item_success(id : Int64, processed_at : Int64, attempts : Int32) : Nil
-      @db.exec("UPDATE memo_embed_queue SET status = 0, processed_at = $1, attempts = $2 WHERE id = $3", processed_at, attempts, id)
+    def mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
+      @db.exec("UPDATE memo_embed_queue SET status = 0, text = NULL, processed_at = $1, attempts = $2 WHERE id = $3 AND text = $4", processed_at, attempts, id, text)
     end
 
     def queue_stats : {Int64, Int64}
@@ -565,38 +595,85 @@ module Memo
       @db.exec("DELETE FROM memo_embed_queue").rows_affected.to_i
     end
 
+    def clear_completed_queue_texts : Nil
+      @db.exec("UPDATE memo_embed_queue SET text = NULL WHERE status = 0 AND text IS NOT NULL")
+    end
+
     # =========================================================================
-    # Texts
+    # Contents
     # =========================================================================
 
-    def upsert_text(source_id : Int64, content : String, content_hash : Bytes?, created_at : Int64) : Nil
+    def upsert_content(hash : Bytes, content : String?, created_at : Int64) : Int64
+      # Fills in the text of a row stored without it (by a Service with
+      # store_text: false), but never replaces or removes one
       @db.exec(
-        "INSERT INTO memo_texts (source_id, content, content_hash, created_at)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (source_id) DO UPDATE SET
-           content = EXCLUDED.content, content_hash = EXCLUDED.content_hash, created_at = EXCLUDED.created_at",
-        source_id, content, content_hash, created_at
+        "INSERT INTO memo_contents (hash, content, created_at) VALUES ($1, $2, $3)
+         ON CONFLICT (hash) DO UPDATE SET content = EXCLUDED.content
+         WHERE memo_contents.content IS NULL AND EXCLUDED.content IS NOT NULL",
+        hash, content, created_at
+      )
+      @db.query_one("SELECT id FROM memo_contents WHERE hash = $1", hash, as: Int64)
+    end
+
+    def find_content_id(hash : Bytes) : Int64?
+      @db.query_one?("SELECT id FROM memo_contents WHERE hash = $1", hash, as: Int64)
+    end
+
+    def release_content(content_id : Int64) : Nil
+      @db.exec(
+        "DELETE FROM memo_contents WHERE id = $1
+           AND NOT EXISTS (SELECT 1 FROM memo_sources WHERE content_id = $1)
+           AND NOT EXISTS (SELECT 1 FROM memo_chunks WHERE content_id = $1)",
+        content_id
       )
     end
 
-    def get_text_hash(source_id : Int64) : Bytes?
-      @db.query_one?("SELECT content_hash FROM memo_texts WHERE source_id = $1", source_id, as: Bytes?)
+    def source_content_id(source_id : Int64) : Int64?
+      @db.query_one?("SELECT content_id FROM memo_sources WHERE id = $1", source_id, as: Int64?)
     end
 
-    def delete_text(source_id : Int64) : Nil
-      @db.exec("DELETE FROM memo_texts WHERE source_id = $1", source_id)
+    def set_source_content(source_id : Int64, content_id : Int64?) : Nil
+      @db.exec("UPDATE memo_sources SET content_id = $1 WHERE id = $2", content_id, source_id)
     end
 
-    def get_text(source_id : Int64) : String?
-      @db.query_one?("SELECT content FROM memo_texts WHERE source_id = $1", source_id, as: String)
+    def set_chunks_content(source_id : Int64, content_id : Int64) : Nil
+      @db.exec("UPDATE memo_chunks SET content_id = $1 WHERE source_id = $2", content_id, source_id)
+    end
+
+    def get_source_text(source_id : Int64) : String?
+      @db.query_one?(
+        "SELECT ct.content FROM memo_sources s JOIN memo_contents ct ON ct.id = s.content_id WHERE s.id = $1",
+        source_id, as: String?
+      )
     end
 
     def get_all_texts : Array(String)
-      texts = [] of String
-      @db.query("SELECT content FROM memo_texts") do |rs|
-        rs.each { texts << rs.read(String) }
-      end
-      texts
+      @db.query_all(
+        "SELECT ct.content FROM memo_sources s JOIN memo_contents ct ON ct.id = s.content_id WHERE ct.content IS NOT NULL",
+        as: String
+      )
+    end
+
+    def legacy_texts_after(source_id : Int64, limit : Int32) : Array({Int64, String, Bytes?})
+      @db.query_all(
+        "SELECT source_id, content, content_hash FROM memo_texts WHERE source_id > $1 ORDER BY source_id LIMIT $2",
+        source_id, limit, as: {Int64, String, Bytes?}
+      )
+    end
+
+    # =========================================================================
+    # Meta
+    # =========================================================================
+
+    def get_meta(key : String) : String?
+      @db.query_one?("SELECT value FROM memo_meta WHERE key = $1", key, as: String)
+    end
+
+    def set_meta(key : String, value : String) : Nil
+      @db.exec(
+        "INSERT INTO memo_meta (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+        key, value
+      )
     end
 
     def get_service_tokens_per_byte(service_id : Int64) : Float64?
@@ -632,12 +709,12 @@ module Memo
     def get_texts_for_reindex(source_type : String) : Array({Int64, Int64?, Int64?, String})
       results = [] of {Int64, Int64?, Int64?, String}
       @db.query(
-        "SELECT st.source_id, c.pair_id, c.parent_id, st.content
-         FROM memo_texts st
-         JOIN memo_sources s ON st.source_id = s.id
-         LEFT JOIN memo_chunks c ON st.source_id = c.source_id
-         WHERE s.source_type = $1
-         GROUP BY st.source_id, c.pair_id, c.parent_id, st.content",
+        "SELECT DISTINCT ON (s.id) s.id, c.pair_id, c.parent_id, ct.content
+         FROM memo_sources s
+         JOIN memo_contents ct ON ct.id = s.content_id
+         LEFT JOIN memo_chunks c ON c.source_id = s.id
+         WHERE s.source_type = $1 AND ct.content IS NOT NULL
+         ORDER BY s.id",
         source_type
       ) do |rs|
         rs.each { results << {rs.read(Int64), rs.read(Int64?), rs.read(Int64?), rs.read(String)} }
@@ -685,6 +762,7 @@ module Memo
           WHERE #{pg_where.join(" AND ")}
         SQL
 
+
         args: [service_id] + params
       ) do |rs|
         rs.each { valid_rowids << rs.read(Int64).to_u64 }
@@ -717,6 +795,7 @@ module Memo
           WHERE e.eid IN (#{placeholders}) AND #{pg_where.join(" AND ")}
         SQL
 
+
         args: candidate_ids.map(&.as(DB::Any)) + params
       ) do |rs|
         rs.each { passing << rs.read(Int64).to_u64 }
@@ -730,7 +809,7 @@ module Memo
       include_text : Bool,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
       text_select = include_text ? ", SUBSTR(st.content, c.\"offset\" + 1, c.size) AS chunk_text" : ""
-      text_join = include_text ? "LEFT JOIN memo_texts st ON c.source_id = st.source_id" : ""
+      text_join = include_text ? "LEFT JOIN memo_contents st ON st.id = c.content_id" : ""
 
       placeholders = rowids.each_with_index.map { |_, i| "$#{i + 1}" }.join(", ")
       service_param_idx = rowids.size + 1
@@ -753,6 +832,7 @@ module Memo
           WHERE e.eid IN (#{placeholders})
             AND e.service_id = $#{service_param_idx}
         SQL
+
 
         args: rowids.map(&.as(DB::Any)) + [service_id.as(DB::Any)]
       ) do |rs|
@@ -951,6 +1031,7 @@ module Memo
           GROUP BY s.external_int, e.eid
           ORDER BY s.external_int, c."offset"
         SQL
+
 
         args: [service_id, source_type] + external_ids.map(&.as(DB::Any))
       ) do |rs|

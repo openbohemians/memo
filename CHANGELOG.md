@@ -8,16 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.13.0] - 2026-10-06
 
 ### Upgrading
-- **The first open of an existing database migrates it once**: vectors are copied out of the
-  index file into the new `memo_vectors` table, and SQLite's full-text table is rebuilt so rows
-  are keyed by source id (0.3 s for 150K rows). Embeddings missing from both the database and the
-  index file are counted in `Service#index_recovery.missing`; indexing their sources again restores them.
+- **The first open of an existing database migrates it once**, in one transaction: each distinct text
+  moves into the new `memo_contents` table, with sources and chunks pointing at it, and `memo_texts` and
+  its full-text index are dropped. Vectors are copied out of the index file into the new `memo_vectors`
+  table. Embeddings missing from both the database and the index file are counted in
+  `Service#index_recovery.missing`; indexing their sources again restores them. `memo_meta` records the
+  schema version, and a database from a newer memo is refused (`Memo::Migration::NewerSchema`).
+- **`memo_texts` is gone.** SQL that read it should join `memo_contents`: a source's latest text is
+  `memo_contents ct ON ct.id = s.content_id`, and the text a chunk was cut from `ct.id = c.content_id`
+  (see "Reading memo's tables" in the README).
 - **An index can only be open in one process at a time.** A second open raises
   `Memo::USearchIndex::InUse`, including the memo CLI against a database a running service has open.
 - **Every statement inside a transaction must use the transaction's connection**
   (`Memo::Database.transaction` yields it); statements sent to the pool commit on their own.
 
 ### Added
+- **Content-addressed text storage**: each distinct text is stored once in `memo_contents`, however many
+  sources have it, and indexed for full-text search once (on SQLite without a second copy of the text).
+  Sources and chunks point at it. With `store_text: false`, memo keeps the text's hash only, so it can
+  still tell when a text hasn't changed.
 - **Index journal** (`Memo::IndexJournal`): vectors stored in `memo_vectors` (16-bit floats) and every
   index change logged in `memo_index_log`, in the same transaction as the data. Opening an index
   replays only changes after its checkpoint; a missing, corrupt or stale file is rebuilt from stored
@@ -34,6 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Memo::Providers::HTTPPool`**: pooled connections and retries for the OpenAI and Voyage providers.
 
 ### Changed
+- **Only chunks with no stored embedding go to the embedding API.** A text another source has costs no
+  API call, and an edited text sends only its changed chunks. Embeddings are reused only while their
+  vector is stored, so one that was lost is embedded again.
+- **Finished queue items no longer keep their text.**
+- **memo-arcana's `index` reply** for a text already indexed is `"chunks": 0, "unchanged": true`.
 - **Dependencies**: embeddings come from [arcana-ai](https://github.com/trans/arcana-ai)
   (`Arcana::AI::Embed`, ~> 0.4) and the bus types from arcana-core ~> 0.16; memo no longer depends
   on arcana itself (the listener specs run on a small relay in `spec/support/bus_relay.cr`). `pg` is
@@ -50,12 +64,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   applies. A deferred `BEGIN` failed at once ("database is locked") when another process held the lock.
 
 ### Fixed
+- **Indexing an unchanged text always called the embedding API**: the content-hash check never fired,
+  because queueing a text cleared the stored hash. `index` now returns -1 for a source already indexed with
+  the same text, `pair_id` and `parent_id`, without calling the API.
+- **A source queued again while its previous text was being embedded lost the new text**: the item was
+  marked done. It now stays pending and is embedded next.
+- **Search results' text came from a queued text before it was embedded**, cut at the old chunks' offsets.
+- **`Memo::Database.create` with a PostgreSQL URL ran SQLite's queries.**
 - **Transactions weren't atomic**: statements ran on other pool connections and committed one by one,
   so a failure could leave a source unsearchable while `index` reported success.
 - **A crash lost every vector added since the last clean shutdown**, and they couldn't be re-added.
 - **Bus-routed embeddings (`bus/openai`, `bus/voyage`) hung in memo-arcana** until a 60 s timeout.
 - **Indexing slowed with every document**: deleting a full-text row scanned the whole FTS5 table
-  (28 ms per document at 150K; now a flat ~2 ms).
+  (28 ms per document at 150K). Full-text rows are now looked up by id.
 - **SQLite inserts could read another connection's `last_insert_rowid`.**
 - **USearch rejected a new embedding** whose reused rowid a stale index file still held.
 - **Postgres numbered `?` inside quoted strings** in `sql_where` as a parameter, shifting the rest. Quoted

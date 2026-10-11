@@ -26,10 +26,24 @@ module Memo
       SCHEMA_SQL = {{ read_file("#{__DIR__}/../../../db/schema/memo_schema.sql") }}
 
       def schema_statements : Array(String)
-        statements = SCHEMA_SQL.split(";").map(&.strip).reject(&.empty?)
-        statements.reject do |statement|
-          statement.lines.all? { |line| line.strip.empty? || line.strip.starts_with?("--") }
+        statements = [] of String
+        trigger = nil.as(String?)
+        SCHEMA_SQL.split(";").each do |part|
+          # A trigger's body has statements of its own: keep its parts
+          # together until its END
+          if body = trigger
+            part = "#{body};#{part}"
+            trigger = nil
+          end
+          statement = part.strip
+          next if statement.lines.all? { |line| line.strip.empty? || line.strip.starts_with?("--") }
+          if statement.matches?(/^CREATE TRIGGER/im) && !statement.matches?(/\bEND$/i)
+            trigger = part
+            next
+          end
+          statements << statement
         end
+        statements
       end
 
       def db_file_path(db : DB::Database) : String?
@@ -39,44 +53,53 @@ module Memo
         )
       end
 
-      # FTS rows are keyed by rowid = source_id. An FTS5 table can only look
-      # rows up by rowid (or MATCH); filtering on its source_id column scans
-      # the whole table, which made each indexed document slower than the
-      # last (9 ms per lookup at 150K documents).
-      def fts_upsert(db : DBHandle, source_id : Int64, content : String)
-        db.exec("DELETE FROM memo_texts_fts WHERE rowid = ?", source_id)
-        db.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) VALUES (?, ?, ?)", source_id, source_id, content)
-      end
-
-      def fts_delete(db : DBHandle, source_id : Int64)
-        db.exec("DELETE FROM memo_texts_fts WHERE rowid = ?", source_id)
-      end
-
+      # memo_contents_fts is an external-content table: rows are keyed by
+      # the content's id, and MATCH looks them up without a second copy
       def fts_join_sql : String
-        "JOIN memo_texts_fts ON memo_texts_fts.rowid = c.source_id"
-      end
-
-      def migrate(db : DB::Database) : Nil
-        return if db.query_one?("SELECT 1 FROM memo_meta WHERE key = 'fts_rowid_is_source_id'", as: Int32)
-        migrate_fts_rowids(db)
-      end
-
-      # Databases from before FTS rows were keyed by source_id: rebuild the
-      # FTS table from memo_texts, once. The transaction holds the write lock
-      # from the start (BEGIN IMMEDIATE) while it re-checks, so a second
-      # process opening the same database waits for the first one's
-      # migration (busy_timeout), then skips it.
-      def migrate_fts_rowids(db : DB::Database) : Nil
-        Memo::Database.transaction(db) do |cnn|
-          next if cnn.query_one?("SELECT 1 FROM memo_meta WHERE key = 'fts_rowid_is_source_id'", as: Int32)
-          cnn.exec("DELETE FROM memo_texts_fts")
-          cnn.exec("INSERT INTO memo_texts_fts (rowid, source_id, content) SELECT source_id, source_id, content FROM memo_texts")
-          cnn.exec("INSERT OR IGNORE INTO memo_meta (key, value) VALUES ('fts_rowid_is_source_id', '1')")
-        end
+        "JOIN memo_contents_fts ON memo_contents_fts.rowid = c.content_id"
       end
 
       def fts_where_sql : String
-        "memo_texts_fts MATCH ?"
+        "memo_contents_fts MATCH ?"
+      end
+
+      def table_exists?(db : DBHandle, table : String) : Bool
+        !db.query_one?("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", table, as: Int32).nil?
+      end
+
+      def column_exists?(db : DBHandle, table : String, column : String) : Bool
+        !db.query_one?("SELECT 1 FROM pragma_table_info(?) WHERE name = ?", table, column, as: Int32).nil?
+      end
+
+      # Databases from before 0.13: add content_id to memo_sources and
+      # memo_chunks, which the schema's indexes need. The transaction takes
+      # the write lock first (BEGIN IMMEDIATE), so a second process opening
+      # the database waits, then finds the columns there.
+      def prepare(db : DB::Database) : Nil
+        return unless CONTENT_TABLES.any? { |table| lacks_content_id?(db, table) }
+        Memo::Database.transaction(db) do |cnn|
+          CONTENT_TABLES.each do |table|
+            next unless lacks_content_id?(cnn, table)
+            cnn.exec("ALTER TABLE #{table} ADD COLUMN content_id INTEGER REFERENCES memo_contents(id)")
+          end
+        end
+      end
+
+      # Tables that point at memo_contents
+      private CONTENT_TABLES = {"memo_sources", "memo_chunks"}
+
+      private def lacks_content_id?(db : DBHandle, table : String) : Bool
+        table_exists?(db, table) && !column_exists?(db, table, "content_id")
+      end
+
+      def drop_legacy_texts(db : DBHandle) : Nil
+        db.exec("DROP TABLE IF EXISTS memo_texts_fts")
+        db.exec("DROP TABLE IF EXISTS memo_texts")
+        db.exec("DELETE FROM memo_meta WHERE key = 'fts_rowid_is_source_id'")
+      end
+
+      # BEGIN IMMEDIATE already holds the write lock
+      def lock_for_migration(db : DB::Connection) : Nil
       end
     end
   end

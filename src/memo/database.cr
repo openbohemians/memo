@@ -6,14 +6,16 @@ module Memo
     # Initialize Memo schema in provided database
     #
     # Uses the dialect attached to the db connection to generate
-    # the correct DDL for the backend (SQLite or PostgreSQL).
+    # the correct DDL for the backend (SQLite or PostgreSQL), then
+    # migrates a database written by an earlier version (see Migration).
     # Safe to call multiple times (uses IF NOT EXISTS)
     def init(db : DB::Database)
       dialect = db.memo_dialect
+      dialect.prepare(db)
       dialect.schema_statements.each do |statement|
         db.exec(statement)
       end
-      dialect.migrate(db)
+      Migration.run(db)
     end
 
     # Create database connection and initialize schema (standalone mode)
@@ -24,6 +26,7 @@ module Memo
       if path.starts_with?("postgres")
         db = DB.open(path)
         db.memo_dialect = Dialect.for(path)
+        db.memo_queries = Queries.for(db, path)
       else
         db = DB.open(sqlite_url(path))
       end

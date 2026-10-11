@@ -622,8 +622,9 @@ module Memo
 
     # Delete chunks by internal source ID
     #
-    # Internal method used by delete() and embed_and_store(). Runs inside the
-    # caller's transaction; index removals are queued on `pending`.
+    # Internal method used by delete() and reindex(). Runs inside the
+    # caller's transaction; index removals are queued on `pending`. Also
+    # clears the source's text, deleting it unless another source has it.
     private def delete_internal(
       cnn : DB::Connection,
       pending : USearchIndex::Pending,
@@ -632,6 +633,7 @@ module Memo
     ) : Int32
       q = cnn.memo_queries
       hashes = q.get_chunk_hashes(internal_source_id, source_type)
+      content_ids = q.chunk_content_ids(internal_source_id)
 
       deleted_count = 0
 
@@ -643,16 +645,22 @@ module Memo
                          end
       end
 
-      hashes.each do |hash|
-        if q.count_chunks_by_hash(hash) == 0
-          IndexJournal.record_removals(cnn, pending, hash, @service_id)
-          q.delete_embeddings_by_hash(hash)
-        end
-      end
-
-      delete_source_text_internal(internal_source_id, cnn)
+      release_embeddings(cnn, pending, hashes)
+      set_source_content(cnn, internal_source_id, nil)
+      content_ids.each { |content_id| q.release_content(content_id) }
 
       deleted_count
+    end
+
+    # Delete the embeddings (every service's) of those `hashes` no chunk
+    # uses any more
+    private def release_embeddings(cnn : DB::Connection, pending : USearchIndex::Pending, hashes : Enumerable(Bytes))
+      q = cnn.memo_queries
+      hashes.each do |hash|
+        next unless q.count_chunks_by_hash(hash) == 0
+        IndexJournal.record_removals(cnn, pending, hash, @service_id)
+        q.delete_embeddings_by_hash(hash)
+      end
     end
 
     # Run the block in a database transaction, yielding its connection and a
@@ -962,14 +970,13 @@ module Memo
       # Format: "MEMO_META:source_type,pair_id,parent_id\n" followed by actual text
       stored_text = "MEMO_META:#{source_type},#{internal_pair_id || ""},#{internal_parent_id || ""}\n#{text}"
 
-      db.memo_queries.enqueue(internal_source_id, stored_text, now)
+      Memo::Database.transaction(db) do |cnn|
+        cnn.memo_queries.enqueue(internal_source_id, stored_text, now)
 
-      # Store text immediately so it's available for retrieval
-      # before embedding runs. Embedding is deferred, text is not.
-      # skip_hash: source_text_changed? treats NULL hash as "changed",
-      # so process_queue will still embed this text later.
-      if @text_storage
-        store_source_text_internal(internal_source_id, text, skip_hash: true, db: db)
+        # The source points at its new text right away, so the text can be
+        # read before the queue runs. Its chunks keep pointing at the text
+        # they were cut from until then.
+        set_source_content(cnn, internal_source_id, store_content(cnn, text))
       end
     end
 
@@ -1030,6 +1037,9 @@ module Memo
     # single-worker processing is the expected use case since we're hitting
     # one API endpoint with batched requests. Parallel workers would hit
     # rate limits and add complexity without benefit.
+    #
+    # A source queued again while its item is being embedded stays pending,
+    # with its new text, and is embedded next.
     def process_queue : Int32
       q = @db.memo_queries
       max_retries = @queue_config.max_retries
@@ -1039,12 +1049,8 @@ module Memo
         raw_items = q.get_pending_queue(@batch_size)
         break if raw_items.empty?
 
-        items = raw_items.map do |id, internal_source_id, stored_text|
+        raw_items.each do |id, internal_source_id, stored_text|
           source_type, text, pair_id, parent_id = parse_queue_text_internal(stored_text)
-          {id, internal_source_id, source_type, text, pair_id, parent_id}
-        end
-
-        items.each do |id, internal_source_id, source_type, text, pair_id, parent_id|
           begin
             stored = embed_and_store_internal(
               source_type: source_type,
@@ -1053,16 +1059,16 @@ module Memo
               internal_pair_id: pair_id,
               internal_parent_id: parent_id
             )
-            q.mark_queue_success(id, Time.utc.to_unix_ms)
-            processed += stored
+            q.mark_queue_success(id, stored_text, Time.utc.to_unix_ms)
+            processed += stored if stored > 0 # -1: unchanged
           rescue ex
             attempts = q.get_queue_attempts(id)
             new_attempts = attempts + 1
 
             if new_attempts >= max_retries
-              q.mark_queue_failed(id, ex.message, new_attempts, Time.utc.to_unix_ms)
+              q.mark_queue_failed(id, stored_text, ex.message, new_attempts, Time.utc.to_unix_ms)
             else
-              q.mark_queue_retry(id, new_attempts, ex.message)
+              q.mark_queue_retry(id, stored_text, new_attempts, ex.message)
             end
           end
         end
@@ -1107,16 +1113,16 @@ module Memo
             internal_pair_id: pair_id,
             internal_parent_id: parent_id
           )
-          q.mark_queue_item_success(id, Time.utc.to_unix_ms, attempts + 1)
+          q.mark_queue_item_success(id, stored_text, Time.utc.to_unix_ms, attempts + 1)
           return chunks_stored
         rescue ex
           last_error = ex
           attempts += 1
-          q.mark_queue_retry(id, attempts, ex.message)
+          q.mark_queue_retry(id, stored_text, attempts, ex.message)
         end
       end
 
-      q.mark_queue_failed(id, last_error.try(&.message), attempts, Time.utc.to_unix_ms)
+      q.mark_queue_failed(id, stored_text, last_error.try(&.message), attempts, Time.utc.to_unix_ms)
       raise Exception.new("Index failed after #{max_retries} attempts: #{last_error.try(&.message)}")
     end
 
@@ -1411,21 +1417,12 @@ module Memo
       return if files.empty?
 
       # Phase 1: Chunk all files and collect data
-      all_chunks = [] of {Int64, String, Int32, Int32} # source_id, chunk_text, offset, size
-      vocab_map = Hash(String, Int32).new(0)           # word => total count
+      file_chunks = files.map { |_, content, _| Chunking.chunk_text(content, @chunking_config) }
+      vocab_map = Hash(String, Int32).new(0) # word => total count
 
-      files.each do |source_id, content, info|
-        chunks = Chunking.chunk_text(content, @chunking_config)
-        chunks.each do |(chunk_text, offset, size)|
-          all_chunks << {source_id, chunk_text, offset, size}
-        end
-
-        # Extract vocabulary
-        if @build_vocab
-          word_freqs = Vocab.extract_terms(content)
-          word_freqs.each do |wf|
-            vocab_map[wf.word] += wf.count
-          end
+      if @build_vocab
+        files.each do |_, content, _|
+          Vocab.extract_terms(content).each { |wf| vocab_map[wf.word] += wf.count }
         end
       end
 
@@ -1434,8 +1431,7 @@ module Memo
       existing_vocab = [] of Vocab::WordFrequency
 
       if @build_vocab && !vocab_map.empty?
-        all_words = vocab_map.keys
-        existing_words = Vocab.get_existing_words(@db, all_words, @service_id)
+        existing_words = Vocab.get_existing_words(@db, vocab_map.keys, @service_id)
 
         vocab_map.each do |word, count|
           wf = Vocab::WordFrequency.new(word, count)
@@ -1447,64 +1443,22 @@ module Memo
         end
       end
 
-      # Phase 2: Single batched API call for all chunks + new vocab
-      chunk_texts = all_chunks.map { |(_, chunk_text, _, _)| chunk_text }
-      new_words = new_vocab.map(&.word)
-      texts_to_embed = chunk_texts + new_words
-
-      return if texts_to_embed.empty?
-
-      embed_result = embed_texts_batched(texts_to_embed)
-
-      # Phase 3: Store everything in a transaction
-      write_transaction do |cnn, pending|
-        # Delete existing chunks for all sources being re-indexed
-        source_ids = files.map { |(source_id, _, _)| source_id }.uniq
-        source_ids.each do |source_id|
-          delete_internal(cnn, pending, source_id, "file")
-        end
-
-        # Store source texts
-        if @text_storage
-          files.each do |source_id, content, info|
-            store_source_text_internal(source_id, content, info.content_hash, db: cnn)
-          end
-        end
-
-        # Store file metadata
-        files.each do |source_id, _, info|
-          Files.store(cnn, source_id, info)
-        end
-
-        # Store chunk embeddings
-        all_chunks.each_with_index do |(source_id, chunk_text, offset, size), idx|
-          hash = Storage.compute_hash(chunk_text)
-          embedding = embed_result.embeddings[idx]
-          token_count = embed_result.token_counts[idx]
-
-          inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
-          IndexJournal.record_vector(cnn, pending, rowid, @service_id, embedding, inserted)
-
-          Storage.create_chunk(
-            db: cnn,
-            hash: hash,
-            source_type: "file",
-            source_id: source_id,
-            offset: offset,
-            size: size
-          )
-        end
-
-        # Store new vocab embeddings
-        if @build_vocab
-          chunk_count = all_chunks.size
-          new_vocab.each_with_index do |wf, idx|
-            embedding = embed_result.embeddings[chunk_count + idx]
-            Vocab.store_word(cnn, wf.word, embedding, wf.count, @service_id)
+      # Phase 2: one batched API call for the chunks without embeddings and
+      # the new vocab. Phase 3: store everything in a transaction
+      chunk_texts = file_chunks.flat_map(&.map(&.[0]))
+      with_embeddings(chunk_texts, new_vocab.map(&.word)) do |fetched|
+        write_transaction do |cnn, pending|
+          files.each_with_index do |(source_id, content, info), i|
+            replace_chunks(cnn, pending, fetched, source_id, "file", content, info.content_hash, file_chunks[i])
+            Files.store(cnn, source_id, info)
           end
 
-          # Update frequencies for existing words
-          Vocab.update_frequencies(cnn, existing_vocab, @service_id)
+          if @build_vocab
+            new_vocab.each_with_index do |wf, idx|
+              Vocab.store_word(cnn, wf.word, fetched.word_vectors[idx], wf.count, @service_id)
+            end
+            Vocab.update_frequencies(cnn, existing_vocab, @service_id)
+          end
         end
       end
     end
@@ -1729,15 +1683,20 @@ module Memo
       end
     end
 
-    # Store source text (keyed by internal source_id)
-    # Also populates FTS5 index for full-text search
-    #
-    # Stores the original un-chunked text. Chunk text is extracted
-    # using offset/size from the chunks table.
-    private def store_source_text_internal(internal_source_id : Int64, content : String, content_hash : Bytes? = nil, skip_hash : Bool = false, db : DBHandle = @db)
-      hash = skip_hash ? nil : (content_hash || Storage.compute_hash(content))
-      db.memo_queries.upsert_text(internal_source_id, content, hash, Time.utc.to_unix_ms)
-      db.memo_dialect.fts_upsert(db, internal_source_id, content)
+    # Store a text (only its hash when text storage is off), or find it
+    # stored already, and return its id
+    private def store_content(db : DBHandle, text : String, hash : Bytes = Storage.compute_hash(text)) : Int64
+      db.memo_queries.upsert_content(hash, @text_storage ? text : nil, Time.utc.to_unix_ms)
+    end
+
+    # Point a source at its latest text (nil: none), deleting the text it
+    # had unless something else still points at it
+    private def set_source_content(db : DBHandle, internal_source_id : Int64, content_id : Int64?) : Nil
+      q = db.memo_queries
+      previous = q.source_content_id(internal_source_id)
+      return if previous == content_id
+      q.set_source_content(internal_source_id, content_id)
+      q.release_content(previous) if previous
     end
 
     # Embed texts in batches of @batch_size to avoid API input limits
@@ -1758,26 +1717,10 @@ module Memo
       Providers::EmbedResult.new(all_embeddings, all_token_counts, total_tokens)
     end
 
-    # Check if source text has changed by comparing content hash
-    private def source_text_changed?(internal_source_id : Int64, content_hash : Bytes) : Bool
-      stored_hash = @db.memo_queries.get_text_hash(internal_source_id)
-      stored_hash.nil? || stored_hash != content_hash
-    end
-
-    # Delete source text by internal ID
-    private def delete_source_text_internal(internal_source_id : Int64, db : DBHandle = @db)
-      db.memo_queries.delete_text(internal_source_id)
-      db.memo_dialect.fts_delete(db, internal_source_id)
-    end
-
-    # Get source text by internal source_id
+    # A source's latest text, by internal source_id: the text last indexed
+    # or queued, before it is embedded. Nil if text storage was off.
     def get_source_text(internal_source_id : Int64) : String?
-      get_source_text_internal(internal_source_id)
-    end
-
-    # Get source text by internal source_id (internal)
-    private def get_source_text_internal(internal_source_id : Int64) : String?
-      @db.memo_queries.get_text(internal_source_id)
+      @db.memo_queries.get_source_text(internal_source_id)
     end
 
     # Parse queue text to extract metadata and actual text (internal format)
@@ -1814,10 +1757,13 @@ module Memo
     #
     # All IDs are internal (FK to sources table).
     #
-    # Deletes existing chunks for the source before re-indexing to ensure
-    # clean state if chunking settings have changed.
+    # Replaces the source's chunks, so a change in chunking settings applies.
+    # Only chunks whose text has no embedding for this service yet go to the
+    # API: the others (the unchanged parts of an edited text, or a text
+    # another source has too) reuse the one stored.
     #
-    # Returns number of chunks successfully stored, or -1 if skipped (unchanged).
+    # Returns number of chunks successfully stored, or -1 if skipped
+    # (already indexed with this text, pair_id and parent_id).
     private def embed_and_store_internal(
       source_type : String,
       internal_source_id : Int64,
@@ -1825,106 +1771,186 @@ module Memo
       internal_pair_id : Int64? = nil,
       internal_parent_id : Int64? = nil,
     ) : Int32
-      # Check if content has changed (skip re-embedding if identical)
       content_hash = Storage.compute_hash(text)
-      unless source_text_changed?(internal_source_id, content_hash)
-        return -1 # Unchanged, skip
-      end
+      return -1 if indexed?(internal_source_id, content_hash, source_type, internal_pair_id, internal_parent_id)
 
       # Chunk text (returns tuples of {text, offset, size})
       chunks = Chunking.chunk_text(text, @chunking_config)
       return 0 if chunks.empty?
 
-      # Extract just the text for embedding
-      chunk_texts = chunks.map { |(chunk_text, _, _)| chunk_text }
+      new_word_freqs, existing_word_freqs = vocab_terms(text)
 
-      # Extract vocabulary if enabled
-      new_word_freqs = [] of Vocab::WordFrequency
-      existing_word_freqs = [] of Vocab::WordFrequency
-
-      if @build_vocab
-        word_freqs = Vocab.extract_terms(text)
-        if !word_freqs.empty?
-          all_words = word_freqs.map(&.word)
-          existing_words = Vocab.get_existing_words(@db, all_words, @service_id)
-
-          new_word_freqs = word_freqs.reject { |wf| existing_words.includes?(wf.word) }
-          existing_word_freqs = word_freqs.select { |wf| existing_words.includes?(wf.word) }
-        end
-      end
-
-      # Combine chunks + new words for embedding in single API call
-      new_words = new_word_freqs.map(&.word)
-      texts_to_embed = chunk_texts + new_words
-
-      # Embed all texts (API call - outside transaction so failure is safe)
-      embed_result = embed_texts_batched(texts_to_embed)
-
-      # Update tokens_per_byte ratio based on actual API results (chunks only)
-      total_bytes = chunk_texts.sum(&.bytesize)
-      if total_bytes > 0 && embed_result.total_tokens > 0
-        observed_ratio = embed_result.total_tokens.to_f / total_bytes
-        Storage.update_tokens_per_byte(@db, @service_id, observed_ratio)
-
-        # Also update in-memory config so future chunking uses the new ratio
-        # (Storage.update_tokens_per_byte uses EMA, so fetch the actual updated value)
-        updated_ratio = @db.memo_queries.get_service_tokens_per_byte(@service_id)
-        @chunking_config = @chunking_config.with_tokens_per_byte(updated_ratio) if updated_ratio
-      end
-
-      # Delete old and store new atomically
-      success_count = 0
-
-      write_transaction do |cnn, pending|
-        # Delete existing chunks for this source before storing new ones
-        # This ensures clean state if chunking settings have changed
-        delete_internal(cnn, pending, internal_source_id, source_type)
-
-        # Store source text once (not per-chunk)
-        # Chunk text is extracted using offset/size when needed
-        store_source_text_internal(internal_source_id, text, content_hash, db: cnn) if @text_storage
-
-        # Store chunk embeddings
-        chunks.each_with_index do |(chunk_text, offset, size), idx|
-          hash = Storage.compute_hash(chunk_text)
-          embedding = embed_result.embeddings[idx]
-          token_count = embed_result.token_counts[idx]
-
-          # Store embedding (deduplicated by hash) and add to USearch index
-          inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
-          IndexJournal.record_vector(cnn, pending, rowid, @service_id, embedding, inserted)
-
-          # Create chunk reference with offset/size from chunking
-          # All IDs are internal (FK to sources table)
-          chunk_id = Storage.create_chunk(
-            db: cnn,
-            hash: hash,
-            source_type: source_type,
-            source_id: internal_source_id,
-            offset: offset,
-            size: size,
-            pair_id: internal_pair_id,
-            parent_id: internal_parent_id
+      with_embeddings(chunks.map(&.[0]), new_word_freqs.map(&.word)) do |fetched|
+        stored = 0
+        write_transaction do |cnn, pending|
+          stored = replace_chunks(
+            cnn, pending, fetched, internal_source_id, source_type, text, content_hash, chunks,
+            internal_pair_id, internal_parent_id
           )
 
-          # Only count if chunk was actually inserted (not ignored as duplicate)
-          success_count += 1 if chunk_id > 0
-        end
-
-        # Store new word embeddings (embeddings start after chunks)
-        if @build_vocab
-          chunk_count = chunks.size
-          new_word_freqs.each_with_index do |wf, idx|
-            embedding = embed_result.embeddings[chunk_count + idx]
-            Vocab.store_word(cnn, wf.word, embedding, wf.count, @service_id)
+          if @build_vocab
+            new_word_freqs.each_with_index do |wf, idx|
+              Vocab.store_word(cnn, wf.word, fetched.word_vectors[idx], wf.count, @service_id)
+            end
+            Vocab.update_frequencies(cnn, existing_word_freqs, @service_id)
           end
+        end
+        stored
+      end
+    end
 
-          # Update frequencies for existing words
-          Vocab.update_frequencies(cnn, existing_word_freqs, @service_id)
+    # Whether the source's chunks were cut from the text with this hash,
+    # carry these ids, and all have this service's embeddings
+    private def indexed?(
+      internal_source_id : Int64,
+      content_hash : Bytes,
+      source_type : String,
+      internal_pair_id : Int64?,
+      internal_parent_id : Int64?,
+    ) : Bool
+      q = @db.memo_queries
+      content_id = q.find_content_id(content_hash)
+      return false unless content_id
+
+      states = q.chunk_states(internal_source_id, @service_id)
+      !states.empty? && states.all? do |chunk_content_id, pair_id, parent_id, chunk_type, embedded|
+        chunk_content_id == content_id && pair_id == internal_pair_id &&
+          parent_id == internal_parent_id && chunk_type == source_type && embedded
+      end
+    end
+
+    # A text's vocabulary: {words new to this service, words stored already}
+    private def vocab_terms(text : String) : {Array(Vocab::WordFrequency), Array(Vocab::WordFrequency)}
+      empty = [] of Vocab::WordFrequency
+      return {empty, empty} unless @build_vocab
+
+      word_freqs = Vocab.extract_terms(text)
+      return {empty, empty} if word_freqs.empty?
+
+      existing_words = Vocab.get_existing_words(@db, word_freqs.map(&.word), @service_id)
+      word_freqs.partition { |wf| !existing_words.includes?(wf.word) }
+    end
+
+    # Embeddings fetched for a write: the new chunk texts', by hash, and the
+    # vocabulary words', in order
+    private record Fetched,
+      vectors : Hash(Bytes, {Array(Float64), Int32}),
+      word_vectors : Array(Array(Float64))
+
+    # An embedding a write meant to reuse was deleted after it looked
+    private class EmbeddingGone < Exception
+    end
+
+    # Fetch the embeddings the chunk texts lack (see embed_missing), then
+    # yield them to the write. Should another writer delete one the write
+    # meant to reuse in between, fetch again.
+    private def with_embeddings(chunk_texts : Array(String), words : Array(String), &)
+      attempts = 0
+      loop do
+        fetched = embed_missing(chunk_texts, words)
+        begin
+          return yield fetched
+        rescue EmbeddingGone
+          attempts += 1
+          raise Exception.new("Embeddings kept disappearing while indexing") if attempts >= 3
         end
       end
+    end
 
-      success_count
+    # Embed (API call - outside any transaction, so failure is safe) the
+    # chunk texts with no embedding for this service yet, each distinct one
+    # once, and the vocabulary words, in batches.
+    private def embed_missing(chunk_texts : Array(String), words : Array(String)) : Fetched
+      hashes = chunk_texts.map { |chunk_text| Storage.compute_hash(chunk_text) }
+      stored = @db.memo_queries.embedded_hashes(hashes.uniq, @service_id)
+      missing = {} of Bytes => String
+      chunk_texts.each_with_index do |chunk_text, i|
+        missing[hashes[i]] = chunk_text unless stored.includes?(hashes[i])
+      end
+
+      vectors = {} of Bytes => {Array(Float64), Int32}
+      texts = missing.values + words
+      return Fetched.new(vectors, [] of Array(Float64)) if texts.empty?
+
+      result = embed_texts_batched(texts)
+      missing.keys.each_with_index do |hash, i|
+        vectors[hash] = {result.embeddings[i], result.token_counts[i]}
+      end
+      learn_tokens_per_byte(texts, result)
+      Fetched.new(vectors, result.embeddings[missing.size..])
+    end
+
+    # Update tokens_per_byte ratio based on actual API results
+    private def learn_tokens_per_byte(texts : Array(String), result : Providers::EmbedResult)
+      total_bytes = texts.sum(&.bytesize)
+      return unless total_bytes > 0 && result.total_tokens > 0
+
+      Storage.update_tokens_per_byte(@db, @service_id, result.total_tokens.to_f / total_bytes)
+
+      # Also update in-memory config so future chunking uses the new ratio
+      # (Storage.update_tokens_per_byte uses EMA, so fetch the actual updated value)
+      updated_ratio = @db.memo_queries.get_service_tokens_per_byte(@service_id)
+      @chunking_config = @chunking_config.with_tokens_per_byte(updated_ratio) if updated_ratio
+    end
+
+    # Inside a write transaction: replace a source's chunks with `chunks`
+    # of `text`, and point the source at the text. New embeddings come from
+    # `fetched`. Embeddings and texts the old chunks used are deleted once
+    # nothing uses them. Returns the number of chunks stored.
+    private def replace_chunks(
+      cnn : DB::Connection,
+      pending : USearchIndex::Pending,
+      fetched : Fetched,
+      internal_source_id : Int64,
+      source_type : String,
+      text : String,
+      content_hash : Bytes,
+      chunks : Array({String, Int32, Int32}),
+      internal_pair_id : Int64? = nil,
+      internal_parent_id : Int64? = nil,
+    ) : Int32
+      q = cnn.memo_queries
+      old_hashes = q.get_chunk_hashes(internal_source_id, nil)
+      old_content_ids = q.chunk_content_ids(internal_source_id)
+      old_hashes.each { |hash| q.delete_chunks(hash, internal_source_id) }
+
+      content_id = store_content(cnn, text, content_hash)
+      set_source_content(cnn, internal_source_id, content_id)
+
+      stored = 0
+      hashes = Set(Bytes).new
+      chunks.each do |(chunk_text, offset, size)|
+        hash = Storage.compute_hash(chunk_text)
+        hashes << hash
+
+        if vector = fetched.vectors[hash]?
+          # Store embedding (deduplicated by hash) and add to USearch index
+          embedding, token_count = vector
+          inserted, rowid = Storage.store_embedding(cnn, hash, token_count, @service_id)
+          IndexJournal.record_vector(cnn, pending, rowid, @service_id, embedding, inserted)
+        elsif !q.get_embedding_rowid?(hash, @service_id)
+          raise EmbeddingGone.new
+        end
+
+        chunk_id = Storage.create_chunk(
+          db: cnn,
+          hash: hash,
+          source_type: source_type,
+          source_id: internal_source_id,
+          content_id: content_id,
+          offset: offset,
+          size: size,
+          pair_id: internal_pair_id,
+          parent_id: internal_parent_id
+        )
+
+        # Only count if chunk was actually inserted (not ignored as duplicate)
+        stored += 1 if chunk_id > 0
+      end
+
+      release_embeddings(cnn, pending, old_hashes.reject { |hash| hashes.includes?(hash) })
+      old_content_ids.each { |old_id| q.release_content(old_id) unless old_id == content_id }
+      stored
     end
   end
 end
