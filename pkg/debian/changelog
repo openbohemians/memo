@@ -15,8 +15,12 @@ memo-rag (0.13.0-1) unstable; urgency=medium
     MEMO_SAVE_INTERVAL seconds. MEMO_MAX_CONCURRENCY caps requests in
     flight (default 32).
   * Filtered searches search first and filter second.
-  * Indexing cost no longer grows with collection size. Existing
-    databases rebuild their full-text table once on open.
+  * Each distinct text is stored once (memo_contents), however many
+    sources share it, and only chunks with no stored embedding are sent
+    to the embedding API. Re-indexing unchanged text makes no API call.
+    The memo_texts table is gone: SQL that read it joins memo_contents.
+    Existing databases are migrated once on open.
+  * Indexing cost no longer grows with collection size.
   * Only one process can open an index at a time.
   * OpenAI and Voyage providers reuse connections and retry rate limits
     and server errors.
@@ -28,7 +32,7 @@ memo-rag (0.13.0-1) unstable; urgency=medium
   * SQLite write transactions begin IMMEDIATE, so they wait for another
     process's write lock instead of failing with "database is locked".
 
- -- trans <trans@github.com>  Tue, 06 Oct 2026 00:00:00 +0000
+ -- trans <trans@github.com>  Sun, 11 Oct 2026 00:00:00 +0000
 
 memo-rag (0.12.1-1) unstable; urgency=medium
 
