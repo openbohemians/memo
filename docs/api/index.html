@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Crystal Docs 1.21.1">
-<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_version" content="0.13.0-dev">
 <meta name="crystal_docs.project_name" content="memo">
 
 
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="js/doc.js"></script>
 
   <meta name="repository-name" content="memo">
-  <title>memo 0.13.0</title>
+  <title>memo 0.13.0-dev</title>
   <script type="text/javascript">
   CrystalDocs.base_path = "";
   </script>
@@ -45,7 +45,7 @@
       </h1>
 
       <span class="project-version">
-        0.13.0
+        0.13.0-dev
       </span>
     </div>
   </div>
@@ -279,6 +279,21 @@
   
   <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
       <a href="Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Migration" data-name="memo::migration">
+      <a href="Memo/Migration.html">Migration</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Migration/NewerSchema" data-name="memo::migration::newerschema">
+      <a href="Memo/Migration/NewerSchema.html">NewerSchema</a>
       
     </li>
   
@@ -537,7 +552,9 @@
 <ul>
 <li><strong>CLI tool</strong> - Index, search, and manage from the command line</li>
 <li><strong>Text chunking</strong> - Smart segmentation into optimal-sized pieces</li>
-<li><strong>Embedding storage</strong> - Deduplication by content hash</li>
+<li><strong>Content-addressed storage</strong> - Each distinct text and each chunk's embedding is stored once, however many
+sources share it; only chunks with no stored embedding are sent to the API, so re-indexing unchanged or
+partly edited text costs little or nothing</li>
 <li><strong>HNSW search</strong> - Fast approximate nearest neighbor via USearch</li>
 <li><strong>Text storage</strong> - Optional persistent text with LIKE and FTS5 full-text search</li>
 <li><strong>Crash-safe index</strong> - Vectors and index changes are journaled in the database; a crash or lost index
@@ -696,7 +713,7 @@ memo.close</code></pre>
   api_key: <span class="s">&quot;sk-...&quot;</span>,             <span class="c"># API key for provider</span>
   model: <span class="n">nil</span>,                    <span class="c"># Optional: override default model</span>
   dimensions: <span class="n">nil</span>,               <span class="c"># Optional: embedding dimensions (provider default)</span>
-  store_text: <span class="n">true</span>,              <span class="c"># Optional: enable text storage (default true)</span>
+  store_text: <span class="n">true</span>,              <span class="c"># Optional: store text in memo (default true; false keeps only its hash)</span>
   chunking_max_tokens: <span class="n">2000</span>      <span class="c"># Optional: max tokens per chunk</span>
 )</code></pre>
 <p>For smaller embeddings (faster search, less storage):</p>
@@ -882,15 +899,30 @@ never build it from untrusted input. On PostgreSQL every <code>?</code> outside 
 <p>Memo keeps its data in the database (a SQLite file at <code>db_path</code>, or PostgreSQL) and an index file per
 embedding service beside it:</p>
 <ul>
-<li><strong>Database</strong>: services, embeddings (deduplicated by content hash), chunks, texts, the embed queue,
-every embedding's vector (<code>memo_vectors</code>, 16-bit floats), and a journal of index changes
-(<code>memo_index_log</code>)</li>
+<li><strong>Database</strong>: services, sources, texts (<code>memo_contents</code>: each distinct text once, by hash), chunks,
+embeddings (one per distinct chunk and service), the embed queue, every embedding's vector
+(<code>memo_vectors</code>, 16-bit floats), and a journal of index changes (<code>memo_index_log</code>)</li>
 <li><strong>USearch index</strong>: an HNSW index file per service (e.g. <code>memo.openai--text-embedding-3-small--1536.usearch</code>),
 held in memory while open, with a <code>.checkpoint</code> and a <code>.lock</code> file beside it</li>
 </ul>
 <p>The index is rebuilt from the database whenever it needs to be, so <strong>backing up the database is enough</strong>
 (e.g. Litestream for SQLite). Text storage can be disabled with <code>store_text: false</code> if you prefer to manage
-text separately.</p>
+text separately: memo then keeps only each text's hash, which is enough to tell an unchanged text.</p>
+<h3><a id="reading-memos-tables" class="anchor" href="#reading-memos-tables">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Reading memo's tables</h3>
+<p>Applications sharing memo's database can join its tables in their own SQL and in <code>sql_where</code>:</p>
+<ul>
+<li><code>memo_sources</code>: one row per indexed item (<code>source_type</code> and <code>external_int</code>, <code>external_text</code> or
+<code>external_blob</code>). <code>content_id</code> points at its latest text, set as soon as it is indexed or queued.</li>
+<li><code>memo_chunks</code> (<code>c</code> in <code>sql_where</code>): a source's chunks. <code>c.source_id</code> is the internal source id, and
+<code>c.content_id</code> the text the chunk was cut from (<code>offset</code>, <code>size</code>), which differs from the source's
+while a new text waits in the queue.</li>
+<li><code>memo_contents</code>: the texts, by <code>id</code> and <code>hash</code>. <code>content</code> is NULL when stored with <code>store_text: false</code>.</li>
+</ul>
+<p>A source's text, for example: <code>SELECT ct.content FROM memo_sources s JOIN memo_contents ct ON ct.id = s.content_id</code>.</p>
 <h3><a id="durability-and-recovery" class="anchor" href="#durability-and-recovery">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
@@ -970,7 +1002,7 @@ See <a href="SECURITY.md">SECURITY.md</a>.</p>
 a service's <code>dimensions</code> is sent to the API, so smaller vectors work. Also works with OpenAI-compatible
 APIs via <code>base_url</code>.</li>
 <li><code>voyage</code> - Voyage AI voyage-3 (default), voyage-3-lite, voyage-code-3</li>
-<li><code>arcana/openai</code>, <code>arcana/voyage</code> - The same APIs through <a href="https://github.com/trans/arcana">Arcana</a>'s embedders</li>
+<li><code>arcana/openai</code>, <code>arcana/voyage</code> - The same APIs through <a href="https://github.com/trans/arcana-ai">arcana-ai</a>'s embedders</li>
 <li><code>bus/openai</code>, <code>bus/voyage</code> - Embeddings from an <code>openai:embed</code> / <code>voyage:embed</code> service on the Arcana bus</li>
 <li><code>mock</code> - Deterministic embeddings for testing</li>
 </ul>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Crystal Docs 1.21.1">
-<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_version" content="0.13.0-dev">
 <meta name="crystal_docs.project_name" content="memo">
 
 
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="../../js/doc.js"></script>
 
   <meta name="repository-name" content="memo">
-  <title>Memo::Queries::Postgres - memo 0.13.0</title>
+  <title>Memo::Queries::Postgres - memo 0.13.0-dev</title>
   <script type="text/javascript">
     CrystalDocs.base_path = "../../";
   </script>
@@ -45,7 +45,7 @@
       </h1>
 
       <span class="project-version">
-        0.13.0
+        0.13.0-dev
       </span>
     </div>
   </div>
@@ -279,6 +279,21 @@
   
   <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
       <a href="../../Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Migration" data-name="memo::migration">
+      <a href="../../Memo/Migration.html">Migration</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Migration/NewerSchema" data-name="memo::migration::newerschema">
+      <a href="../../Memo/Migration/NewerSchema.html">NewerSchema</a>
       
     </li>
   
@@ -611,7 +626,28 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
+        <a href="#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="signature"><strong>#chunk_content_ids</strong>(source_id : Int64) : Array(Int64)</a>
+        
+          <div class="summary"><p>The texts a source's chunks were cut from</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#chunk_states%28source_id%3AInt64%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%2CBool%29%29-instance-method" class="signature"><strong>#chunk_states</strong>(source_id : Int64, service_id : Int64) : Array(Tuple(Int64 | Nil, Int64 | Nil, Int64 | Nil, String, Bool))</a>
+        
+          <div class="summary"><p>Per chunk of a source: {content_id, pair_id, parent_id, source_type, whether its hash has an embedding, with a stored vector, for the service}</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#clear_completed_queue%3AInt32-instance-method" class="signature"><strong>#clear_completed_queue</strong> : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#clear_completed_queue_texts%3ANil-instance-method" class="signature"><strong>#clear_completed_queue_texts</strong> : Nil</a>
+        
+          <div class="summary"><p>Drop the text of finished items (from before memo did so itself)</p></div>
         
       </li>
     
@@ -748,17 +784,19 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_text</strong>(source_id : Int64) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
         <a href="#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vector</strong>(embedding_id : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vocab</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#embedded_hashes%28hashes%3AArray%28Bytes%29%2Cservice_id%3AInt64%29%3ASet%28Bytes%29-instance-method" class="signature"><strong>#embedded_hashes</strong>(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)</a>
+        
+          <div class="summary"><p>Which of <code>hashes</code> have an embedding for the service with a stored vector (one without has been lost: embed it again)</p></div>
         
       </li>
     
@@ -788,6 +826,11 @@
         <a href="#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#filter_candidates</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)</a>
         
           <div class="summary"><p>Which of <code>candidate_ids</code> pass the filter clauses (looked up by id, so the cost depends on the number of candidates, not the collection)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_content_id%28hash%3ABytes%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_content_id</strong>(hash : Bytes) : Int64 | Nil</a>
         
       </li>
     
@@ -835,6 +878,8 @@
     
       <li class="entry-summary">
         <a href="#get_all_texts%3AArray%28String%29-instance-method" class="signature"><strong>#get_all_texts</strong> : Array(String)</a>
+        
+          <div class="summary"><p>Every source's stored text (a text shared by several, once for each)</p></div>
         
       </li>
     
@@ -901,6 +946,11 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#get_meta%28key%3AString%29%3AString%7CNil-instance-method" class="signature"><strong>#get_meta</strong>(key : String) : String | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method" class="signature"><strong>#get_pending_queue</strong>(limit : Int32) : Array(Tuple(Int64, Int64, String))</a>
         
       </li>
@@ -956,12 +1006,9 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="signature"><strong>#get_text</strong>(source_id : Int64) : String | Nil</a>
+        <a href="#get_source_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="signature"><strong>#get_source_text</strong>(source_id : Int64) : String | Nil</a>
         
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method" class="signature"><strong>#get_text_hash</strong>(source_id : Int64) : Bytes | Nil</a>
+          <div class="summary"><p>A source's latest text (nil if not stored)</p></div>
         
       </li>
     
@@ -1003,7 +1050,7 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</a>
+        <a href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Ccontent_id%3AInt64%7CNil%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, content_id : Int64 | Nil, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</a>
         
       </li>
     
@@ -1045,6 +1092,13 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#legacy_texts_after%28source_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CString%2CBytes%7CNil%29%29-instance-method" class="signature"><strong>#legacy_texts_after</strong>(source_id : Int64, limit : Int32) : Array(Tuple(Int64, String, Bytes | Nil))</a>
+        
+          <div class="summary"><p>memo_texts rows (databases from before 0.13): {source_id, content, content_hash}</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method" class="signature"><strong>#list_files</strong>(limit : Int32, offset : Int32) : Array(Files::FileRecord)</a>
         
       </li>
@@ -1075,22 +1129,24 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</a>
+        <a href="#mark_queue_failed%28id%3AInt64%2Ctext%3AString%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_failed</strong>(id : Int64, text : String, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil</a>
+        <a href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil</a>
+        <a href="#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil</a>
+        <a href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil</a>
+        
+          <div class="summary"><p>The mark_queue_* methods take the item's text as it was read, and do nothing if it has changed since: the source was queued again, and the newer text still needs embedding.</p></div>
         
       </li>
     
@@ -1115,12 +1171,24 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#release_content%28content_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#release_content</strong>(content_id : Int64) : Nil</a>
+        
+          <div class="summary"><p>Delete a text unless a source or chunk still points at it</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#search_filtered_rowids</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#service_exists%3F%28id%3AInt64%29%3ABool-instance-method" class="signature"><strong>#service_exists?</strong>(id : Int64) : Bool</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_chunks_content%28source_id%3AInt64%2Ccontent_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_chunks_content</strong>(source_id : Int64, content_id : Int64) : Nil</a>
         
       </li>
     
@@ -1135,7 +1203,22 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#set_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method" class="signature"><strong>#set_meta</strong>(key : String, value : String) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_source_content%28source_id%3AInt64%2Ccontent_id%3AInt64%7CNil%29%3ANil-instance-method" class="signature"><strong>#set_source_content</strong>(source_id : Int64, content_id : Int64 | Nil) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_vectors_backfilled</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#source_content_id%28source_id%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#source_content_id</strong>(source_id : Int64) : Int64 | Nil</a>
         
       </li>
     
@@ -1155,17 +1238,19 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#upsert_content%28hash%3ABytes%2Ccontent%3AString%7CNil%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#upsert_content</strong>(hash : Bytes, content : String | Nil, created_at : Int64) : Int64</a>
+        
+          <div class="summary"><p>The id of the text with this hash, storing it if new.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_file</strong>(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_query_cache</strong>(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil</a>
         
       </li>
     
@@ -1197,9 +1282,24 @@
   <h3>Instance methods inherited from class <code><a href="../../Memo/Queries.html">Memo::Queries</a></code></h3>
   
   
+    <a href="../../Memo/Queries.html#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="tooltip">
+      <span>chunk_content_ids(source_id : Int64) : Array(Int64)</span>
+    chunk_content_ids</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#chunk_states%28source_id%3AInt64%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%2CBool%29%29-instance-method" class="tooltip">
+      <span>chunk_states(source_id : Int64, service_id : Int64) : Array(Tuple(Int64 | Nil, Int64 | Nil, Int64 | Nil, String, Bool))</span>
+    chunk_states</a>, 
+    
+  
     <a href="../../Memo/Queries.html#clear_completed_queue%3AInt32-instance-method" class="tooltip">
       <span>clear_completed_queue : Int32</span>
     clear_completed_queue</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#clear_completed_queue_texts%3ANil-instance-method" class="tooltip">
+      <span>clear_completed_queue_texts : Nil</span>
+    clear_completed_queue_texts</a>, 
     
   
     <a href="../../Memo/Queries.html#clear_default_service%3ANil-instance-method" class="tooltip">
@@ -1332,11 +1432,6 @@
     delete_source_text</a>, 
     
   
-    <a href="../../Memo/Queries.html#delete_text%28source_id%3AInt64%29%3ANil-instance-method" class="tooltip">
-      <span>delete_text(source_id : Int64) : Nil</span>
-    delete_text</a>, 
-    
-  
     <a href="../../Memo/Queries.html#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>delete_vector(embedding_id : Int64) : Nil</span>
     delete_vector</a>, 
@@ -1345,6 +1440,11 @@
     <a href="../../Memo/Queries.html#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>delete_vocab(service_id : Int64) : Nil</span>
     delete_vocab</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#embedded_hashes%28hashes%3AArray%28Bytes%29%2Cservice_id%3AInt64%29%3ASet%28Bytes%29-instance-method" class="tooltip">
+      <span>embedded_hashes(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)</span>
+    embedded_hashes</a>, 
     
   
     <a href="../../Memo/Queries.html#embedding_ids_for_hash%28hash%3ABytes%29%3AArray%28Tuple%28Int64%2CInt64%29%29-instance-method" class="tooltip">
@@ -1370,6 +1470,11 @@
     <a href="../../Memo/Queries.html#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method" class="tooltip">
       <span>filter_candidates(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)</span>
     filter_candidates</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#find_content_id%28hash%3ABytes%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>find_content_id(hash : Bytes) : Int64 | Nil</span>
+    find_content_id</a>, 
     
   
     <a href="../../Memo/Queries.html#find_service_id%28name%3AString%29%3AInt64%7CNil-instance-method" class="tooltip">
@@ -1477,6 +1582,11 @@
     get_index_state</a>, 
     
   
+    <a href="../../Memo/Queries.html#get_meta%28key%3AString%29%3AString%7CNil-instance-method" class="tooltip">
+      <span>get_meta(key : String) : String | Nil</span>
+    get_meta</a>, 
+    
+  
     <a href="../../Memo/Queries.html#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method" class="tooltip">
       <span>get_pending_queue(limit : Int32) : Array(Tuple(Int64, Int64, String))</span>
     get_pending_queue</a>, 
@@ -1532,14 +1642,9 @@
     get_source_external</a>, 
     
   
-    <a href="../../Memo/Queries.html#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="tooltip">
-      <span>get_text(source_id : Int64) : String | Nil</span>
-    get_text</a>, 
-    
-  
-    <a href="../../Memo/Queries.html#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method" class="tooltip">
-      <span>get_text_hash(source_id : Int64) : Bytes | Nil</span>
-    get_text_hash</a>, 
+    <a href="../../Memo/Queries.html#get_source_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="tooltip">
+      <span>get_source_text(source_id : Int64) : String | Nil</span>
+    get_source_text</a>, 
     
   
     <a href="../../Memo/Queries.html#get_texts_for_reindex%28source_type%3AString%29%3AArray%28Tuple%28Int64%2CInt64%7CNil%2CInt64%7CNil%2CString%29%29-instance-method" class="tooltip">
@@ -1577,8 +1682,8 @@
     index_changes_since</a>, 
     
   
-    <a href="../../Memo/Queries.html#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
-      <span>insert_chunk_ignore(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</span>
+    <a href="../../Memo/Queries.html#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Ccontent_id%3AInt64%7CNil%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>insert_chunk_ignore(hash : Bytes, source_id : Int64, source_type : String, content_id : Int64 | Nil, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</span>
     insert_chunk_ignore</a>, 
     
   
@@ -1617,6 +1722,11 @@
     insert_source_text</a>, 
     
   
+    <a href="../../Memo/Queries.html#legacy_texts_after%28source_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CString%2CBytes%7CNil%29%29-instance-method" class="tooltip">
+      <span>legacy_texts_after(source_id : Int64, limit : Int32) : Array(Tuple(Int64, String, Bytes | Nil))</span>
+    legacy_texts_after</a>, 
+    
+  
     <a href="../../Memo/Queries.html#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method" class="tooltip">
       <span>list_files(limit : Int32, offset : Int32) : Array(Files::FileRecord)</span>
     list_files</a>, 
@@ -1647,23 +1757,23 @@
     log_index_change</a>, 
     
   
-    <a href="../../Memo/Queries.html#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_failed(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</span>
+    <a href="../../Memo/Queries.html#mark_queue_failed%28id%3AInt64%2Ctext%3AString%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_failed(id : Int64, text : String, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</span>
     mark_queue_failed</a>, 
     
   
-    <a href="../../Memo/Queries.html#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_item_success(id : Int64, processed_at : Int64, attempts : Int32) : Nil</span>
+    <a href="../../Memo/Queries.html#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil</span>
     mark_queue_item_success</a>, 
     
   
-    <a href="../../Memo/Queries.html#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_retry(id : Int64, attempts : Int32, error_message : String | Nil) : Nil</span>
+    <a href="../../Memo/Queries.html#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_retry(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil</span>
     mark_queue_retry</a>, 
     
   
-    <a href="../../Memo/Queries.html#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_success(id : Int64, processed_at : Int64) : Nil</span>
+    <a href="../../Memo/Queries.html#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil</span>
     mark_queue_success</a>, 
     
   
@@ -1687,6 +1797,11 @@
     queue_stats</a>, 
     
   
+    <a href="../../Memo/Queries.html#release_content%28content_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>release_content(content_id : Int64) : Nil</span>
+    release_content</a>, 
+    
+  
     <a href="../../Memo/Queries.html#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method" class="tooltip">
       <span>search_filtered_rowids(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)</span>
     search_filtered_rowids</a>, 
@@ -1695,6 +1810,11 @@
     <a href="../../Memo/Queries.html#service_exists%3F%28id%3AInt64%29%3ABool-instance-method" class="tooltip">
       <span>service_exists?(id : Int64) : Bool</span>
     service_exists?</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#set_chunks_content%28source_id%3AInt64%2Ccontent_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>set_chunks_content(source_id : Int64, content_id : Int64) : Nil</span>
+    set_chunks_content</a>, 
     
   
     <a href="../../Memo/Queries.html#set_default_service%28id%3AInt64%29%3ANil-instance-method" class="tooltip">
@@ -1707,9 +1827,24 @@
     set_index_pruned_through</a>, 
     
   
+    <a href="../../Memo/Queries.html#set_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method" class="tooltip">
+      <span>set_meta(key : String, value : String) : Nil</span>
+    set_meta</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#set_source_content%28source_id%3AInt64%2Ccontent_id%3AInt64%7CNil%29%3ANil-instance-method" class="tooltip">
+      <span>set_source_content(source_id : Int64, content_id : Int64 | Nil) : Nil</span>
+    set_source_content</a>, 
+    
+  
     <a href="../../Memo/Queries.html#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>set_vectors_backfilled(service_id : Int64) : Nil</span>
     set_vectors_backfilled</a>, 
+    
+  
+    <a href="../../Memo/Queries.html#source_content_id%28source_id%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>source_content_id(source_id : Int64) : Int64 | Nil</span>
+    source_content_id</a>, 
     
   
     <a href="../../Memo/Queries.html#update_service%28id%3AInt64%2Cupdates%3AArray%28String%29%2Cparams%3AArray%28DB%3A%3AAny%29%29%3AInt64-instance-method" class="tooltip">
@@ -1727,6 +1862,11 @@
     update_word_frequency</a>, 
     
   
+    <a href="../../Memo/Queries.html#upsert_content%28hash%3ABytes%2Ccontent%3AString%7CNil%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
+      <span>upsert_content(hash : Bytes, content : String | Nil, created_at : Int64) : Int64</span>
+    upsert_content</a>, 
+    
+  
     <a href="../../Memo/Queries.html#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>upsert_file(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil</span>
     upsert_file</a>, 
@@ -1735,11 +1875,6 @@
     <a href="../../Memo/Queries.html#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>upsert_query_cache(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil</span>
     upsert_query_cache</a>, 
-    
-  
-    <a href="../../Memo/Queries.html#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="tooltip">
-      <span>upsert_text(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil</span>
-    upsert_text</a>, 
     
   
     <a href="../../Memo/Queries.html#upsert_vector%28embedding_id%3AInt64%2Cservice_id%3AInt64%2Cvector%3ABytes%29%3ANil-instance-method" class="tooltip">
@@ -1872,6 +2007,58 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="chunk_content_ids(source_id:Int64):Array(Int64)-instance-method">
+      <div class="signature">
+        
+        def <strong>chunk_content_ids</strong>(source_id : Int64) : Array(Int64)
+
+        <a class="method-permalink" href="#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>The texts a source's chunks were cut from</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L314" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="chunk_states(source_id:Int64,service_id:Int64):Array(Tuple(Int64|Nil,Int64|Nil,Int64|Nil,String,Bool))-instance-method">
+      <div class="signature">
+        
+        def <strong>chunk_states</strong>(source_id : Int64, service_id : Int64) : Array(Tuple(Int64 | Nil, Int64 | Nil, Int64 | Nil, String, Bool))
+
+        <a class="method-permalink" href="#chunk_states%28source_id%3AInt64%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%2CBool%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Per chunk of a source: {content_id, pair_id, parent_id, source_type,
+whether its hash has an embedding, with a stored vector, for the
+service}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L318" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="clear_completed_queue:Int32-instance-method">
       <div class="signature">
         
@@ -1883,7 +2070,32 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L560" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L590" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="clear_completed_queue_texts:Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>clear_completed_queue_texts</strong> : Nil
+
+        <a class="method-permalink" href="#clear_completed_queue_texts%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Drop the text of finished items (from before memo did so itself)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L598" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1915,7 +2127,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L807" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L887" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1931,7 +2143,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L564" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L594" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1947,7 +2159,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L314" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L344" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1995,7 +2207,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L448" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L478" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2011,7 +2223,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L795" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L875" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2027,7 +2239,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L614" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L691" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2043,7 +2255,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L610" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L687" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2059,7 +2271,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L621" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L698" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2091,7 +2303,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L843" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L923" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2107,7 +2319,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L494" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L524" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2171,7 +2383,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L318" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L348" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2203,7 +2415,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L436" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L466" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2228,7 +2440,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L926" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L1006" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2260,7 +2472,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L383" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L413" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2276,7 +2488,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L387" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L417" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2292,7 +2504,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L375" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L405" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2308,23 +2520,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L379" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="delete_text(source_id:Int64):Nil-instance-method">
-      <div class="signature">
-        
-        def <strong>delete_text</strong>(source_id : Int64) : Nil
-
-        <a class="method-permalink" href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L586" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L409" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2340,7 +2536,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L839" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L919" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2356,7 +2552,33 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L490" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L520" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="embedded_hashes(hashes:Array(Bytes),service_id:Int64):Set(Bytes)-instance-method">
+      <div class="signature">
+        
+        def <strong>embedded_hashes</strong>(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)
+
+        <a class="method-permalink" href="#embedded_hashes%28hashes%3AArray%28Bytes%29%2Cservice_id%3AInt64%29%3ASet%28Bytes%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Which of <code>hashes</code> have an embedding for the service with a stored
+vector (one without has been lost: embed it again)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L329" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2381,7 +2603,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L859" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L939" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2397,7 +2619,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L867" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L947" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2413,7 +2635,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L502" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L532" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2429,7 +2651,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L727" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L806" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2455,7 +2677,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L695" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L773" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_content_id(hash:Bytes):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find_content_id</strong>(hash : Bytes) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_content_id%28hash%3ABytes%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L618" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2487,7 +2725,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L350" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L380" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2503,7 +2741,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L362" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L392" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2519,7 +2757,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L342" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L372" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2535,7 +2773,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L354" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L384" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2551,7 +2789,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L346" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L376" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2567,7 +2805,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L358" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L388" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2605,10 +2843,19 @@ cost depends on the number of candidates, not the collection)</p>
         <a class="method-permalink" href="#get_all_texts%3AArray%28String%29-instance-method">#</a>
       </div>
       
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Every source's stored text (a text shared by several, once for each)</p>
+        </div>
+      
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L594" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L650" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2656,7 +2903,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L648" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L725" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2736,7 +2983,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L472" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L502" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2752,7 +2999,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L424" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L454" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2768,7 +3015,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L418" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L448" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2784,7 +3031,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L430" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L460" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2809,7 +3056,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L903" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L983" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_meta(key:String):String|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>get_meta</strong>(key : String) : String | Nil
+
+        <a class="method-permalink" href="#get_meta%28key%3AString%29%3AString%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L668" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2825,7 +3088,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L516" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L546" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2841,7 +3104,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L778" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L858" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2857,7 +3120,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L531" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L561" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2873,7 +3136,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L546" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L576" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2889,7 +3152,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L811" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L891" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2969,7 +3232,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L602" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L679" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2985,39 +3248,32 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L366" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L396" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="get_text(source_id:Int64):String|Nil-instance-method">
+    <div class="entry-detail" id="get_source_text(source_id:Int64):String|Nil-instance-method">
       <div class="signature">
         
-        def <strong>get_text</strong>(source_id : Int64) : String | Nil
+        def <strong>get_source_text</strong>(source_id : Int64) : String | Nil
 
-        <a class="method-permalink" href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method">#</a>
+        <a class="method-permalink" href="#get_source_text%28source_id%3AInt64%29%3AString%7CNil-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>A source's latest text (nil if not stored)</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L590" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="get_text_hash(source_id:Int64):Bytes|Nil-instance-method">
-      <div class="signature">
-        
-        def <strong>get_text_hash</strong>(source_id : Int64) : Bytes | Nil
-
-        <a class="method-permalink" href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L582" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L643" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3033,7 +3289,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L632" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L709" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3065,7 +3321,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L835" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L915" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3081,7 +3337,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L456" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L486" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3138,17 +3394,17 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L884" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L964" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="insert_chunk_ignore(hash:Bytes,source_id:Int64,source_type:String,pair_id:Int64|Nil,parent_id:Int64|Nil,offset:Int32|Nil,size:Int32,created_at:Int64):Int64-instance-method">
+    <div class="entry-detail" id="insert_chunk_ignore(hash:Bytes,source_id:Int64,source_type:String,content_id:Int64|Nil,pair_id:Int64|Nil,parent_id:Int64|Nil,offset:Int32|Nil,size:Int32,created_at:Int64):Int64-instance-method">
       <div class="signature">
         
-        def <strong>insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64
+        def <strong>insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, content_id : Int64 | Nil, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64
 
-        <a class="method-permalink" href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+        <a class="method-permalink" href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Ccontent_id%3AInt64%7CNil%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
       </div>
       
       <br/>
@@ -3227,7 +3483,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L326" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L356" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3243,7 +3499,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L338" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L368" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3259,7 +3515,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L330" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L360" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3275,7 +3531,32 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L334" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L364" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="legacy_texts_after(source_id:Int64,limit:Int32):Array(Tuple(Int64,String,Bytes|Nil))-instance-method">
+      <div class="signature">
+        
+        def <strong>legacy_texts_after</strong>(source_id : Int64, limit : Int32) : Array(Tuple(Int64, String, Bytes | Nil))
+
+        <a class="method-permalink" href="#legacy_texts_after%28source_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CString%2CBytes%7CNil%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>memo_texts rows (databases from before 0.13): {source_id, content, content_hash}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L657" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3291,7 +3572,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L440" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L470" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3339,7 +3620,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L391" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L421" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3355,7 +3636,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L936" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L1016" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3371,71 +3652,82 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L880" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L960" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_failed(id:Int64,error_message:String|Nil,attempts:Int32,processed_at:Int64):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_failed(id:Int64,text:String,error_message:String|Nil,attempts:Int32,processed_at:Int64):Nil-instance-method">
       <div class="signature">
         
-        def <strong>mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil
+        def <strong>mark_queue_failed</strong>(id : Int64, text : String, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil
 
-        <a class="method-permalink" href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_failed%28id%3AInt64%2Ctext%3AString%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L535" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L565" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_item_success(id:Int64,processed_at:Int64,attempts:Int32):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_item_success(id:Int64,text:String,processed_at:Int64,attempts:Int32):Nil-instance-method">
       <div class="signature">
         
-        def <strong>mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil
+        def <strong>mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
 
-        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L550" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L580" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_retry(id:Int64,attempts:Int32,error_message:String|Nil):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_retry(id:Int64,text:String,attempts:Int32,error_message:String|Nil):Nil-instance-method">
       <div class="signature">
         
-        def <strong>mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil
+        def <strong>mark_queue_retry</strong>(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil
 
-        <a class="method-permalink" href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L542" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L572" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_success(id:Int64,processed_at:Int64):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_success(id:Int64,text:String,processed_at:Int64):Nil-instance-method">
       <div class="signature">
         
-        def <strong>mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil
+        def <strong>mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil
 
-        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>The mark_queue_* methods take the item's text as it was read, and do
+nothing if it has changed since: the source was queued again, and the
+newer text still needs embedding.</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L527" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L557" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3451,7 +3743,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L895" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L975" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3467,7 +3759,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L899" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L979" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3483,7 +3775,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L799" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L879" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3499,7 +3791,32 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L554" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L584" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="release_content(content_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>release_content</strong>(content_id : Int64) : Nil
+
+        <a class="method-permalink" href="#release_content%28content_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>Delete a text unless a source or chunk still points at it</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L622" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3515,7 +3832,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L667" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L744" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3532,6 +3849,22 @@ cost depends on the number of candidates, not the collection)</p>
       <div>
         
           [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L217" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_chunks_content(source_id:Int64,content_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_chunks_content</strong>(source_id : Int64, content_id : Int64) : Nil
+
+        <a class="method-permalink" href="#set_chunks_content%28source_id%3AInt64%2Ccontent_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L639" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3563,7 +3896,39 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L910" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L990" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_meta(key:String,value:String):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_meta</strong>(key : String, value : String) : Nil
+
+        <a class="method-permalink" href="#set_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L672" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_source_content(source_id:Int64,content_id:Int64|Nil):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>set_source_content</strong>(source_id : Int64, content_id : Int64 | Nil) : Nil
+
+        <a class="method-permalink" href="#set_source_content%28source_id%3AInt64%2Ccontent_id%3AInt64%7CNil%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L635" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3579,7 +3944,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L918" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L998" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="source_content_id(source_id:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>source_content_id</strong>(source_id : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#source_content_id%28source_id%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L631" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3627,7 +4008,33 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L486" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L516" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_content(hash:Bytes,content:String|Nil,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        
+        def <strong>upsert_content</strong>(hash : Bytes, content : String | Nil, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#upsert_content%28hash%3ABytes%2Ccontent%3AString%7CNil%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>The id of the text with this hash, storing it if new. <code>content</code> nil
+stores the hash alone.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L606" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3643,7 +4050,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L407" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L437" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3659,23 +4066,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L785" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="upsert_text(source_id:Int64,content:String,content_hash:Bytes|Nil,created_at:Int64):Nil-instance-method">
-      <div class="signature">
-        
-        def <strong>upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil
-
-        <a class="method-permalink" href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L572" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L865" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3691,7 +4082,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L827" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L907" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3707,7 +4098,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L462" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L492" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3732,7 +4123,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L847" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/postgres.cr#L927" target="_blank">View source</a>]
         
       </div>
     </div>

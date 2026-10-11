@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Crystal Docs 1.21.1">
-<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_version" content="0.13.0-dev">
 <meta name="crystal_docs.project_name" content="memo">
 
 
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="../../js/doc.js"></script>
 
   <meta name="repository-name" content="memo">
-  <title>Memo::Dialect::Base - memo 0.13.0</title>
+  <title>Memo::Dialect::Base - memo 0.13.0-dev</title>
   <script type="text/javascript">
     CrystalDocs.base_path = "../../";
   </script>
@@ -45,7 +45,7 @@
       </h1>
 
       <span class="project-version">
-        0.13.0
+        0.13.0-dev
       </span>
     </div>
   </div>
@@ -279,6 +279,21 @@
   
   <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
       <a href="../../Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Migration" data-name="memo::migration">
+      <a href="../../Memo/Migration.html">Migration</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Migration/NewerSchema" data-name="memo::migration::newerschema">
+      <a href="../../Memo/Migration/NewerSchema.html">NewerSchema</a>
       
     </li>
   
@@ -636,6 +651,13 @@ the patterns that differ:</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#drop_legacy_texts%28db%3ADBHandle%29%3ANil-instance-method" class="signature"><strong>#drop_legacy_texts</strong>(db : DBHandle) : Nil</a>
+        
+          <div class="summary"><p>Drop the tables content-addressed storage replaced (memo_texts and its full-text index).</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#embedding_rowid_column%3AString-instance-method" class="signature"><strong>#embedding_rowid_column</strong> : String</a>
         
           <div class="summary"><p>The column name for embedding row identity used as USearch key.</p></div>
@@ -643,23 +665,9 @@ the patterns that differ:</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#fts_delete%28db%3ADBHandle%2Csource_id%3AInt64%29-instance-method" class="signature"><strong>#fts_delete</strong>(db : DBHandle, source_id : Int64)</a>
-        
-          <div class="summary"><p>Delete FTS index entry for a source.</p></div>
-        
-      </li>
-    
-      <li class="entry-summary">
         <a href="#fts_join_sql%3AString-instance-method" class="signature"><strong>#fts_join_sql</strong> : String</a>
         
-          <div class="summary"><p>Build FTS JOIN clause for search queries.</p></div>
-        
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#fts_upsert%28db%3ADBHandle%2Csource_id%3AInt64%2Ccontent%3AString%29-instance-method" class="signature"><strong>#fts_upsert</strong>(db : DBHandle, source_id : Int64, content : String)</a>
-        
-          <div class="summary"><p>Insert or update FTS index for a source.</p></div>
+          <div class="summary"><p>Build FTS JOIN clause for search queries (joining a chunk's text).</p></div>
         
       </li>
     
@@ -685,9 +693,16 @@ the patterns that differ:</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#migrate%28db%3ADB%3A%3ADatabase%29%3ANil-instance-method" class="signature"><strong>#migrate</strong>(db : DB::Database) : Nil</a>
+        <a href="#lock_for_migration%28db%3ADB%3A%3AConnection%29%3ANil-instance-method" class="signature"><strong>#lock_for_migration</strong>(db : DB::Connection) : Nil</a>
         
-          <div class="summary"><p>One-time data migrations, run by Database.init after the schema.</p></div>
+          <div class="summary"><p>Inside a migration's transaction: keep other processes from migrating the same database at the same time.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#prepare%28db%3ADB%3A%3ADatabase%29%3ANil-instance-method" class="signature"><strong>#prepare</strong>(db : DB::Database) : Nil</a>
+        
+          <div class="summary"><p>Bring existing tables up to date before the schema runs, where its statements depend on columns older databases lack.</p></div>
         
       </li>
     
@@ -695,6 +710,11 @@ the patterns that differ:</p>
         <a href="#schema_statements%3AArray%28String%29-instance-method" class="signature"><strong>#schema_statements</strong> : Array(String)</a>
         
           <div class="summary"><p>Get schema DDL statements.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#table_exists%3F%28db%3ADBHandle%2Ctable%3AString%29%3ABool-instance-method" class="signature"><strong>#table_exists?</strong>(db : DBHandle, table : String) : Bool</a>
         
       </li>
     
@@ -773,7 +793,29 @@ PostgreSQL: returns nil (no local file)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L47" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L58" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="drop_legacy_texts(db:DBHandle):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>drop_legacy_texts</strong>(db : <a href="../../Memo/DBHandle.html">DBHandle</a>) : Nil
+
+        <a class="method-permalink" href="#drop_legacy_texts%28db%3ADBHandle%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Drop the tables content-addressed storage replaced (memo_texts and
+its full-text index).</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -801,27 +843,6 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       </div>
     </div>
   
-    <div class="entry-detail" id="fts_delete(db:DBHandle,source_id:Int64)-instance-method">
-      <div class="signature">
-        abstract 
-        def <strong>fts_delete</strong>(db : <a href="../../Memo/DBHandle.html">DBHandle</a>, source_id : Int64)
-
-        <a class="method-permalink" href="#fts_delete%28db%3ADBHandle%2Csource_id%3AInt64%29-instance-method">#</a>
-      </div>
-      
-        <div class="doc">
-          
-          <p>Delete FTS index entry for a source.</p>
-        </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L53" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
     <div class="entry-detail" id="fts_join_sql:String-instance-method">
       <div class="signature">
         abstract 
@@ -832,34 +853,13 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       
         <div class="doc">
           
-          <p>Build FTS JOIN clause for search queries.</p>
+          <p>Build FTS JOIN clause for search queries (joining a chunk's text).</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L56" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="fts_upsert(db:DBHandle,source_id:Int64,content:String)-instance-method">
-      <div class="signature">
-        abstract 
-        def <strong>fts_upsert</strong>(db : <a href="../../Memo/DBHandle.html">DBHandle</a>, source_id : Int64, content : String)
-
-        <a class="method-permalink" href="#fts_upsert%28db%3ADBHandle%2Csource_id%3AInt64%2Ccontent%3AString%29-instance-method">#</a>
-      </div>
-      
-        <div class="doc">
-          
-          <p>Insert or update FTS index for a source.</p>
-        </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L50" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L61" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -880,7 +880,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L59" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L64" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -927,23 +927,46 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       </div>
     </div>
   
-    <div class="entry-detail" id="migrate(db:DB::Database):Nil-instance-method">
+    <div class="entry-detail" id="lock_for_migration(db:DB::Connection):Nil-instance-method">
       <div class="signature">
-        
-        def <strong>migrate</strong>(db : <a href="../../DB/Database.html">DB::Database</a>) : Nil
+        abstract 
+        def <strong>lock_for_migration</strong>(db : <a href="../../DB/Connection.html">DB::Connection</a>) : Nil
 
-        <a class="method-permalink" href="#migrate%28db%3ADB%3A%3ADatabase%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#lock_for_migration%28db%3ADB%3A%3AConnection%29%3ANil-instance-method">#</a>
       </div>
       
         <div class="doc">
           
-          <p>One-time data migrations, run by Database.init after the schema.</p>
+          <p>Inside a migration's transaction: keep other processes from
+migrating the same database at the same time.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L40" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L52" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="prepare(db:DB::Database):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>prepare</strong>(db : <a href="../../DB/Database.html">DB::Database</a>) : Nil
+
+        <a class="method-permalink" href="#prepare%28db%3ADB%3A%3ADatabase%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Bring existing tables up to date before the schema runs, where its
+statements depend on columns older databases lack.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L41" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -965,6 +988,22 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <div>
         
           [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L37" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="table_exists?(db:DBHandle,table:String):Bool-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>table_exists?</strong>(db : <a href="../../Memo/DBHandle.html">DBHandle</a>, table : String) : Bool
+
+        <a class="method-permalink" href="#table_exists%3F%28db%3ADBHandle%2Ctable%3AString%29%3ABool-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/dialect/base.cr#L44" target="_blank">View source</a>]
         
       </div>
     </div>

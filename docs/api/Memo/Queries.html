@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Crystal Docs 1.21.1">
-<meta name="crystal_docs.project_version" content="0.13.0">
+<meta name="crystal_docs.project_version" content="0.13.0-dev">
 <meta name="crystal_docs.project_name" content="memo">
 
 
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="../js/doc.js"></script>
 
   <meta name="repository-name" content="memo">
-  <title>Memo::Queries - memo 0.13.0</title>
+  <title>Memo::Queries - memo 0.13.0-dev</title>
   <script type="text/javascript">
     CrystalDocs.base_path = "../";
   </script>
@@ -45,7 +45,7 @@
       </h1>
 
       <span class="project-version">
-        0.13.0
+        0.13.0-dev
       </span>
     </div>
   </div>
@@ -279,6 +279,21 @@
   
   <li class=" " data-id="memo/Memo/IndexJournal/Recovery" data-name="memo::indexjournal::recovery">
       <a href="../Memo/IndexJournal/Recovery.html">Recovery</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class="parent " data-id="memo/Memo/Migration" data-name="memo::migration">
+      <a href="../Memo/Migration.html">Migration</a>
+      
+        <ul>
+  
+  <li class=" " data-id="memo/Memo/Migration/NewerSchema" data-name="memo::migration::newerschema">
+      <a href="../Memo/Migration/NewerSchema.html">NewerSchema</a>
       
     </li>
   
@@ -661,7 +676,28 @@ translation and keeps SQL explicit per backend.</p>
   <ul class="list-summary">
     
       <li class="entry-summary">
+        <a href="#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="signature"><strong>#chunk_content_ids</strong>(source_id : Int64) : Array(Int64)</a>
+        
+          <div class="summary"><p>The texts a source's chunks were cut from</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#chunk_states%28source_id%3AInt64%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%2CBool%29%29-instance-method" class="signature"><strong>#chunk_states</strong>(source_id : Int64, service_id : Int64) : Array(Tuple(Int64 | Nil, Int64 | Nil, Int64 | Nil, String, Bool))</a>
+        
+          <div class="summary"><p>Per chunk of a source: {content_id, pair_id, parent_id, source_type, whether its hash has an embedding, with a stored vector, for the service}</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#clear_completed_queue%3AInt32-instance-method" class="signature"><strong>#clear_completed_queue</strong> : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#clear_completed_queue_texts%3ANil-instance-method" class="signature"><strong>#clear_completed_queue_texts</strong> : Nil</a>
+        
+          <div class="summary"><p>Drop the text of finished items (from before memo did so itself)</p></div>
         
       </li>
     
@@ -803,17 +839,19 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_text</strong>(source_id : Int64) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
         <a href="#delete_vector%28embedding_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vector</strong>(embedding_id : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#delete_vocab%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_vocab</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#embedded_hashes%28hashes%3AArray%28Bytes%29%2Cservice_id%3AInt64%29%3ASet%28Bytes%29-instance-method" class="signature"><strong>#embedded_hashes</strong>(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)</a>
+        
+          <div class="summary"><p>Which of <code>hashes</code> have an embedding for the service with a stored vector (one without has been lost: embed it again)</p></div>
         
       </li>
     
@@ -843,6 +881,11 @@ translation and keeps SQL explicit per backend.</p>
         <a href="#filter_candidates%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Ccandidate_ids%3AArray%28Int64%29%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#filter_candidates</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, candidate_ids : Array(Int64)) : Set(UInt64)</a>
         
           <div class="summary"><p>Which of <code>candidate_ids</code> pass the filter clauses (looked up by id, so the cost depends on the number of candidates, not the collection)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find_content_id%28hash%3ABytes%29%3AInt64%7CNil-instance-method" class="signature"><strong>#find_content_id</strong>(hash : Bytes) : Int64 | Nil</a>
         
       </li>
     
@@ -890,6 +933,8 @@ translation and keeps SQL explicit per backend.</p>
     
       <li class="entry-summary">
         <a href="#get_all_texts%3AArray%28String%29-instance-method" class="signature"><strong>#get_all_texts</strong> : Array(String)</a>
+        
+          <div class="summary"><p>Every source's stored text (a text shared by several, once for each)</p></div>
         
       </li>
     
@@ -956,6 +1001,11 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#get_meta%28key%3AString%29%3AString%7CNil-instance-method" class="signature"><strong>#get_meta</strong>(key : String) : String | Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#get_pending_queue%28limit%3AInt32%29%3AArray%28Tuple%28Int64%2CInt64%2CString%29%29-instance-method" class="signature"><strong>#get_pending_queue</strong>(limit : Int32) : Array(Tuple(Int64, Int64, String))</a>
         
       </li>
@@ -1011,12 +1061,9 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="signature"><strong>#get_text</strong>(source_id : Int64) : String | Nil</a>
+        <a href="#get_source_text%28source_id%3AInt64%29%3AString%7CNil-instance-method" class="signature"><strong>#get_source_text</strong>(source_id : Int64) : String | Nil</a>
         
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method" class="signature"><strong>#get_text_hash</strong>(source_id : Int64) : Bytes | Nil</a>
+          <div class="summary"><p>A source's latest text (nil if not stored)</p></div>
         
       </li>
     
@@ -1058,7 +1105,7 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</a>
+        <a href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Ccontent_id%3AInt64%7CNil%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, content_id : Int64 | Nil, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64</a>
         
       </li>
     
@@ -1100,6 +1147,13 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#legacy_texts_after%28source_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CString%2CBytes%7CNil%29%29-instance-method" class="signature"><strong>#legacy_texts_after</strong>(source_id : Int64, limit : Int32) : Array(Tuple(Int64, String, Bytes | Nil))</a>
+        
+          <div class="summary"><p>memo_texts rows (databases from before 0.13): {source_id, content, content_hash}</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#list_files%28limit%3AInt32%2Coffset%3AInt32%29%3AArray%28Files%3A%3AFileRecord%29-instance-method" class="signature"><strong>#list_files</strong>(limit : Int32, offset : Int32) : Array(Files::FileRecord)</a>
         
       </li>
@@ -1130,22 +1184,24 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</a>
+        <a href="#mark_queue_failed%28id%3AInt64%2Ctext%3AString%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_failed</strong>(id : Int64, text : String, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil</a>
+        <a href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil</a>
+        <a href="#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil</a>
+        <a href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil</a>
+        
+          <div class="summary"><p>The mark_queue_* methods take the item's text as it was read, and do nothing if it has changed since: the source was queued again, and the newer text still needs embedding.</p></div>
         
       </li>
     
@@ -1170,12 +1226,24 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#release_content%28content_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#release_content</strong>(content_id : Int64) : Nil</a>
+        
+          <div class="summary"><p>Delete a text unless a source or chunk still points at it</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#search_filtered_rowids%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%29%3ASet%28UInt64%29-instance-method" class="signature"><strong>#search_filtered_rowids</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String) : Set(UInt64)</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#service_exists%3F%28id%3AInt64%29%3ABool-instance-method" class="signature"><strong>#service_exists?</strong>(id : Int64) : Bool</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_chunks_content%28source_id%3AInt64%2Ccontent_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_chunks_content</strong>(source_id : Int64, content_id : Int64) : Nil</a>
         
       </li>
     
@@ -1190,7 +1258,22 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#set_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method" class="signature"><strong>#set_meta</strong>(key : String, value : String) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#set_source_content%28source_id%3AInt64%2Ccontent_id%3AInt64%7CNil%29%3ANil-instance-method" class="signature"><strong>#set_source_content</strong>(source_id : Int64, content_id : Int64 | Nil) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#set_vectors_backfilled%28service_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#set_vectors_backfilled</strong>(service_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#source_content_id%28source_id%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#source_content_id</strong>(source_id : Int64) : Int64 | Nil</a>
         
       </li>
     
@@ -1210,17 +1293,19 @@ translation and keeps SQL explicit per backend.</p>
       </li>
     
       <li class="entry-summary">
+        <a href="#upsert_content%28hash%3ABytes%2Ccontent%3AString%7CNil%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#upsert_content</strong>(hash : Bytes, content : String | Nil, created_at : Int64) : Int64</a>
+        
+          <div class="summary"><p>The id of the text with this hash, storing it if new.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#upsert_file%28source_id%3AInt64%2Cpath%3AString%2Ccontent_hash%3ABytes%2Cmtime%3AInt64%2Csize%3AInt64%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_file</strong>(source_id : Int64, path : String, content_hash : Bytes, mtime : Int64, size : Int64, created_at : Int64) : Nil</a>
         
       </li>
     
       <li class="entry-summary">
         <a href="#upsert_query_cache%28query%3AString%2Cservice_id%3AInt64%2Cembedding%3ABytes%2Ctoken_count%3AInt32%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_query_cache</strong>(query : String, service_id : Int64, embedding : Bytes, token_count : Int32, created_at : Int64) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil</a>
         
       </li>
     
@@ -1359,6 +1444,50 @@ translation and keeps SQL explicit per backend.</p>
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="chunk_content_ids(source_id:Int64):Array(Int64)-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>chunk_content_ids</strong>(source_id : Int64) : Array(Int64)
+
+        <a class="method-permalink" href="#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The texts a source's chunks were cut from</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L127" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="chunk_states(source_id:Int64,service_id:Int64):Array(Tuple(Int64|Nil,Int64|Nil,Int64|Nil,String,Bool))-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>chunk_states</strong>(source_id : Int64, service_id : Int64) : Array(Tuple(Int64 | Nil, Int64 | Nil, Int64 | Nil, String, Bool))
+
+        <a class="method-permalink" href="#chunk_states%28source_id%3AInt64%2Cservice_id%3AInt64%29%3AArray%28Tuple%28Int64%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%2CBool%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Per chunk of a source: {content_id, pair_id, parent_id, source_type,
+whether its hash has an embedding, with a stored vector, for the
+service}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L132" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="clear_completed_queue:Int32-instance-method">
       <div class="signature">
         abstract 
@@ -1370,7 +1499,28 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L222" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L237" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="clear_completed_queue_texts:Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>clear_completed_queue_texts</strong> : Nil
+
+        <a class="method-permalink" href="#clear_completed_queue_texts%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Drop the text of finished items (from before memo did so itself)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L242" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1402,7 +1552,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L301" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L341" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1418,7 +1568,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L224" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L239" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1434,7 +1584,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L126" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L138" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1482,7 +1632,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L182" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L194" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1498,7 +1648,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L297" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L337" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1514,7 +1664,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L248" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L288" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1530,7 +1680,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L246" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L286" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1546,7 +1696,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L250" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L290" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1578,7 +1728,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L315" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L355" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1594,7 +1744,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L198" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L210" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1674,7 +1824,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L128" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L140" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1706,7 +1856,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L178" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L190" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1727,7 +1877,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L342" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L382" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1759,7 +1909,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L160" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L172" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1775,7 +1925,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L162" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L174" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1791,7 +1941,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L156" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L168" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1807,23 +1957,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L158" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="delete_text(source_id:Int64):Nil-instance-method">
-      <div class="signature">
-        abstract 
-        def <strong>delete_text</strong>(source_id : Int64) : Nil
-
-        <a class="method-permalink" href="#delete_text%28source_id%3AInt64%29%3ANil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L234" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L170" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1839,7 +1973,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L313" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L353" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1855,7 +1989,29 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L196" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L208" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="embedded_hashes(hashes:Array(Bytes),service_id:Int64):Set(Bytes)-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>embedded_hashes</strong>(hashes : Array(Bytes), service_id : Int64) : Set(Bytes)
+
+        <a class="method-permalink" href="#embedded_hashes%28hashes%3AArray%28Bytes%29%2Cservice_id%3AInt64%29%3ASet%28Bytes%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Which of <code>hashes</code> have an embedding for the service with a stored
+vector (one without has been lost: embed it again)</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L136" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1876,7 +2032,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L321" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L361" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1892,7 +2048,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L323" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L363" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1908,7 +2064,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L204" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L216" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1924,7 +2080,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L283" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L323" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1946,7 +2102,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L274" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L314" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find_content_id(hash:Bytes):Int64|Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>find_content_id</strong>(hash : Bytes) : Int64 | Nil
+
+        <a class="method-permalink" href="#find_content_id%28hash%3ABytes%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L252" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1978,7 +2150,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L146" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L158" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1994,7 +2166,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L152" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L164" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2010,7 +2182,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L142" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L154" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2026,7 +2198,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L148" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L160" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2042,7 +2214,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L144" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L156" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2058,7 +2230,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L150" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L162" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2092,10 +2264,15 @@ cost depends on the number of candidates, not the collection)</p>
         <a class="method-permalink" href="#get_all_texts%3AArray%28String%29-instance-method">#</a>
       </div>
       
+        <div class="doc">
+          
+          <p>Every source's stored text (a text shared by several, once for each)</p>
+        </div>
+      
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L238" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L267" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2143,7 +2320,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L258" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L298" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2223,7 +2400,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L192" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L204" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2239,7 +2416,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L174" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L186" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2255,7 +2432,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L172" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L184" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2271,7 +2448,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L176" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L188" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2292,7 +2469,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L335" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L375" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="get_meta(key:String):String|Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>get_meta</strong>(key : String) : String | Nil
+
+        <a class="method-permalink" href="#get_meta%28key%3AString%29%3AString%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L276" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2308,7 +2501,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L206" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L218" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2324,7 +2517,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L293" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L333" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2340,7 +2533,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L210" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L225" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2356,7 +2549,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L216" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L231" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2372,7 +2565,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L303" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L343" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2452,7 +2645,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L240" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L280" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2468,39 +2661,28 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L154" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L166" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="get_text(source_id:Int64):String|Nil-instance-method">
+    <div class="entry-detail" id="get_source_text(source_id:Int64):String|Nil-instance-method">
       <div class="signature">
         abstract 
-        def <strong>get_text</strong>(source_id : Int64) : String | Nil
+        def <strong>get_source_text</strong>(source_id : Int64) : String | Nil
 
-        <a class="method-permalink" href="#get_text%28source_id%3AInt64%29%3AString%7CNil-instance-method">#</a>
+        <a class="method-permalink" href="#get_source_text%28source_id%3AInt64%29%3AString%7CNil-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+          <p>A source's latest text (nil if not stored)</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L236" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="get_text_hash(source_id:Int64):Bytes|Nil-instance-method">
-      <div class="signature">
-        abstract 
-        def <strong>get_text_hash</strong>(source_id : Int64) : Bytes | Nil
-
-        <a class="method-permalink" href="#get_text_hash%28source_id%3AInt64%29%3ABytes%7CNil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L232" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L264" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2516,7 +2698,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L256" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L296" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2548,7 +2730,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L311" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L351" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2564,7 +2746,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L188" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L200" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2617,17 +2799,17 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L328" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L368" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="insert_chunk_ignore(hash:Bytes,source_id:Int64,source_type:String,pair_id:Int64|Nil,parent_id:Int64|Nil,offset:Int32|Nil,size:Int32,created_at:Int64):Int64-instance-method">
+    <div class="entry-detail" id="insert_chunk_ignore(hash:Bytes,source_id:Int64,source_type:String,content_id:Int64|Nil,pair_id:Int64|Nil,parent_id:Int64|Nil,offset:Int32|Nil,size:Int32,created_at:Int64):Int64-instance-method">
       <div class="signature">
         abstract 
-        def <strong>insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64
+        def <strong>insert_chunk_ignore</strong>(hash : Bytes, source_id : Int64, source_type : String, content_id : Int64 | Nil, pair_id : Int64 | Nil, parent_id : Int64 | Nil, offset : Int32 | Nil, size : Int32, created_at : Int64) : Int64
 
-        <a class="method-permalink" href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+        <a class="method-permalink" href="#insert_chunk_ignore%28hash%3ABytes%2Csource_id%3AInt64%2Csource_type%3AString%2Ccontent_id%3AInt64%7CNil%2Cpair_id%3AInt64%7CNil%2Cparent_id%3AInt64%7CNil%2Coffset%3AInt32%7CNil%2Csize%3AInt32%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
       </div>
       
       <br/>
@@ -2702,7 +2884,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L134" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L146" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2718,7 +2900,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L140" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L152" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2734,7 +2916,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L136" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L148" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2750,7 +2932,28 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L138" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L150" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="legacy_texts_after(source_id:Int64,limit:Int32):Array(Tuple(Int64,String,Bytes|Nil))-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>legacy_texts_after</strong>(source_id : Int64, limit : Int32) : Array(Tuple(Int64, String, Bytes | Nil))
+
+        <a class="method-permalink" href="#legacy_texts_after%28source_id%3AInt64%2Climit%3AInt32%29%3AArray%28Tuple%28Int64%2CString%2CBytes%7CNil%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>memo_texts rows (databases from before 0.13): {source_id, content, content_hash}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L270" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2766,7 +2969,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L180" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L192" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2814,7 +3017,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L164" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L176" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2830,7 +3033,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L348" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L388" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2846,71 +3049,78 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L325" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L365" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_failed(id:Int64,error_message:String|Nil,attempts:Int32,processed_at:Int64):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_failed(id:Int64,text:String,error_message:String|Nil,attempts:Int32,processed_at:Int64):Nil-instance-method">
       <div class="signature">
         abstract 
-        def <strong>mark_queue_failed</strong>(id : Int64, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil
+        def <strong>mark_queue_failed</strong>(id : Int64, text : String, error_message : String | Nil, attempts : Int32, processed_at : Int64) : Nil
 
-        <a class="method-permalink" href="#mark_queue_failed%28id%3AInt64%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_failed%28id%3AInt64%2Ctext%3AString%2Cerror_message%3AString%7CNil%2Cattempts%3AInt32%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L212" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L227" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_item_success(id:Int64,processed_at:Int64,attempts:Int32):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_item_success(id:Int64,text:String,processed_at:Int64,attempts:Int32):Nil-instance-method">
       <div class="signature">
         abstract 
-        def <strong>mark_queue_item_success</strong>(id : Int64, processed_at : Int64, attempts : Int32) : Nil
+        def <strong>mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
 
-        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L218" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L233" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_retry(id:Int64,attempts:Int32,error_message:String|Nil):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_retry(id:Int64,text:String,attempts:Int32,error_message:String|Nil):Nil-instance-method">
       <div class="signature">
         abstract 
-        def <strong>mark_queue_retry</strong>(id : Int64, attempts : Int32, error_message : String | Nil) : Nil
+        def <strong>mark_queue_retry</strong>(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil
 
-        <a class="method-permalink" href="#mark_queue_retry%28id%3AInt64%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L214" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L229" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="mark_queue_success(id:Int64,processed_at:Int64):Nil-instance-method">
+    <div class="entry-detail" id="mark_queue_success(id:Int64,text:String,processed_at:Int64):Nil-instance-method">
       <div class="signature">
         abstract 
-        def <strong>mark_queue_success</strong>(id : Int64, processed_at : Int64) : Nil
+        def <strong>mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil
 
-        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
+        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+          <p>The mark_queue_* methods take the item's text as it was read, and do
+nothing if it has changed since: the source was queued again, and the
+newer text still needs embedding.</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L208" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L223" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2926,7 +3136,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L330" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L370" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2942,7 +3152,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L332" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L372" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2958,7 +3168,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L299" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L339" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2974,7 +3184,28 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L220" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L235" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="release_content(content_id:Int64):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>release_content</strong>(content_id : Int64) : Nil
+
+        <a class="method-permalink" href="#release_content%28content_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Delete a text unless a source or chunk still points at it</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L255" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2990,7 +3221,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L264" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L304" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3007,6 +3238,22 @@ cost depends on the number of candidates, not the collection)</p>
       <div>
         
           [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L83" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_chunks_content(source_id:Int64,content_id:Int64):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>set_chunks_content</strong>(source_id : Int64, content_id : Int64) : Nil
+
+        <a class="method-permalink" href="#set_chunks_content%28source_id%3AInt64%2Ccontent_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L261" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3038,7 +3285,39 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L337" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L377" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_meta(key:String,value:String):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>set_meta</strong>(key : String, value : String) : Nil
+
+        <a class="method-permalink" href="#set_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L278" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="set_source_content(source_id:Int64,content_id:Int64|Nil):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>set_source_content</strong>(source_id : Int64, content_id : Int64 | Nil) : Nil
+
+        <a class="method-permalink" href="#set_source_content%28source_id%3AInt64%2Ccontent_id%3AInt64%7CNil%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L259" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3054,7 +3333,23 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L339" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L379" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="source_content_id(source_id:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>source_content_id</strong>(source_id : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#source_content_id%28source_id%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L257" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3102,7 +3397,29 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L194" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L206" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="upsert_content(hash:Bytes,content:String|Nil,created_at:Int64):Int64-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>upsert_content</strong>(hash : Bytes, content : String | Nil, created_at : Int64) : Int64
+
+        <a class="method-permalink" href="#upsert_content%28hash%3ABytes%2Ccontent%3AString%7CNil%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The id of the text with this hash, storing it if new. <code>content</code> nil
+stores the hash alone.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L250" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3118,7 +3435,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L170" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L182" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3134,23 +3451,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L295" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="upsert_text(source_id:Int64,content:String,content_hash:Bytes|Nil,created_at:Int64):Nil-instance-method">
-      <div class="signature">
-        abstract 
-        def <strong>upsert_text</strong>(source_id : Int64, content : String, content_hash : Bytes | Nil, created_at : Int64) : Nil
-
-        <a class="method-permalink" href="#upsert_text%28source_id%3AInt64%2Ccontent%3AString%2Ccontent_hash%3ABytes%7CNil%2Ccreated_at%3AInt64%29%3ANil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L230" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L335" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3166,7 +3467,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L309" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L349" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3182,7 +3483,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L190" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L202" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3203,7 +3504,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L318" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/queries/base.cr#L358" target="_blank">View source</a>]
         
       </div>
     </div>
