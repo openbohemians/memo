@@ -46,7 +46,9 @@ module Memo
           max_retries: @max_retries
         )
 
-        EmbedResult.new(response.embeddings, response.token_counts, response.total_tokens)
+        # usage is nil when the provider reported no count
+        total_tokens = response.usage.try(&.input.to_i32) || 0
+        EmbedResult.new(response.embeddings, response.token_counts, total_tokens)
       end
     end
   end

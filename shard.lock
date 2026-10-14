@@ -6,7 +6,7 @@ shards:
 
   arcana-ai:
     git: https://github.com/trans/arcana-ai.git
-    version: 0.4.0
+    version: 0.5.3
 
   arcana-core:
     git: https://github.com/trans/arcana-core.git

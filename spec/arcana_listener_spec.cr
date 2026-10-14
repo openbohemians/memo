@@ -26,7 +26,8 @@ private class TestBus
           rng = Random.new(text.as_s.hash)
           JSON::Any.new(Array.new(1536) { JSON::Any.new(rng.next_float - 0.5) })
         end
-        data = JSON::Any.new({"embeddings" => JSON::Any.new(vectors), "total_tokens" => JSON::Any.new(texts.size.to_i64)})
+        usage = JSON::Any.new({"input" => JSON::Any.new(texts.size.to_i64)}) # as arcana 0.35 replies
+        data = JSON::Any.new({"embeddings" => JSON::Any.new(vectors), "usage" => usage})
         @embed.send(envelope.reply(from: "openai:embed", payload: Arcana::Protocol.result(data)))
       end
     end

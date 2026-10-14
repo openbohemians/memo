@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Token counts come from `usage`**, ahead of their removal in arcana-ai 0.6.0 and arcana 0.36.0.
+  The arcana provider reads `Embed::Result#usage.input` instead of the deprecated `total_tokens`, and
+  the bus provider reads `usage.input` from the embed service's reply (sent since arcana 0.35). A reply
+  without `usage` counts 0 tokens, as when a provider reports none. Requires arcana-ai ~> 0.5.1.
+
 ## [0.13.0] - 2026-10-11
 
 ### Upgrading

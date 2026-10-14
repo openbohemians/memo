@@ -10,9 +10,10 @@ module Memo
     # Requires an Arcana::Client to be available — typically set once
     # at process startup via `Memo::Providers::Bus.client = ...`.
     #
-    # Bus responses don't include per-text token counts, only `total_tokens`.
-    # We distribute the total evenly across texts (same approach as
-    # Memo::Providers::OpenAI when the API doesn't itemize).
+    # Bus replies don't include per-text token counts, only `usage` for the
+    # whole call (arcana 0.35 and later; absent when the provider reported
+    # none). We distribute its input count evenly across texts (same
+    # approach as Memo::Providers::OpenAI when the API doesn't itemize).
     class Bus
       include Base
 
@@ -72,15 +73,21 @@ module Memo
         end
 
         data = ::Arcana::Protocol.data(reply.payload) || raise "Bus embed: empty reply"
+        self.class.parse_reply(data, texts.size)
+      end
 
+      # An embed service's reply data as an EmbedResult. The token count
+      # comes from `usage.input`; without `usage` it is 0, as when the
+      # provider reports none.
+      def self.parse_reply(data : JSON::Any, count : Int32) : EmbedResult
         embeddings_json = data["embeddings"]?.try(&.as_a?) || raise "Bus embed: no embeddings in reply"
         embeddings = embeddings_json.map do |arr|
           arr.as_a.map(&.as_f)
         end
 
-        total_tokens = data["total_tokens"]?.try(&.as_i?) || 0
-        avg_tokens = texts.size > 0 ? (total_tokens.to_f / texts.size).round.to_i : 0
-        token_counts = Array.new(texts.size, avg_tokens)
+        total_tokens = data["usage"]?.try(&.["input"]?).try(&.as_i64?).try(&.to_i32) || 0
+        avg_tokens = count > 0 ? (total_tokens.to_f / count).round.to_i : 0
+        token_counts = Array.new(count, avg_tokens)
 
         EmbedResult.new(embeddings, token_counts, total_tokens)
       end
