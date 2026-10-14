@@ -1,3 +1,11 @@
+memo-rag (0.13.1-1) unstable; urgency=medium
+
+  * Token counts come from arcana-ai's usage, ahead of the removal of
+    total_tokens in arcana-ai 0.6.0 and arcana 0.36.0. Requires
+    arcana-ai 0.5.1 or later.
+
+ -- trans <trans@github.com>  Wed, 14 Oct 2026 00:00:00 +0000
+
 memo-rag (0.13.0-1) unstable; urgency=medium
 
   * Database transactions are atomic. A failure partway through indexing
