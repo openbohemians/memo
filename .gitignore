@@ -23,3 +23,6 @@ memo.db
 memo_cli
 .env
 *.deb
+
+# Agents' notes: the ai branch, checked out here as a worktree (dot-ai)
+/.ai/
