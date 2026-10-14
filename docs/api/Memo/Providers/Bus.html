@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Crystal Docs 1.21.1">
-<meta name="crystal_docs.project_version" content="0.13.0-dev">
+<meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="memo">
 
 
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="../../js/doc.js"></script>
 
   <meta name="repository-name" content="memo">
-  <title>Memo::Providers::Bus - memo 0.13.0-dev</title>
+  <title>Memo::Providers::Bus - memo main</title>
   <script type="text/javascript">
     CrystalDocs.base_path = "../../";
   </script>
@@ -45,7 +45,7 @@
       </h1>
 
       <span class="project-version">
-        0.13.0-dev
+        main
       </span>
     </div>
   </div>
@@ -567,9 +567,10 @@
 embedding service (e.g. <code>openai:embed</code>, <code>voyage:embed</code>).</p>
 <p>Requires an Arcana::Client to be available — typically set once
 at process startup via <code><a href="../../Memo/Providers/Bus.html#client%3A%3A%3AArcana%3A%3AClient%7CNil-class-method">Memo::Providers::Bus.client</a> = ...</code>.</p>
-<p>Bus responses don't include per-text token counts, only <code>total_tokens</code>.
-We distribute the total evenly across texts (same approach as
-Memo::Providers::OpenAI when the API doesn't itemize).</p>
+<p>Bus replies don't include per-text token counts, only <code>usage</code> for the
+whole call (arcana 0.35 and later; absent when the provider reported
+none). We distribute its input count evenly across texts (same
+approach as Memo::Providers::OpenAI when the API doesn't itemize).</p>
 
 
 
@@ -610,7 +611,7 @@ Memo::Providers::OpenAI when the API doesn't itemize).</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L16" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L17" target="_blank">
         memo/providers/bus.cr
       </a>
     
@@ -681,6 +682,13 @@ Memo::Providers::OpenAI when the API doesn't itemize).</p>
         <a href="#client%3D%28client%3A%3A%3AArcana%3A%3AClient%7CNil%29-class-method" class="signature"><strong>.client=</strong>(client : ::Arcana::Client | Nil)</a>
         
           <div class="summary"><p>Process-wide Arcana::Client used by all Bus providers.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#parse_reply%28data%3AJSON%3A%3AAny%2Ccount%3AInt32%29%3AEmbedResult-class-method" class="signature"><strong>.parse_reply</strong>(data : JSON::Any, count : Int32) : EmbedResult</a>
+        
+          <div class="summary"><p>An embed service's reply data as an EmbedResult.</p></div>
         
       </li>
     
@@ -811,7 +819,7 @@ Memo::Providers::OpenAI when the API doesn't itemize).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L29" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L30" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -845,7 +853,7 @@ Set once at process startup (e.g. in bin/memo-arcana.cr).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L21" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -867,7 +875,30 @@ Set once at process startup (e.g. in bin/memo-arcana.cr).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L21" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L22" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="parse_reply(data:JSON::Any,count:Int32):EmbedResult-class-method">
+      <div class="signature">
+        
+        def self.<strong>parse_reply</strong>(data : JSON::Any, count : Int32) : <a href="../../Memo/Providers/EmbedResult.html">EmbedResult</a>
+
+        <a class="method-permalink" href="#parse_reply%28data%3AJSON%3A%3AAny%2Ccount%3AInt32%29%3AEmbedResult-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>An embed service's reply data as an EmbedResult. The token count
+comes from <code>usage.input</code>; without <code>usage</code> it is 0, as when the
+provider reports none.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L82" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -908,7 +939,7 @@ input_type: &quot;query&quot; or &quot;document&quot; (used by Voyage AI for opt
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L37" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L38" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -935,7 +966,7 @@ input_type: &quot;query&quot; or &quot;document&quot; (used by Voyage AI for opt
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L42" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L43" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -951,7 +982,7 @@ input_type: &quot;query&quot; or &quot;document&quot; (used by Voyage AI for opt
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L27" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L28" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -967,7 +998,7 @@ input_type: &quot;query&quot; or &quot;document&quot; (used by Voyage AI for opt
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L26" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L27" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -983,7 +1014,7 @@ input_type: &quot;query&quot; or &quot;document&quot; (used by Voyage AI for opt
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.13.0/src/memo/providers/bus.cr#L25" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.13.1/src/memo/providers/bus.cr#L26" target="_blank">View source</a>]
         
       </div>
     </div>
