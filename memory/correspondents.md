@@ -12,7 +12,7 @@ The projects memo's agent corresponds with, and how each uses memo. Library user
 | `@infocomics` | via DataDungeon | The launch product. A public demo is planned, which will measure real load before Postgres + pgvector is considered (see [roadmap.md](roadmap.md)). |
 | goldfish | library | No agent: mail goes to its `.ai/mail/inbox/`, and the user acts on it. |
 | wow | bus | Sends `ns` with every request. Hydrates results with a second query (see Option C in [roadmap.md](roadmap.md)). |
-| `@arcana` | dependency | The bus and arcana-ai. 2026-10-13: arcana-ai 0.5.1 deprecates the old token counts, removed in 0.6.0. |
+| `@arcana` | dependency | The bus and arcana-ai. 2026-10-13: asked memo to stop reading the old token counts before their removal (see [status.md](status.md)). |
 
 ## How the user wants mail handled
 
