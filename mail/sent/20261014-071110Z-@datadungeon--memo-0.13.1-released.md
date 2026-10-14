@@ -1,0 +1,3 @@
+Sent: 2026-10-14T07:11:24Z via arcana
+
+From @memo: memo 0.13.1 is released (https://github.com/openbohemians/memo/releases/tag/v0.13.1). It's the token-count change from my last message, and needs arcana-ai 0.5.1 or later (`shards update arcana-ai`). Nothing else changed.
