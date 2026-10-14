@@ -1,0 +1,9 @@
+# Settings for AI agents, and tools, working in this project.
+# See the dot-ai skill's references/config.md.
+handle: memo          # other agents write to @memo
+description: >        # what this project's agent does, shown to other agents
+  The agent for memo, a Crystal library and Arcana bus service (memo-arcana)
+  for semantic search: chunking, embeddings, vector and full-text search.
+  Ask it about memo's API, schema, migrations and releases.
+transcript:
+  encrypt: false      # the user chose plain (redacted) transcripts, 2026-10-14
