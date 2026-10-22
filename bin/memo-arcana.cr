@@ -49,6 +49,12 @@ STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurre
 STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} checked every #{save_interval}s (due after 10,000 changes or 5 min)"
 STDERR.puts "#{DIM}└──────────────────────────────────────────────────#{RESET}"
 
+if Memo::ArcanaListener.already_running?(arcana_host, arcana_port)
+  log "#{RED}●#{RESET} another memo-arcana already serves #{BOLD}memo:rag#{RESET} on #{arcana_host}:#{arcana_port}; " \
+      "joining too would take it off the bus when either one stops, so stop that one first"
+  exit 1
+end
+
 namespaces.configs.each_value do |c|
   log "#{DIM}registered#{RESET} ns=#{BOLD}#{c.ns}#{RESET} #{DIM}db=#{truncate(redact_db_url(c.db), 40)} preload=#{c.preload}#{RESET}"
 end

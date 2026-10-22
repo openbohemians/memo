@@ -53,6 +53,10 @@ private class TestBus
     @tester.request(envelope, timeout: timeout)
   end
 
+  def port : Int32
+    @relay.port
+  end
+
   def close
     @namespaces.close_all
     Memo::Providers::Bus.client = nil
@@ -131,6 +135,38 @@ describe Memo::ArcanaListener do
       busy.should be >= 1
       answered.should be <= 3 # 1 running + 2 waiting at most
       (busy + answered).should eq 6
+    end
+  end
+
+  describe ".already_running?" do
+    it "sees a memo-arcana serving its address" do
+      with_test_bus do |bus|
+        Memo::ArcanaListener.already_running?("127.0.0.1", bus.port).should be_true
+      end
+    end
+
+    it "answers at once when its address isn't listed" do
+      relay = BusRelay.new
+      started = Time.instant
+      Memo::ArcanaListener.already_running?("127.0.0.1", relay.port).should be_false
+      (Time.instant - started).should be < 1.second
+    ensure
+      relay.try(&.close)
+    end
+
+    it "isn't fooled by a listing no one answers for" do
+      relay = BusRelay.new
+      relay.list(Memo::ArcanaListener::ADDRESS)
+      Memo::ArcanaListener.already_running?("127.0.0.1", relay.port, timeout: 300.milliseconds).should be_false
+    ensure
+      relay.try(&.close)
+    end
+
+    it "leaves an unreachable bus to the join" do
+      server = TCPServer.new("127.0.0.1", 0)
+      port = server.local_address.port
+      server.close
+      Memo::ArcanaListener.already_running?("127.0.0.1", port).should be_false
     end
   end
 end

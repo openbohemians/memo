@@ -1,4 +1,5 @@
 require "arcana-core"
+require "http/client"
 require "./service"
 require "./namespaces"
 require "./bus_log"
@@ -24,6 +25,50 @@ module Memo
       @handler = ArcanaService.new(@namespaces)
       @slots = Channel(Nil).new(max_concurrency)
       @waiting = 0
+    end
+
+    # Is a memo-arcana already serving ADDRESS on the bus at host:port?
+    # Another one mustn't join: it would share the address's mailbox, and
+    # when either connection closed, the bus would drop the address for
+    # both. The bus keeps a joined service's listing across its own
+    # restarts, so a listed address is asked for help, and only a reply
+    # counts. Two instances starting at the same moment can both pass.
+    def self.already_running?(host : String, port : Int32, timeout : Time::Span = 3.seconds) : Bool
+      listed?(host, port) && answers_help?(host, port, timeout)
+    end
+
+    # Unless the bus says ADDRESS isn't listed. A bus that can't be reached
+    # counts as not listed, so joining it fails with the real error.
+    private def self.listed?(host : String, port : Int32) : Bool
+      http = HTTP::Client.new(host, port)
+      http.connect_timeout = 2.seconds
+      http.read_timeout = 2.seconds
+      !http.get("/directory/#{ADDRESS}").status.not_found?
+    rescue IO::Error | Socket::Error
+      false
+    ensure
+      http.try(&.close)
+    end
+
+    private def self.answers_help?(host : String, port : Int32, timeout : Time::Span) : Bool
+      probe = Arcana::Client.new(url: "ws://#{host}:#{port}/bus",
+        address: "memo-arcana-check-#{Random::Secure.hex(4)}", listed: false)
+      spawn do
+        probe.connect
+      rescue
+        # not connected, so no reply: the check passes
+      end
+      waited = Time.instant
+      until probe.connected? || Time.instant - waited > timeout
+        sleep 10.milliseconds
+      end
+      return false unless probe.connected?
+
+      help = Arcana::Envelope.new(from: probe.address, to: ADDRESS, subject: "help",
+        payload: JSON.parse(%({"_intent":"help"})))
+      probe.request(help, timeout: timeout).try(&.from) == ADDRESS
+    ensure
+      probe.try(&.close)
     end
 
     # Answer requests arriving on the client

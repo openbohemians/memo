@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **memo-arcana won't start while another one serves `memo:rag`.** A second instance on the same bus
+  joined the same address and shared its mailbox, and when either one stopped, the bus dropped the address
+  for both, leaving the other running but unreachable. memo-arcana now looks `memo:rag` up in the bus's
+  directory, and if it's listed, asks it for help; a reply means another instance is serving, and
+  memo-arcana exits with an error. A listing no one answers for, as after a bus restart, doesn't stop it.
+
 ## [0.15.0] - 2026-10-22
 
 ### Changed

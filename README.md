@@ -485,6 +485,9 @@ A namespace a client opens over the bus names its own database, so it gets only 
 it, never the server's. Opening a namespace that's already registered changes nothing. Any client on the
 bus can still read and write every namespace, so run it on a trusted bus. See [SECURITY.md](SECURITY.md).
 
+Run one memo-arcana per bus. A second one would share `memo:rag`, and when either stopped, the bus would
+drop the address for both, so memo-arcana won't start while another one answers there.
+
 ## Providers
 
 Currently supported:
