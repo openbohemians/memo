@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for both, leaving the other running but unreachable. memo-arcana now looks `memo:rag` up in the bus's
   directory, and if it's listed, asks it for help; a reply means another instance is serving, and
   memo-arcana exits with an error. A listing no one answers for, as after a bus restart, doesn't stop it.
+- **memo-arcana rejoins the bus when its connection drops.** When the bus restarted, memo-arcana exited
+  with status 0 and no message, so systemd's `Restart=on-failure` left it stopped. It now logs the loss
+  and rejoins, retrying with waits that grow from 1 to 30 seconds, and checks first that no other
+  memo-arcana has taken `memo:rag` meanwhile. A bus it can't reach at startup is retried the same way.
 
 ## [0.15.0] - 2026-10-22
 
