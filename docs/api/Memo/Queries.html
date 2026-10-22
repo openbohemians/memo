@@ -608,7 +608,7 @@ translation and keeps SQL explicit per backend.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L7" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L7" target="_blank">
         memo/queries/base.cr
       </a>
     
@@ -674,6 +674,13 @@ translation and keeps SQL explicit per backend.</p>
     Instance Method Summary
   </h2>
   <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#add_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method" class="signature"><strong>#add_meta</strong>(key : String, value : String) : Nil</a>
+        
+          <div class="summary"><p>Set a meta value unless the key already has one</p></div>
+        
+      </li>
     
       <li class="entry-summary">
         <a href="#chunk_content_ids%28source_id%3AInt64%29%3AArray%28Int64%29-instance-method" class="signature"><strong>#chunk_content_ids</strong>(source_id : Int64) : Array(Int64)</a>
@@ -1387,7 +1394,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L23" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L23" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1403,7 +1410,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L10" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L10" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1431,7 +1438,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L19" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L19" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1450,6 +1457,27 @@ translation and keeps SQL explicit per backend.</p>
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="add_meta(key:String,value:String):Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>add_meta</strong>(key : String, value : String) : Nil
+
+        <a class="method-permalink" href="#add_meta%28key%3AString%2Cvalue%3AString%29%3ANil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Set a meta value unless the key already has one</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L287" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="chunk_content_ids(source_id:Int64):Array(Int64)-instance-method">
       <div class="signature">
         abstract 
@@ -1466,7 +1494,7 @@ translation and keeps SQL explicit per backend.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L127" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L127" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1489,7 +1517,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L132" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L132" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1505,7 +1533,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L243" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L243" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1526,7 +1554,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L248" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L248" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1542,7 +1570,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L61" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L61" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1558,7 +1586,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L355" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L358" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1574,7 +1602,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L245" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L245" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1599,7 +1627,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L228" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L228" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1615,7 +1643,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L138" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L138" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1631,7 +1659,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L81" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L81" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1647,7 +1675,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L79" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L79" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1663,7 +1691,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L197" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L197" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1679,7 +1707,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L351" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L354" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1695,7 +1723,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L294" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L297" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1711,7 +1739,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L292" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L295" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1727,7 +1755,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L296" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L299" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1743,7 +1771,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L85" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L85" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1759,7 +1787,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L369" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L372" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1775,7 +1803,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L213" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L213" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1791,7 +1819,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L8" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L8" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1807,7 +1835,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L122" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L122" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1823,7 +1851,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L124" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L124" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1839,7 +1867,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L73" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L73" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1855,7 +1883,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L140" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L140" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1871,7 +1899,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L75" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L75" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1887,7 +1915,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L193" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L193" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1908,7 +1936,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L396" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L399" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1924,7 +1952,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L239" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L239" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1940,7 +1968,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L77" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L77" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1956,7 +1984,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L175" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L175" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1972,7 +2000,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L177" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L177" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1988,7 +2016,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L171" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L171" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2004,7 +2032,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L173" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L173" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2020,7 +2048,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L367" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L370" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2036,7 +2064,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L211" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L211" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2058,7 +2086,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L136" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L136" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2079,7 +2107,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L375" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L378" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2095,7 +2123,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L377" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L380" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2111,7 +2139,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L219" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L219" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2134,7 +2162,7 @@ text, so its other chunks may belong to sources the filters exclude.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L332" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L335" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2156,7 +2184,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L320" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L323" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2172,7 +2200,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L258" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L258" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2188,7 +2216,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L40" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L40" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2204,7 +2232,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L161" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L161" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2220,7 +2248,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L167" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L167" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2236,7 +2264,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L157" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L157" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2252,7 +2280,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L163" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L163" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2268,7 +2296,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L159" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L159" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2284,7 +2312,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L165" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L165" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2305,7 +2333,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L14" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L14" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2326,7 +2354,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L273" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L273" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2342,7 +2370,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L120" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L120" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2358,7 +2386,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L114" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L114" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2374,7 +2402,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L304" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L307" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2390,7 +2418,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L59" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L59" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2406,7 +2434,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L71" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L71" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2422,7 +2450,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L100" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L100" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2438,7 +2466,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L102" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L102" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2454,7 +2482,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L207" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L207" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2470,7 +2498,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L189" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L189" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2486,7 +2514,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L187" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L187" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2502,7 +2530,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L191" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L191" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2523,7 +2551,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L389" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L392" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2539,7 +2567,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L282" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L282" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2555,7 +2583,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L221" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L221" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2571,7 +2599,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L347" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L350" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2592,7 +2620,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L231" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L231" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2608,7 +2636,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L237" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L237" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2624,7 +2652,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L357" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L360" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2640,7 +2668,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L49" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L49" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2656,7 +2684,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L47" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L47" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2672,7 +2700,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L55" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L55" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2688,7 +2716,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L57" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L57" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2704,7 +2732,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L286" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L289" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2720,7 +2748,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L169" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L169" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2741,7 +2769,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L270" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L270" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2757,7 +2785,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L302" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L305" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2773,7 +2801,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L51" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L51" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2789,7 +2817,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L365" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L368" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2805,7 +2833,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L203" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L203" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2821,7 +2849,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L116" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L116" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2837,7 +2865,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L118" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L118" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2858,7 +2886,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L382" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L385" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2874,7 +2902,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L108" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L108" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2890,7 +2918,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L98" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L98" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2906,7 +2934,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L42" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L42" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2927,7 +2955,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L88" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L88" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2943,7 +2971,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L146" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L146" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2959,7 +2987,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L155" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L155" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2982,7 +3010,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L151" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L151" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2998,7 +3026,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L153" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L153" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3019,7 +3047,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L276" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L276" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3035,7 +3063,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L195" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L195" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3051,7 +3079,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L65" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L65" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3067,7 +3095,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L67" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L67" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3083,7 +3111,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L179" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L179" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3099,7 +3127,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L402" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L405" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3115,7 +3143,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L379" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L382" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3131,7 +3159,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L233" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L233" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3147,7 +3175,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L235" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L235" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3163,7 +3191,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L384" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L387" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3179,7 +3207,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L386" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L389" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3195,7 +3223,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L353" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L356" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3211,7 +3239,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L241" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L241" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3232,7 +3260,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L261" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L261" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3248,7 +3276,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L310" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L313" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3264,7 +3292,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L83" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L83" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3280,7 +3308,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L267" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L267" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3296,7 +3324,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L63" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L63" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3312,7 +3340,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L391" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L394" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3328,7 +3356,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L284" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L284" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3344,7 +3372,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L265" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L265" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3360,7 +3388,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L393" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L396" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3376,7 +3404,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L263" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L263" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3392,7 +3420,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L69" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L69" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3408,7 +3436,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L53" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L53" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3424,7 +3452,7 @@ existed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L209" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L209" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3446,7 +3474,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L256" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L256" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3462,7 +3490,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L185" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L185" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3478,7 +3506,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L349" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L352" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3494,7 +3522,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L363" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L366" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3510,7 +3538,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L205" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L205" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3531,7 +3559,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/base.cr#L372" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/queries/base.cr#L375" target="_blank">View source</a>]
         
       </div>
     </div>

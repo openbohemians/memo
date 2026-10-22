@@ -601,7 +601,7 @@
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L3" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L3" target="_blank">
         memo/database.cr
       </a>
     
@@ -633,6 +633,13 @@
         <a href="#create%28path%3AString%29%3ADB%3A%3ADatabase-instance-method" class="signature"><strong>#create</strong>(path : String) : DB::Database</a>
         
           <div class="summary"><p>Create database connection and initialize schema (standalone mode)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#id%28db%3ADBHandle%29%3AString-instance-method" class="signature"><strong>#id</strong>(db : DBHandle) : String</a>
+        
+          <div class="summary"><p>The database's id, made at random the first time it's asked for.</p></div>
         
       </li>
     
@@ -706,7 +713,30 @@ Sets the appropriate dialect automatically.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L25" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L36" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="id(db:DBHandle):String-instance-method">
+      <div class="signature">
+        
+        def <strong>id</strong>(db : <a href="../Memo/DBHandle.html">DBHandle</a>) : String
+
+        <a class="method-permalink" href="#id%28db%3ADBHandle%29%3AString-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The database's id, made at random the first time it's asked for.
+Index files record it, so one left over from another database isn't
+taken for this one's.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L24" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -731,7 +761,7 @@ Safe to call multiple times (uses IF NOT EXISTS)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L12" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L12" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -753,7 +783,7 @@ Safe to call multiple times (uses IF NOT EXISTS)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L46" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L57" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -775,7 +805,7 @@ up to 5 s for another's write lock instead of failing at once.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L39" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L50" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -800,7 +830,7 @@ connection and commit on their own, outside the transaction.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/database.cr#L57" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/database.cr#L68" target="_blank">View source</a>]
         
       </div>
     </div>

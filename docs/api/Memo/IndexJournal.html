@@ -572,6 +572,8 @@ calls the embedding API.</p>
 <p>Replay is idempotent: each logged embedding is set to its current state
 in the database (added if it has a stored vector, removed otherwise).
 A checkpoint that lags the file only costs extra replay.</p>
+<p>The checkpoint also records the database's id and the service's, so a
+file another database or service saved is rebuilt rather than trusted.</p>
 
 
 
@@ -612,7 +614,7 @@ A checkpoint that lags the file only costs extra replay.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L17" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L20" target="_blank">
         memo/index_journal.cr
       </a>
     
@@ -632,6 +634,16 @@ A checkpoint that lags the file only costs extra replay.</p>
     </h2>
   
   <dl>
+    
+      <dt class="entry-const" id="ADOPT_SAMPLE">
+        <strong>ADOPT_SAMPLE</strong> = <code><span class="n">32</span></code>
+      </dt>
+      
+      <dd class="entry-const-doc">
+        <p>Stored vectors compared with a file that doesn't record whose it is,
+before adopting it (see adopt)</p>
+      </dd>
+      
     
       <dt class="entry-const" id="REBUILD_PAGE">
         <strong>REBUILD_PAGE</strong> = <code><span class="n">256</span></code>
@@ -690,7 +702,7 @@ insert takes ~4 ms at 1536 dimensions).</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#open%28db%3ADB%3A%3ADatabase%2Cpath%3AString%2Cdimensions%3AInt32%2Cservice_id%3AInt64%29%3ATuple%28USearch%3A%3AIndex%2CRecovery%2CFile%29-instance-method" class="signature"><strong>#open</strong>(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : Tuple(USearch::Index, Recovery, File)</a>
+        <a href="#open%28db%3ADB%3A%3ADatabase%2Cpath%3AString%2Cdimensions%3AInt32%2Cservice_id%3AInt64%2Clegacy_path%3AString%7CNil%3Dnil%29%3ATuple%28USearch%3A%3AIndex%2CRecovery%2CFile%29-instance-method" class="signature"><strong>#open</strong>(db : DB::Database, path : String, dimensions : Int32, service_id : Int64, legacy_path : String | Nil = <span class="n">nil</span>) : Tuple(USearch::Index, Recovery, File)</a>
         
           <div class="summary"><p>Lock and open the index at <code>path</code>, bringing it up to date with the database.</p></div>
         
@@ -753,7 +765,7 @@ is idempotent, so entries the index already has do no harm.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L145" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L188" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -779,17 +791,17 @@ would claim changes the file lacks.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L126" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L169" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="open(db:DB::Database,path:String,dimensions:Int32,service_id:Int64):Tuple(USearch::Index,Recovery,File)-instance-method">
+    <div class="entry-detail" id="open(db:DB::Database,path:String,dimensions:Int32,service_id:Int64,legacy_path:String|Nil=nil):Tuple(USearch::Index,Recovery,File)-instance-method">
       <div class="signature">
         
-        def <strong>open</strong>(db : <a href="../DB/Database.html">DB::Database</a>, path : String, dimensions : Int32, service_id : Int64) : Tuple(USearch::Index, <a href="../Memo/IndexJournal/Recovery.html">Recovery</a>, File)
+        def <strong>open</strong>(db : <a href="../DB/Database.html">DB::Database</a>, path : String, dimensions : Int32, service_id : Int64, legacy_path : String | Nil = <span class="n">nil</span>) : Tuple(USearch::Index, <a href="../Memo/IndexJournal/Recovery.html">Recovery</a>, File)
 
-        <a class="method-permalink" href="#open%28db%3ADB%3A%3ADatabase%2Cpath%3AString%2Cdimensions%3AInt32%2Cservice_id%3AInt64%29%3ATuple%28USearch%3A%3AIndex%2CRecovery%2CFile%29-instance-method">#</a>
+        <a class="method-permalink" href="#open%28db%3ADB%3A%3ADatabase%2Cpath%3AString%2Cdimensions%3AInt32%2Cservice_id%3AInt64%2Clegacy_path%3AString%7CNil%3Dnil%29%3ATuple%28USearch%3A%3AIndex%2CRecovery%2CFile%29-instance-method">#</a>
       </div>
       
         <div class="doc">
@@ -797,12 +809,14 @@ would claim changes the file lacks.</p>
           <p>Lock and open the index at <code>path</code>, bringing it up to date with the
 database. Returns the index, what recovery did, and the lock to hold
 while the index is open (see USearchIndex.lock).</p>
+<p>When there's no file at <code>path</code> yet, the one at <code>legacy_path</code> (where an
+earlier memo kept it) is adopted if it holds this service's vectors.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L43" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L62" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -829,7 +843,7 @@ is gone), but it takes up one of the nearest-neighbor slots.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L105" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L148" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -852,7 +866,7 @@ and queue it for the index. A row that already has a stored vector
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/index_journal.cr#L81" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/index_journal.cr#L124" target="_blank">View source</a>]
         
       </div>
     </div>

@@ -897,13 +897,17 @@ never build it from untrusted input. On PostgreSQL every <code>?</code> outside 
   </svg>
 </a>Storage</h2>
 <p>Memo keeps its data in the database (a SQLite file at <code>db_path</code>, or PostgreSQL) and an index file per
-embedding service beside it:</p>
+embedding service, beside the SQLite file or in <code>index_dir</code>:</p>
 <ul>
 <li><strong>Database</strong>: services, sources, texts (<code>memo_contents</code>: each distinct text once, by hash), chunks,
 embeddings (one per distinct chunk and service), the embed queue, every embedding's vector
 (<code>memo_vectors</code>, 16-bit floats), and a journal of index changes (<code>memo_index_log</code>)</li>
-<li><strong>USearch index</strong>: an HNSW index file per service (e.g. <code>memo.openai--text-embedding-3-small--1536.usearch</code>),
-held in memory while open, with a <code>.checkpoint</code> and a <code>.lock</code> file beside it</li>
+<li><strong>USearch index</strong>: an HNSW index file per service, held in memory while open, with a <code>.checkpoint</code> and a
+<code>.lock</code> file beside it. Beside <code>notes.db</code> it's <code>notes.openai--text-embedding-3-small--1536.usearch</code>. In
+<code>index_dir</code> (PostgreSQL's default is <code>~/.local/share/memo/indices</code>, or <code>/var/lib/memo/indices</code> for a
+system user) its name starts with the database's name and id instead, such as <code>wow_dev-3f9a1c2b.…</code>, so
+databases can share the directory. The checkpoint records whose index it is: a file from another
+database or service is rebuilt rather than used.</li>
 </ul>
 <p>The index is rebuilt from the database whenever it needs to be, so <strong>backing up the database is enough</strong>
 (e.g. Litestream for SQLite). Text storage can be disabled with <code>store_text: false</code> if you prefer to manage

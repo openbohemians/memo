@@ -578,7 +578,7 @@
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L3" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L3" target="_blank">
         memo/dialect/sqlite.cr
       </a>
     
@@ -627,6 +627,13 @@
     
       <li class="entry-summary">
         <a href="#column_exists%3F%28db%3ADBHandle%2Ctable%3AString%2Ccolumn%3AString%29%3ABool-instance-method" class="signature"><strong>#column_exists?</strong>(db : DBHandle, table : String, column : String) : Bool</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#database_name%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method" class="signature"><strong>#database_name</strong>(db : DB::Database) : String | Nil</a>
+        
+          <div class="summary"><p>The database's name on its server, for naming index files.</p></div>
         
       </li>
     
@@ -722,6 +729,11 @@
 
   <h3>Instance methods inherited from class <code><a href="../../Memo/Dialect/Base.html">Memo::Dialect::Base</a></code></h3>
   
+  
+    <a href="../../Memo/Dialect/Base.html#database_name%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method" class="tooltip">
+      <span>database_name(db : DB::Database) : String | Nil</span>
+    database_name</a>, 
+    
   
     <a href="../../Memo/Dialect/Base.html#db_file_path%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method" class="tooltip">
       <span>db_file_path(db : DB::Database) : String | Nil</span>
@@ -850,7 +862,34 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L70" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L74" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="database_name(db:DB::Database):String|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>database_name</strong>(db : <a href="../../DB/Database.html">DB::Database</a>) : String | Nil
+
+        <a class="method-permalink" href="#database_name%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Dialect/Base.html">Memo::Dialect::Base</a>
+            </div>
+          
+          <p>The database's name on its server, for naming index files.</p>
+<p>SQLite: nil (the file names it)
+PostgreSQL: current_database()</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -877,7 +916,7 @@ PostgreSQL: returns nil (no local file)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L49" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L49" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -903,7 +942,7 @@ its full-text index).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L95" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L99" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -930,7 +969,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -952,7 +991,7 @@ the content's id, and MATCH looks them up without a second copy</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L58" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L62" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -977,7 +1016,7 @@ the content's id, and MATCH looks them up without a second copy</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L62" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L66" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1002,7 +1041,7 @@ the content's id, and MATCH looks them up without a second copy</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L8" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L8" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1027,7 +1066,7 @@ the content's id, and MATCH looks them up without a second copy</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L4" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L4" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1048,7 +1087,7 @@ the content's id, and MATCH looks them up without a second copy</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L102" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L106" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1072,7 +1111,7 @@ the database waits, then finds the columns there.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L78" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L82" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1097,7 +1136,7 @@ the database waits, then finds the columns there.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L28" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L28" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1113,7 +1152,7 @@ the database waits, then finds the columns there.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L66" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L70" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1138,7 +1177,7 @@ the database waits, then finds the columns there.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/sqlite.cr#L12" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/sqlite.cr#L12" target="_blank">View source</a>]
         
       </div>
     </div>

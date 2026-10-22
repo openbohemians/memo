@@ -615,7 +615,7 @@ the patterns that differ:</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L14" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L14" target="_blank">
         memo/dialect/base.cr
       </a>
     
@@ -642,6 +642,13 @@ the patterns that differ:</p>
     Instance Method Summary
   </h2>
   <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#database_name%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method" class="signature"><strong>#database_name</strong>(db : DB::Database) : String | Nil</a>
+        
+          <div class="summary"><p>The database's name on its server, for naming index files.</p></div>
+        
+      </li>
     
       <li class="entry-summary">
         <a href="#db_file_path%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method" class="signature"><strong>#db_file_path</strong>(db : DB::Database) : String | Nil</a>
@@ -775,6 +782,29 @@ the patterns that differ:</p>
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="database_name(db:DB::Database):String|Nil-instance-method">
+      <div class="signature">
+        abstract 
+        def <strong>database_name</strong>(db : <a href="../../DB/Database.html">DB::Database</a>) : String | Nil
+
+        <a class="method-permalink" href="#database_name%28db%3ADB%3A%3ADatabase%29%3AString%7CNil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The database's name on its server, for naming index files.</p>
+<p>SQLite: nil (the file names it)
+PostgreSQL: current_database()</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L64" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="db_file_path(db:DB::Database):String|Nil-instance-method">
       <div class="signature">
         abstract 
@@ -793,7 +823,7 @@ PostgreSQL: returns nil (no local file)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L58" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L58" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -815,7 +845,7 @@ its full-text index).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L48" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -838,7 +868,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L34" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L34" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -859,7 +889,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L61" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L67" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -880,7 +910,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L64" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L70" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -901,7 +931,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L19" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L19" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -922,7 +952,7 @@ PostgreSQL: &quot;eid&quot; (explicit column)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L16" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L16" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -944,7 +974,7 @@ migrating the same database at the same time.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L52" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L52" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -966,7 +996,7 @@ statements depend on columns older databases lack.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L41" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L41" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -987,7 +1017,7 @@ statements depend on columns older databases lack.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L37" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L37" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1003,7 +1033,7 @@ statements depend on columns older databases lack.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L44" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L44" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1024,7 +1054,7 @@ statements depend on columns older databases lack.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/dialect/base.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.3/src/memo/dialect/base.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
