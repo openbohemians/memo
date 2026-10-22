@@ -571,6 +571,20 @@ with request parameters summarized and secrets redacted.</p>
 
 
 
+  <h2>
+    <a id="extended-modules" class="anchor" href="#extended-modules">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Extended Modules
+  </h2>
+  <ul class="other-types-list">
+    
+      <li class="other-type"><a href="../Memo/BusLog.html">Memo::BusLog</a></li>
+    
+  </ul>
+
 
 
 
@@ -602,7 +616,7 @@ with request parameters summarized and secrets redacted.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L7" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L7" target="_blank">
         arcana/bus_log.cr
       </a>
     
@@ -721,7 +735,9 @@ with request parameters summarized and secrets redacted.</p>
       </li>
     
       <li class="entry-summary">
-        <a href="#redact_db_url%28url%3AString%29%3AString-instance-method" class="signature"><strong>#redact_db_url</strong>(url : String) : String</a>
+        <a href="#redact_db_url%28text%3AString%29%3AString-instance-method" class="signature"><strong>#redact_db_url</strong>(text : String) : String</a>
+        
+          <div class="summary"><p>The text with *** for the passwords in any database URLs in it: the user's password (postgres://user:pass@host) and query parameters such as ?password= or &amp;sslpassword=.</p></div>
         
       </li>
     
@@ -776,7 +792,7 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L18" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L20" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -797,7 +813,7 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L18" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L20" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -827,23 +843,30 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L20" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="redact_db_url(url:String):String-instance-method">
+    <div class="entry-detail" id="redact_db_url(text:String):String-instance-method">
       <div class="signature">
         
-        def <strong>redact_db_url</strong>(url : String) : String
+        def <strong>redact_db_url</strong>(text : String) : String
 
-        <a class="method-permalink" href="#redact_db_url%28url%3AString%29%3AString-instance-method">#</a>
+        <a class="method-permalink" href="#redact_db_url%28text%3AString%29%3AString-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+          <p>The text with *** for the passwords in any database URLs in it: the
+user's password (postgres://user:pass@host) and query parameters
+such as ?password= or &amp;sslpassword=. Works on messages too.</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L35" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L40" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -859,7 +882,7 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L30" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L32" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -875,7 +898,7 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L39" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -891,7 +914,7 @@ with request parameters summarized and secrets redacted.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/bus_log.cr#L24" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/bus_log.cr#L26" target="_blank">View source</a>]
         
       </div>
     </div>

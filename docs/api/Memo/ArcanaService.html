@@ -590,7 +590,7 @@ Memo::Service instances for multi-project isolation.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/service.cr#L8" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/service.cr#L8" target="_blank">
         arcana/service.cr
       </a>
     
@@ -612,8 +612,17 @@ Memo::Service instances for multi-project isolation.</p>
   <dl>
     
       <dt class="entry-const" id="GUIDE">
-        <strong>GUIDE</strong> = <code><span class="s">&quot;Memo semantic search service — multi-namespace router.\n\nEach `ns` (namespace) has its own isolated embedding space: separate\ndatabase, USearch index, and embedding service.\n\nManagement actions:\n  open   — Register and open a namespace. Params: ns, db, [service, format, api_key, model, index_dir]\n  close  — Close a namespace. Params: ns\n  list   — List registered namespaces.\n\nData actions (all require `ns`):\n  index        — Index a document. Params: ns, source_type, source_id, text\n  index_batch  — Index multiple documents. Params: ns, documents (array of {source_type, source_id, text})\n  search       — Semantic search. Params: ns, query, limit (default 10), min_score (default 0.7), source_type\n  delete       — Delete a document. Params: ns, source_id, source_type\n  stats        — Get index statistics. Params: ns\n\nExamples:\n  {\&quot;action\&quot;: \&quot;open\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;db\&quot;: \&quot;postgres://wow:wow@localhost/wow_dev\&quot;, \&quot;service\&quot;: \&quot;openai\&quot;}\n  {\&quot;action\&quot;: \&quot;index\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;source_type\&quot;: \&quot;claim\&quot;, \&quot;source_id\&quot;: \&quot;42\&quot;, \&quot;text\&quot;: \&quot;...\&quot;}\n  {\&quot;action\&quot;: \&quot;search\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;query\&quot;: \&quot;bitcoin\&quot;, \&quot;limit\&quot;: 5}\n  {\&quot;action\&quot;: \&quot;stats\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;}&quot;</span></code>
+        <strong>GUIDE</strong> = <code><span class="s">&quot;Memo semantic search service — multi-namespace router.\n\nEach `ns` (namespace) has its own isolated embedding space: separate\ndatabase, USearch index, and embedding service.\n\nManagement actions:\n  open   — Open a namespace. Params: ns, db, [service, format, api_key, model, index_dir]\n           Namespaces come from memo-arcana&#39;s config file; registering\n           others this way needs MEMO_BUS_OPEN=1 on the server, and they\n           use only the api_key given here. Opening a registered\n           namespace again changes nothing (another db is refused).\n  close  — Close a namespace. Params: ns\n  list   — List registered namespaces.\n\nData actions (all require `ns`):\n  index        — Index a document. Params: ns, source_type, source_id, text\n  index_batch  — Index multiple documents. Params: ns, documents (array of {source_type, source_id, text})\n  search       — Semantic search. Params: ns, query, limit (default 10, at most 1000), min_score (default 0.7), source_type\n  delete       — Delete a document. Params: ns, source_id, source_type\n  stats        — Get index statistics. Params: ns\n\nExamples:\n  {\&quot;action\&quot;: \&quot;open\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;db\&quot;: \&quot;postgres://wow:wow@localhost/wow_dev\&quot;, \&quot;service\&quot;: \&quot;openai\&quot;}\n  {\&quot;action\&quot;: \&quot;index\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;source_type\&quot;: \&quot;claim\&quot;, \&quot;source_id\&quot;: \&quot;42\&quot;, \&quot;text\&quot;: \&quot;...\&quot;}\n  {\&quot;action\&quot;: \&quot;search\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;, \&quot;query\&quot;: \&quot;bitcoin\&quot;, \&quot;limit\&quot;: 5}\n  {\&quot;action\&quot;: \&quot;stats\&quot;, \&quot;ns\&quot;: \&quot;wow\&quot;}&quot;</span></code>
       </dt>
+      
+    
+      <dt class="entry-const" id="MAX_LIMIT">
+        <strong>MAX_LIMIT</strong> = <code><span class="n">1000</span></code>
+      </dt>
+      
+      <dd class="entry-const-doc">
+        <p>Most results one search returns</p>
+      </dd>
       
     
       <dt class="entry-const" id="SCHEMA">
@@ -724,7 +733,7 @@ Memo::Service instances for multi-project isolation.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/service.cr#L38" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/service.cr#L45" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -756,7 +765,7 @@ Memo::Service instances for multi-project isolation.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/service.cr#L41" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/service.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -772,7 +781,7 @@ Memo::Service instances for multi-project isolation.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/service.cr#L36" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/service.cr#L43" target="_blank">View source</a>]
         
       </div>
     </div>

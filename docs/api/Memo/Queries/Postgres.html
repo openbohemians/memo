@@ -578,7 +578,7 @@
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L2" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L2" target="_blank">
         memo/queries/postgres.cr
       </a>
     
@@ -1095,17 +1095,19 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64</a>
+        <a href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64 | Nil</a>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64</a>
+        <a href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64 | Nil</a>
+        
+          <div class="summary"><p>DO NOTHING waits for a competing insert of the same id to commit, so the caller's next lookup finds it</p></div>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="signature"><strong>#insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64</a>
+        <a href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="signature"><strong>#insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64 | Nil</a>
         
       </li>
     
@@ -1723,18 +1725,18 @@
     insert_source</a>, 
     
   
-    <a href="../../Memo/Queries.html#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
-      <span>insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64</span>
+    <a href="../../Memo/Queries.html#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64 | Nil</span>
     insert_source_blob</a>, 
     
   
-    <a href="../../Memo/Queries.html#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
-      <span>insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64</span>
+    <a href="../../Memo/Queries.html#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64 | Nil</span>
     insert_source_int</a>, 
     
   
-    <a href="../../Memo/Queries.html#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method" class="tooltip">
-      <span>insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64</span>
+    <a href="../../Memo/Queries.html#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method" class="tooltip">
+      <span>insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64 | Nil</span>
     insert_source_text</a>, 
     
   
@@ -1994,7 +1996,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L13" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L13" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2033,7 +2035,7 @@ use jsonb_exists, jsonb_exists_any and jsonb_exists_all instead.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L317" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L317" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2060,7 +2062,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L321" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L321" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2076,7 +2078,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L596" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L598" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2101,7 +2103,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L604" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L606" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2117,7 +2119,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L151" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L151" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2133,7 +2135,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L909" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L911" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2149,7 +2151,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L600" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L602" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2178,7 +2180,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L560" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L562" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2194,7 +2196,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L347" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L347" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2210,7 +2212,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L213" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L213" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2226,7 +2228,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L209" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L209" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2242,7 +2244,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L481" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L483" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2258,7 +2260,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L897" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L899" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2274,7 +2276,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L697" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L699" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2290,7 +2292,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L693" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L695" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2306,7 +2308,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L704" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L706" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2322,7 +2324,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L224" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L224" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2338,7 +2340,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L945" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L947" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2354,7 +2356,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L527" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L529" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2370,7 +2372,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L309" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L309" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2386,7 +2388,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L313" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L313" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2402,7 +2404,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L197" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L197" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2418,7 +2420,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L351" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L351" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2434,7 +2436,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L201" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L201" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2450,7 +2452,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L469" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L471" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2475,7 +2477,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1028" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1030" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2491,7 +2493,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L586" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L588" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2507,7 +2509,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L205" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L205" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2523,7 +2525,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L416" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L418" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2539,7 +2541,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L420" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L422" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2555,7 +2557,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L408" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L410" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2571,7 +2573,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L412" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L414" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2587,7 +2589,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L941" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L943" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2603,7 +2605,7 @@ it was read). Returns whether it did.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L523" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L525" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2629,7 +2631,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L332" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L332" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2654,7 +2656,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L961" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L963" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2670,7 +2672,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L969" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L971" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2686,7 +2688,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L535" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L537" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2713,7 +2715,7 @@ text, so its other chunks may belong to sources the filters exclude.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L812" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L814" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2739,7 +2741,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L779" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L781" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2755,7 +2757,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L624" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L626" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2771,7 +2773,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L86" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L86" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2787,7 +2789,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L383" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L385" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2803,7 +2805,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L395" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L397" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2819,7 +2821,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L375" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L377" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2835,7 +2837,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L387" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L389" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2851,7 +2853,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L379" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L381" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2867,7 +2869,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L391" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L393" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2892,7 +2894,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L3" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L3" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2917,7 +2919,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L656" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L658" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2933,7 +2935,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L295" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L295" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2949,7 +2951,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L279" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L279" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2965,7 +2967,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L731" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L733" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2981,7 +2983,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L144" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L144" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2997,7 +2999,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L189" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L189" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3013,7 +3015,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L253" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L253" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3029,7 +3031,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L257" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L257" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3045,7 +3047,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L505" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L507" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3061,7 +3063,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L457" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L459" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3077,7 +3079,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L451" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L453" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3093,7 +3095,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L463" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L465" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3118,7 +3120,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1005" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1007" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3134,7 +3136,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L674" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L676" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3150,7 +3152,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L549" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L551" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3166,7 +3168,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L880" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L882" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3191,7 +3193,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L567" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L569" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3207,7 +3209,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L582" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L584" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3223,7 +3225,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L913" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L915" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3245,7 +3247,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L112" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L112" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3261,7 +3263,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L101" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L101" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3277,7 +3279,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L130" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L130" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3293,7 +3295,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L137" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L137" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3309,7 +3311,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L685" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L687" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3325,7 +3327,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L399" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L401" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3350,7 +3352,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L649" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L651" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3366,7 +3368,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L715" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L717" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3382,7 +3384,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L122" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L122" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3398,7 +3400,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L937" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L939" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3414,7 +3416,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L489" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L491" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3430,7 +3432,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L283" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L283" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3446,7 +3448,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L289" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L289" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3471,7 +3473,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L986" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L988" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3487,7 +3489,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L265" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L265" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3503,7 +3505,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L244" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L244" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3519,7 +3521,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L90" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L90" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3544,7 +3546,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L228" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L228" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3560,55 +3562,61 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L359" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L359" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="insert_source_blob(source_type:String,external_id:Bytes,created_at:Int64):Int64-instance-method">
+    <div class="entry-detail" id="insert_source_blob(source_type:String,external_id:Bytes,created_at:Int64):Int64|Nil-instance-method">
       <div class="signature">
         
-        def <strong>insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64
+        def <strong>insert_source_blob</strong>(source_type : String, external_id : Bytes, created_at : Int64) : Int64 | Nil
 
-        <a class="method-permalink" href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+        <a class="method-permalink" href="#insert_source_blob%28source_type%3AString%2Cexternal_id%3ABytes%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L371" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L373" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="insert_source_int(source_type:String,external_id:Int64,created_at:Int64):Int64-instance-method">
+    <div class="entry-detail" id="insert_source_int(source_type:String,external_id:Int64,created_at:Int64):Int64|Nil-instance-method">
       <div class="signature">
         
-        def <strong>insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64
+        def <strong>insert_source_int</strong>(source_type : String, external_id : Int64, created_at : Int64) : Int64 | Nil
 
-        <a class="method-permalink" href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
+        <a class="method-permalink" href="#insert_source_int%28source_type%3AString%2Cexternal_id%3AInt64%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>DO NOTHING waits for a competing insert of the same id to commit, so
+the caller's next lookup finds it</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L365" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="insert_source_text(source_type:String,external_id:String,created_at:Int64):Int64|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64 | Nil
+
+        <a class="method-permalink" href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64%7CNil-instance-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L363" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="insert_source_text(source_type:String,external_id:String,created_at:Int64):Int64-instance-method">
-      <div class="signature">
-        
-        def <strong>insert_source_text</strong>(source_type : String, external_id : String, created_at : Int64) : Int64
-
-        <a class="method-permalink" href="#insert_source_text%28source_type%3AString%2Cexternal_id%3AString%2Ccreated_at%3AInt64%29%3AInt64-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L367" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L369" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3633,7 +3641,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L663" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L665" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3649,7 +3657,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L473" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L475" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3665,7 +3673,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L159" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L159" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3681,7 +3689,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L168" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L168" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3697,7 +3705,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L424" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L426" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3713,7 +3721,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1038" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1040" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3729,7 +3737,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L982" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L984" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3745,7 +3753,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L571" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L573" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3761,7 +3769,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L578" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L580" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3777,7 +3785,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L997" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L999" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3793,7 +3801,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1001" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1003" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3809,7 +3817,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L901" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L903" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3825,7 +3833,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L590" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L592" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3850,7 +3858,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L628" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L630" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3866,7 +3874,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L750" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L752" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3882,7 +3890,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L220" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L220" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3898,7 +3906,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L645" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L647" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3914,7 +3922,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L155" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L155" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3930,7 +3938,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1012" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1014" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3946,7 +3954,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L678" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L680" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3962,7 +3970,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L641" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L643" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3978,7 +3986,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L1020" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L1022" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3994,7 +4002,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L637" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L639" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4010,7 +4018,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L177" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L177" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4026,7 +4034,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L126" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L126" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4042,7 +4050,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L519" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L521" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4068,7 +4076,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L612" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L614" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4084,7 +4092,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L440" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L442" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4100,7 +4108,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L887" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L889" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4116,7 +4124,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L929" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L931" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4132,7 +4140,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L495" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L497" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4157,7 +4165,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/postgres.cr#L949" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/memo/queries/postgres.cr#L951" target="_blank">View source</a>]
         
       </div>
     </div>

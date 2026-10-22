@@ -566,9 +566,9 @@
 <p>Each ns has its own database, embedding service, and USearch index —
 providing true isolation between projects sharing one memo-arcana
 process.</p>
-<p>Namespaces can be opened explicitly via <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> or listed in a config
-file for preloading at boot. Once opened, services are cached in
-memory until explicitly closed (or the process exits).</p>
+<p>Namespaces are listed in a config file (some preloaded at boot), or
+registered with <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> when allow_open is set. Once opened, services
+are cached in memory until explicitly closed (or the process exits).</p>
 
 
 
@@ -595,7 +595,7 @@ memory until explicitly closed (or the process exits).</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L15" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L16" target="_blank">
         arcana/namespaces.cr
       </a>
     
@@ -639,6 +639,20 @@ memory until explicitly closed (or the process exits).</p>
     Instance Method Summary
   </h2>
   <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#allow_open%3D%28allow_open%3ABool%29-instance-method" class="signature"><strong>#allow_open=</strong>(allow_open : Bool)</a>
+        
+          <div class="summary"><p>Whether <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> may register a namespace the config file doesn't list.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#allow_open%3F%3ABool-instance-method" class="signature"><strong>#allow_open?</strong> : Bool</a>
+        
+          <div class="summary"><p>Whether <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> may register a namespace the config file doesn't list.</p></div>
+        
+      </li>
     
       <li class="entry-summary">
         <a href="#close%28ns%3AString%29%3ABool-instance-method" class="signature"><strong>#close</strong>(ns : String) : Bool</a>
@@ -775,7 +789,7 @@ memory until explicitly closed (or the process exits).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -796,6 +810,50 @@ memory until explicitly closed (or the process exits).</p>
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="allow_open=(allow_open:Bool)-instance-method">
+      <div class="signature">
+        
+        def <strong>allow_open=</strong>(allow_open : Bool)
+
+        <a class="method-permalink" href="#allow_open%3D%28allow_open%3ABool%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Whether <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> may register a namespace the config file doesn't list.
+Off by default, since the requester picks the database.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="allow_open?:Bool-instance-method">
+      <div class="signature">
+        
+        def <strong>allow_open?</strong> : Bool
+
+        <a class="method-permalink" href="#allow_open%3F%3ABool-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Whether <code><a href="../Memo/Namespaces.html#open%28config%3AConfig%29%3AMemo%3A%3AService-instance-method">#open</a></code> may register a namespace the config file doesn't list.
+Off by default, since the requester picks the database.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="close(ns:String):Bool-instance-method">
       <div class="signature">
         
@@ -814,7 +872,7 @@ open it afresh.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L99" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L130" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -836,7 +894,7 @@ in-flight requests finish.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L137" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L168" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -852,7 +910,7 @@ in-flight requests finish.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L42" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L49" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -876,7 +934,7 @@ only that namespace's open lock; requests for other namespaces carry on.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L71" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L102" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -897,7 +955,7 @@ only that namespace's open lock; requests for other namespaces carry on.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L111" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L142" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -927,7 +985,7 @@ service: mock</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L153" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L184" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -943,12 +1001,16 @@ service: mock</p>
         <div class="doc">
           
           <p>Register and immediately open a namespace. Returns the Service.</p>
+<p>A namespace already registered keeps its settings: opening it again
+with the same database just opens it, and with another one raises.
+Registering a new one needs allow_open, and it's dropped again if it
+fails to open, so a corrected open can follow.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L61" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L77" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -970,7 +1032,7 @@ service: mock</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L119" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L150" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -991,7 +1053,7 @@ service: mock</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L124" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L155" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1012,7 +1074,7 @@ service: mock</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L54" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L65" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1028,7 +1090,7 @@ service: mock</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L43" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L50" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1050,7 +1112,7 @@ close waits for blocks already running before it closes the service.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L87" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L118" target="_blank">View source</a>]
         
       </div>
     </div>

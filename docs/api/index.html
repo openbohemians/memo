@@ -988,9 +988,11 @@ database, index and embedding service. Namespaces are listed in <code>/etc/memo/
 | <code>MEMO_NAMESPACES</code> | <code>/etc/memo/namespaces.yaml</code> | Namespace config |
 | <code>MEMO_MAX_CONCURRENCY</code> | <code>32</code> | Requests handled at once |
 | <code>MEMO_MAX_WAITING</code> | 8x concurrency | Requests waiting for a turn; beyond that, memo answers with an error carrying <code>&quot;code&quot;: &quot;busy&quot;</code>, which callers can retry |
-| <code>MEMO_SAVE_INTERVAL</code> | <code>60</code> | Seconds between checks for an index save that's due |</p>
-<p>Any client on the bus can open namespaces (including arbitrary database paths), so run it on a trusted bus.
-See <a href="SECURITY.md">SECURITY.md</a>.</p>
+| <code>MEMO_SAVE_INTERVAL</code> | <code>60</code> | Seconds between checks for an index save that's due |
+| <code>MEMO_BUS_OPEN</code> | off | Set to <code>1</code> to let <code>open</code> requests register namespaces the config doesn't list |</p>
+<p>A namespace a client opens over the bus names its own database, so it gets only the <code>api_key</code> sent with
+it, never the server's. Opening a namespace that's already registered changes nothing. Any client on the
+bus can still read and write every namespace, so run it on a trusted bus. See <a href="SECURITY.md">SECURITY.md</a>.</p>
 <h2><a id="providers" class="anchor" href="#providers">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>

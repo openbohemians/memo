@@ -589,7 +589,7 @@
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L17" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L18" target="_blank">
         arcana/namespaces.cr
       </a>
     
@@ -612,7 +612,7 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#new%28ns%3AString%2Cdb%3AString%2Cservice%3AString%7CNil%3Dnil%2Cformat%3AString%7CNil%3Dnil%2Capi_key%3AString%7CNil%3Dnil%2Cmodel%3AString%7CNil%3Dnil%2Cindex_dir%3AString%7CNil%3Dnil%2Cchunking_max_tokens%3AInt32%3D2000%2Cpreload%3ABool%3Dfalse%29-class-method" class="signature"><strong>.new</strong>(ns : String, db : String, service : String | Nil = <span class="n">nil</span>, format : String | Nil = <span class="n">nil</span>, api_key : String | Nil = <span class="n">nil</span>, model : String | Nil = <span class="n">nil</span>, index_dir : String | Nil = <span class="n">nil</span>, chunking_max_tokens : Int32 = <span class="n">2000</span>, preload : Bool = <span class="n">false</span>)</a>
+        <a href="#new%28ns%3AString%2Cdb%3AString%2Cservice%3AString%7CNil%3Dnil%2Cformat%3AString%7CNil%3Dnil%2Capi_key%3AString%7CNil%3Dnil%2Cmodel%3AString%7CNil%3Dnil%2Cindex_dir%3AString%7CNil%3Dnil%2Cchunking_max_tokens%3AInt32%3D2000%2Cpreload%3ABool%3Dfalse%2Cenv_api_key%3ABool%3Dfalse%29-class-method" class="signature"><strong>.new</strong>(ns : String, db : String, service : String | Nil = <span class="n">nil</span>, format : String | Nil = <span class="n">nil</span>, api_key : String | Nil = <span class="n">nil</span>, model : String | Nil = <span class="n">nil</span>, index_dir : String | Nil = <span class="n">nil</span>, chunking_max_tokens : Int32 = <span class="n">2000</span>, preload : Bool = <span class="n">false</span>, env_api_key : Bool = <span class="n">false</span>)</a>
         
       </li>
     
@@ -646,6 +646,13 @@
     
       <li class="entry-summary">
         <a href="#db%3AString-instance-method" class="signature"><strong>#db</strong> : String</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#env_api_key%3F%3ABool-instance-method" class="signature"><strong>#env_api_key?</strong> : Bool</a>
+        
+          <div class="summary"><p>Whether to fall back to MEMO_API_KEY or OPENAI_API_KEY when api_key isn't set.</p></div>
         
       </li>
     
@@ -736,18 +743,18 @@
     Constructor Detail
   </h2>
   
-    <div class="entry-detail" id="new(ns:String,db:String,service:String|Nil=nil,format:String|Nil=nil,api_key:String|Nil=nil,model:String|Nil=nil,index_dir:String|Nil=nil,chunking_max_tokens:Int32=2000,preload:Bool=false)-class-method">
+    <div class="entry-detail" id="new(ns:String,db:String,service:String|Nil=nil,format:String|Nil=nil,api_key:String|Nil=nil,model:String|Nil=nil,index_dir:String|Nil=nil,chunking_max_tokens:Int32=2000,preload:Bool=false,env_api_key:Bool=false)-class-method">
       <div class="signature">
         
-        def self.<strong>new</strong>(ns : String, db : String, service : String | Nil = <span class="n">nil</span>, format : String | Nil = <span class="n">nil</span>, api_key : String | Nil = <span class="n">nil</span>, model : String | Nil = <span class="n">nil</span>, index_dir : String | Nil = <span class="n">nil</span>, chunking_max_tokens : Int32 = <span class="n">2000</span>, preload : Bool = <span class="n">false</span>)
+        def self.<strong>new</strong>(ns : String, db : String, service : String | Nil = <span class="n">nil</span>, format : String | Nil = <span class="n">nil</span>, api_key : String | Nil = <span class="n">nil</span>, model : String | Nil = <span class="n">nil</span>, index_dir : String | Nil = <span class="n">nil</span>, chunking_max_tokens : Int32 = <span class="n">2000</span>, preload : Bool = <span class="n">false</span>, env_api_key : Bool = <span class="n">false</span>)
 
-        <a class="method-permalink" href="#new%28ns%3AString%2Cdb%3AString%2Cservice%3AString%7CNil%3Dnil%2Cformat%3AString%7CNil%3Dnil%2Capi_key%3AString%7CNil%3Dnil%2Cmodel%3AString%7CNil%3Dnil%2Cindex_dir%3AString%7CNil%3Dnil%2Cchunking_max_tokens%3AInt32%3D2000%2Cpreload%3ABool%3Dfalse%29-class-method">#</a>
+        <a class="method-permalink" href="#new%28ns%3AString%2Cdb%3AString%2Cservice%3AString%7CNil%3Dnil%2Cformat%3AString%7CNil%3Dnil%2Capi_key%3AString%7CNil%3Dnil%2Cmodel%3AString%7CNil%3Dnil%2Cindex_dir%3AString%7CNil%3Dnil%2Cchunking_max_tokens%3AInt32%3D2000%2Cpreload%3ABool%3Dfalse%2Cenv_api_key%3ABool%3Dfalse%29-class-method">#</a>
       </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L28" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L34" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -779,7 +786,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L23" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -795,7 +802,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L25" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L26" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -811,7 +818,31 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L19" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L20" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="env_api_key?:Bool-instance-method">
+      <div class="signature">
+        
+        def <strong>env_api_key?</strong> : Bool
+
+        <a class="method-permalink" href="#env_api_key%3F%3ABool-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Whether to fall back to MEMO_API_KEY or OPENAI_API_KEY when api_key
+isn't set. Only the config file's namespaces do: a namespace opened
+over the bus names its own database, whose stored base_url could
+send the key anywhere.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L32" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -827,7 +858,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L21" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -843,7 +874,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L24" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L25" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -859,7 +890,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L23" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L24" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -875,7 +906,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L18" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L19" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -891,7 +922,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L26" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L27" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -907,7 +938,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/arcana/namespaces.cr#L20" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.2/src/arcana/namespaces.cr#L21" target="_blank">View source</a>]
         
       </div>
     </div>
