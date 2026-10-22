@@ -1,3 +1,16 @@
+memo-rag (0.15.2-1) unstable; urgency=medium
+
+  * memo-arcana chunks a namespace at 100 tokens only when it uses the
+    mock service. One configured by format alone, or by neither service
+    nor format, was chunked at 100 tokens instead of 2000.
+  * Library fixes from a code review: use_service switches the query
+    cache and chunking with the service; opening by format and model
+    uses the service's stored base_url; delete_service works on
+    PostgreSQL and spares other services' chunks; clustering works on
+    PostgreSQL; another service's removals no longer linger in an index.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.15.1-1) unstable; urgency=medium
 
   * memo-arcana rejoins the bus when its connection drops. It exited
