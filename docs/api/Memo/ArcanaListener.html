@@ -610,7 +610,7 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.15.0/src/arcana/listener.cr#L17" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L18" target="_blank">
         arcana/listener.cr
       </a>
     
@@ -660,6 +660,25 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
 
 
   
+  <h2>
+    <a id="class-method-summary" class="anchor" href="#class-method-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Class Method Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#already_running%3F%28host%3AString%2Cport%3AInt32%2Ctimeout%3ATime%3A%3ASpan%3D3.seconds%29%3ABool-class-method" class="signature"><strong>.already_running?</strong>(host : String, port : Int32, timeout : Time::Span = <span class="n">3</span>.seconds) : Bool</a>
+        
+          <div class="summary"><p>Is a memo-arcana already serving ADDRESS on the bus at host:port? Another one mustn't join: it would share the address's mailbox, and when either connection closed, the bus would drop the address for both.</p></div>
+        
+      </li>
+    
+  </ul>
+
 
   
 
@@ -806,7 +825,7 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.0/src/arcana/listener.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L23" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -814,6 +833,42 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
 
 
   
+  <h2>
+    <a id="class-method-detail" class="anchor" href="#class-method-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Class Method Detail
+  </h2>
+  
+    <div class="entry-detail" id="already_running?(host:String,port:Int32,timeout:Time::Span=3.seconds):Bool-class-method">
+      <div class="signature">
+        
+        def self.<strong>already_running?</strong>(host : String, port : Int32, timeout : Time::Span = <span class="n">3</span>.seconds) : Bool
+
+        <a class="method-permalink" href="#already_running%3F%28host%3AString%2Cport%3AInt32%2Ctimeout%3ATime%3A%3ASpan%3D3.seconds%29%3ABool-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Is a memo-arcana already serving ADDRESS on the bus at host:port?
+Another one mustn't join: it would share the address's mailbox, and
+when either connection closed, the bus would drop the address for
+both. The bus keeps a joined service's listing across its own
+restarts, so a listed address is asked for help, and only a reply
+counts. Two instances starting at the same moment can both pass.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L36" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
 
   
 
@@ -843,7 +898,7 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.0/src/arcana/listener.cr#L92" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L137" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -864,7 +919,7 @@ can't simply block for backpressure, since memo's own bus calls need it.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.0/src/arcana/listener.cr#L30" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L75" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -887,7 +942,7 @@ gone unsaved too long without further writes.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.0/src/arcana/listener.cr#L78" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/arcana/listener.cr#L123" target="_blank">View source</a>]
         
       </div>
     </div>
