@@ -188,4 +188,20 @@ describe "PostgreSQL backend" do
       memo.close
     end
   end
+
+  it "opens a listed service by format and model, past a copy an earlier memo added" do
+    with_pg_database do |url, index_dir|
+      service = open_pg(url, index_dir)
+      listed_id = service.service_id
+      service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at)
+                       VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
+      service.close
+
+      service = Memo::Service.new(db_path: url, index_dir: index_dir, format: "mock", model: "mock-8d", chunking_max_tokens: 50)
+      service.service_id.should eq listed_id
+      service.service_name.should eq "mock"
+      pg_count(service, "memo_services WHERE format = 'mock'").should eq 2
+      service.close
+    end
+  end
 end

@@ -44,6 +44,31 @@ describe Memo::Service do
       end
     end
 
+    it "opens a listed service by format and model without copying it" do
+      with_test_db_path do |db_path|
+        2.times do
+          service = Memo::Service.new(db_path: db_path, format: "mock", model: "mock-8d", chunking_max_tokens: 50)
+          service.service_name.should eq "mock"
+          service.db.scalar("SELECT COUNT(*) FROM memo_services WHERE format = 'mock' AND model = 'mock-8d'").should eq 1
+          service.close
+        end
+      end
+    end
+
+    it "opens by format and model where an earlier memo copied the listed service" do
+      with_test_db_path do |db_path|
+        service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+        listed_id = service.service_id
+        service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at)
+                         VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
+        service.close
+
+        service = Memo::Service.new(db_path: db_path, format: "mock", model: "mock-8d", chunking_max_tokens: 50)
+        service.service_id.should eq listed_id
+        service.close
+      end
+    end
+
     it "validates chunking vs service limits" do
       expect_raises(ArgumentError, /exceeds service limit/) do
         with_test_db_path do |db_path|

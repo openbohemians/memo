@@ -107,10 +107,13 @@ module Memo
       end
     end
 
+    # The oldest match: a listed service, not a copy memo 0.13.1 and
+    # earlier added when opening it by format and model
     def get_service_by_format_model(format : String, model : String) : {Int64, String, String?, String, Int32, Int32, Float64}?
       @db.query_one?(
         "SELECT id, format, base_url, model, dimensions, max_tokens, COALESCE(tokens_per_byte, 0.25)
-         FROM memo_services WHERE format = $1 AND model = $2", format, model
+         FROM memo_services WHERE format = $1 AND model = $2
+         ORDER BY id LIMIT 1", format, model
       ) do |rs|
         {rs.read(Int64), rs.read(String), rs.read(String?), rs.read(String), rs.read(Int32), rs.read(Int32), rs.read(Float64)}
       end

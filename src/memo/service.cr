@@ -1653,18 +1653,25 @@ module Memo
         provider_instance = Providers::Registry.create(final_format, api_key, final_model, base_url, final_dimensions)
         raise ArgumentError.new("Unknown format: #{final_format}") unless provider_instance
 
-        # Register or get existing service in database (auto-generates name)
-        service_id = Storage.register_service(
-          db: @db,
-          name: nil, # Auto-generate from format/model
-          format: final_format,
-          base_url: base_url,
-          model: final_model,
-          dimensions: final_dimensions,
-          max_tokens: final_max_tokens
-        )
+        # Use the service found, whatever its name (a listed one such as
+        # "openai" isn't named format/model), or register a new one
+        if existing
+          service_id = existing[0]
+          service_name = ServiceProvider.get(@db, service_id).try(&.name) || "#{final_format}/#{final_model}"
+        else
+          service_name = "#{final_format}/#{final_model}"
+          service_id = Storage.register_service(
+            db: @db,
+            name: service_name,
+            format: final_format,
+            base_url: base_url,
+            model: final_model,
+            dimensions: final_dimensions,
+            max_tokens: final_max_tokens
+          )
+        end
 
-        ProviderConfig.new(provider_instance, service_id, "#{final_format}/#{final_model}", final_format, final_model, final_dimensions, final_max_tokens, final_tokens_per_byte)
+        ProviderConfig.new(provider_instance, service_id, service_name, final_format, final_model, final_dimensions, final_max_tokens, final_tokens_per_byte)
       else
         # Use the default service
         default_svc = ServiceProvider.get_default(@db)
