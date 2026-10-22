@@ -2,6 +2,15 @@
 
 *Updated 2026-10-22*
 
+- **0.14.2 released 2026-10-22** (tag `v0.14.2` at `f4f8a57`): the review's second batch.
+  Chunking is linear for non-ASCII text, and no chunk exceeds `max_tokens` (`02f6baa`). A
+  new source id resolves safely under concurrent writers (`c3f93d1`). memo-arcana
+  (`6536c36`): `open` registers a namespace the config doesn't list only with
+  `MEMO_BUS_OPEN=1`. The user chose off by default (2026-10-22), and will list wow in the
+  deployed `namespaces.yaml`, since wow opens its namespace over the bus. Bus-opened
+  namespaces never get the server's API key, `open` can't redirect a registered namespace,
+  search `limit` is capped at 1000, and database passwords are redacted in the startup log
+  and error replies. Library users have nothing to act on.
 - **0.14.1 released 2026-10-22** (tag `v0.14.1` at `4e2b072`): the first batch of fixes from
   an independent review (Codex, 2026-10-22). Search filters now apply to every result, which
   matters because sources sharing a text used to leak past them (`1e54b50`). Unresolved id
