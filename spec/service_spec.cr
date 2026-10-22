@@ -68,6 +68,30 @@ describe Memo::Service do
       end
     end
 
+    it "uses a service's stored base_url when opened by format and model" do
+      with_test_db_path do |db_path|
+        service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+        service.create_service(name: "proxy", format: "openai", model: "proxy-embed", dimensions: 8,
+          max_tokens: 100, base_url: "http://127.0.0.1:9/v1")
+        service.close
+
+        service = Memo::Service.new(db_path: db_path, format: "openai", model: "proxy-embed", api_key: "sk-test",
+          chunking_max_tokens: 50)
+        service.provider.as(Memo::Providers::OpenAI).base_url.should eq "http://127.0.0.1:9/v1"
+        service.close
+
+        # A base_url the caller passes still wins, by format and model or by name
+        service = Memo::Service.new(db_path: db_path, format: "openai", model: "proxy-embed", api_key: "sk-test",
+          base_url: "http://127.0.0.1:10/v1", chunking_max_tokens: 50)
+        service.provider.as(Memo::Providers::OpenAI).base_url.should eq "http://127.0.0.1:10/v1"
+        service.close
+        service = Memo::Service.new(db_path: db_path, service: "proxy", api_key: "sk-test",
+          base_url: "http://127.0.0.1:10/v1", chunking_max_tokens: 50)
+        service.provider.as(Memo::Providers::OpenAI).base_url.should eq "http://127.0.0.1:10/v1"
+        service.close
+      end
+    end
+
     it "validates chunking vs service limits" do
       expect_raises(ArgumentError, /exceeds service limit/) do
         with_test_db_path do |db_path|

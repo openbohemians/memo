@@ -168,7 +168,8 @@ module Memo
     # Optional:
     # - service: Name of pre-configured service to use
     # - format: API format for inline configuration (default "openai")
-    # - base_url: Custom API endpoint (for OpenAI-compatible APIs)
+    # - base_url: Custom API endpoint (for OpenAI-compatible APIs); defaults
+    #   to the service's stored one
     # - model: Embedding model (default depends on format)
     # - dimensions: Vector dimensions (auto-detected from model)
     # - max_tokens: Token limit (auto-detected from model)
@@ -1659,7 +1660,7 @@ module Memo
         svc_id, svc_format, svc_base_url, svc_model, svc_dimensions, svc_max_tokens, svc_tokens_per_byte = svc
 
         # Create provider instance from stored config
-        provider_instance = Providers::Registry.create(svc_format, api_key, svc_model, svc_base_url, svc_dimensions)
+        provider_instance = Providers::Registry.create(svc_format, api_key, svc_model, base_url || svc_base_url, svc_dimensions)
         raise ArgumentError.new("Unknown format: #{svc_format}") unless provider_instance
 
         # Validate chunking doesn't exceed provider limits
@@ -1681,12 +1682,14 @@ module Memo
           # Use existing service configuration
           # Don't allow overriding dimensions - it's intrinsic to the model
           # and overriding would cause USearch index dimension mismatch
-          _id, _fmt, _base_url, svc_model, svc_dimensions, svc_max_tokens, svc_tokens_per_byte = existing
+          _id, _fmt, svc_base_url, svc_model, svc_dimensions, svc_max_tokens, svc_tokens_per_byte = existing
           if dimensions && dimensions != svc_dimensions
             raise ArgumentError.new("Cannot override dimensions (#{dimensions}) for existing service with dimensions=#{svc_dimensions}")
           end
           final_model = svc_model
           final_dimensions = svc_dimensions
+          # The service's endpoint, unless the caller names another
+          final_base_url = base_url || svc_base_url
           # max_tokens can be overridden - it's a limit we choose, not intrinsic to model
           final_max_tokens = max_tokens || svc_max_tokens
           final_tokens_per_byte = svc_tokens_per_byte
@@ -1697,6 +1700,7 @@ module Memo
           raise ArgumentError.new("max_tokens required for #{final_format}/#{model}") unless max_tokens
           final_model = model
           final_dimensions = dimensions
+          final_base_url = base_url
           final_max_tokens = max_tokens
           final_tokens_per_byte = 0.25
         end
@@ -1707,7 +1711,7 @@ module Memo
         end
 
         # Create provider instance
-        provider_instance = Providers::Registry.create(final_format, api_key, final_model, base_url, final_dimensions)
+        provider_instance = Providers::Registry.create(final_format, api_key, final_model, final_base_url, final_dimensions)
         raise ArgumentError.new("Unknown format: #{final_format}") unless provider_instance
 
         # Use the service found, whatever its name (a listed one such as
@@ -1735,7 +1739,7 @@ module Memo
         raise ArgumentError.new("No default service configured") unless default_svc
 
         # Create provider instance from default service config
-        provider_instance = Providers::Registry.create(default_svc.format, api_key, default_svc.model, default_svc.base_url, default_svc.dimensions)
+        provider_instance = Providers::Registry.create(default_svc.format, api_key, default_svc.model, base_url || default_svc.base_url, default_svc.dimensions)
         raise ArgumentError.new("Unknown format: #{default_svc.format}") unless provider_instance
 
         # Validate chunking doesn't exceed provider limits

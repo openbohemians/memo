@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   service's tokens per byte, and refuses a service whose `max_tokens` is below the chunk size, as opening
   one by name does. It swaps the index while holding the write lock, and if the new index can't be opened
   (another process holds it), it stays on the current service.
+- **Opening a service by format and model uses its stored `base_url`.** It took the service's id and
+  dimensions but not its endpoint, so a service set up for an OpenAI-compatible API (Azure, a proxy)
+  sent its texts to the provider's public endpoint instead. A `base_url` passed to `Service.new` still
+  takes precedence, and now does when opening by name or the default service too, where it was ignored.
 
 ## [0.15.1] - 2026-10-22
 
