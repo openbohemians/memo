@@ -82,7 +82,7 @@ module Memo
           @namespaces.open_services.each do |ns, svc|
             svc.save_index_if_due
           rescue ex
-            log "#{RED}error#{RESET}      saving #{ns} index: #{ex.message}"
+            log "#{RED}error#{RESET}      saving #{ns} index: #{redact_db_url(ex.message.to_s)}"
           end
         end
       end
@@ -137,17 +137,19 @@ module Memo
 
         @client.send(envelope.reply(from: ADDRESS, payload: result_payload))
       rescue ex
+        # Errors can quote a database URL
+        message = redact_db_url(ex.message || "Unknown error")
         error_payload = JSON::Any.new({
           "_proto"  => JSON::Any.new("arcana/1"),
           "_status" => JSON::Any.new("error"),
-          "message" => JSON::Any.new(ex.message || "Unknown error"),
+          "message" => JSON::Any.new(message),
         } of String => JSON::Any)
         begin
           @client.send(envelope.reply(from: ADDRESS, payload: error_payload))
         rescue
           # client may be closed
         end
-        log "#{RED}error#{RESET}      #{ex.message}"
+        log "#{RED}error#{RESET}      #{message}"
       end
     end
   end

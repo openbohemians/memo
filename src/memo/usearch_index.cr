@@ -214,6 +214,8 @@ module Memo
     # Returns USearch::SearchResult array with keys and distances.
     # Cosine distance = 1 - similarity, so similarity = 1 - distance.
     def search(index : USearch::Index, query : Array(Float64), k : Int32) : Array(USearch::SearchResult)
+      k = capped(index, k)
+      return [] of USearch::SearchResult if k == 0
       index.search(to_f32(query), k: k)
     end
 
@@ -222,7 +224,17 @@ module Memo
     # Only results where the filter block returns true are included.
     # Use this with a Set of valid rowids from SQL pre-filtering.
     def filtered_search(index : USearch::Index, query : Array(Float64), k : Int32, &filter : UInt64 -> Bool) : Array(USearch::SearchResult)
+      k = capped(index, k)
+      return [] of USearch::SearchResult if k == 0
       index.filtered_search(to_f32(query), k: k, &filter)
+    end
+
+    # k, but no more than the index holds: USearch allocates room for k
+    # results up front, so a huge k could take gigabytes
+    private def capped(index : USearch::Index, k : Int32) : Int32
+      return 0 if k <= 0
+      size = index.size
+      size < k ? size.to_i32 : k
     end
 
     # Exact nearest neighbors among `keys`, comparing the query with each.

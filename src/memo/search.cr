@@ -85,6 +85,7 @@ module Memo
       sql_where_args : Array(DB::Any) = [] of DB::Any,
       track_matches : Bool = true,
     ) : Array(Result)
+      raise ArgumentError.new("limit can't be negative") if limit < 0
       has_filters = filters || sql_where || (like && !like.empty?) || (match && !match.empty?)
       clauses = filter_clauses(db, service_id, filters, sql_where, like, match, sql_where_args)
 
@@ -157,6 +158,8 @@ module Memo
       min_score : Float64,
       clauses : FilterClauses,
     ) : Array(USearch::SearchResult)
+      # The embeddings found can't outnumber the index's vectors
+      limit = usearch_index.size < limit ? usearch_index.size.to_i32 : limit
       k = {limit * 4, 40}.max
       max_candidates = {MAX_CANDIDATES, limit * 25}.max
       2.times do |round|
@@ -170,8 +173,9 @@ module Memo
         return passed if exhausted || candidates.empty? || 1.0 - candidates.last.distance.to_f64 < min_score
         break if round == 1 || passed.empty?
 
-        k = (k * limit * 2.0 / passed.size).ceil.to_i
-        break if k > max_candidates
+        wanted = (k * 2.0 * limit / passed.size).ceil
+        break if wanted > max_candidates
+        k = wanted.to_i
       end
 
       prefiltered_search(db, usearch_index, embedding, service_id, limit, clauses)

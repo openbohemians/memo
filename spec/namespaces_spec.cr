@@ -69,4 +69,64 @@ describe Memo::Namespaces do
       outcome.receive.should eq 1 # it finished, rather than finding the index closed
     end
   end
+
+  it "opens only configured namespaces unless allowed to open others" do
+    with_test_db_path do |db_path|
+      namespaces = Memo::Namespaces.new
+      config = Memo::Namespaces::Config.new(ns: "a", db: db_path, service: "mock")
+      expect_raises(Exception, /isn't configured/) { namespaces.open(config) }
+      namespaces.list.should be_empty
+
+      namespaces.allow_open = true
+      namespaces.open(config).should be namespaces.get("a")
+      namespaces.close_all
+    end
+  end
+
+  it "keeps a registered namespace's settings when it's opened again" do
+    with_test_db_path do |db_path|
+      with_test_db_path do |other_path|
+        namespaces = Memo::Namespaces.new
+        namespaces.allow_open = true
+        namespaces.register(Memo::Namespaces::Config.new(ns: "a", db: db_path, service: "mock"))
+
+        namespaces.open(Memo::Namespaces::Config.new(ns: "a", db: db_path, service: "mock")).db_path.should eq db_path
+        expect_raises(Exception, /already registered with another database/) do
+          namespaces.open(Memo::Namespaces::Config.new(ns: "a", db: other_path, service: "mock"))
+        end
+        namespaces.close("a")
+        namespaces.get("a").db_path.should eq db_path # reopens with its own settings
+        namespaces.close_all
+      end
+    end
+  end
+
+  it "gives the server's API key only to namespaces from the config file" do
+    with_test_db_path do |db_path|
+      with_test_db_path do |other_path|
+        config_path = File.tempname("namespaces", ".yaml")
+        File.write(config_path, "namespaces:\n  - ns: configured\n    db: #{db_path}\n    service: openai\n")
+        previous = ENV["MEMO_API_KEY"]?
+        ENV["MEMO_API_KEY"] = "sk-server"
+        begin
+          namespaces = Memo::Namespaces.new
+          namespaces.load_config(config_path)
+          namespaces.get("configured").provider.as(Memo::Providers::OpenAI).api_key.should eq "sk-server"
+
+          namespaces.allow_open = true
+          expect_raises(ArgumentError, /api_key required/) do
+            namespaces.open(Memo::Namespaces::Config.new(ns: "opened", db: other_path, service: "openai"))
+          end
+          namespaces.list.should eq [{"configured", true}] # dropped, so a corrected open can follow
+
+          opened = namespaces.open(Memo::Namespaces::Config.new(ns: "opened", db: other_path, service: "openai", api_key: "sk-client"))
+          opened.provider.as(Memo::Providers::OpenAI).api_key.should eq "sk-client"
+          namespaces.close_all
+        ensure
+          ENV["MEMO_API_KEY"] = previous
+          File.delete(config_path)
+        end
+      end
+    end
+  end
 end

@@ -6,6 +6,9 @@ module Memo
   # Arcana bus service wrapper. Routes requests to per-namespace
   # Memo::Service instances for multi-project isolation.
   class ArcanaService
+    # Most results one search returns
+    MAX_LIMIT = 1000
+
     SCHEMA = JSON.parse(%({"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["open","close","list","index","index_batch","search","delete","stats","help"]},"ns":{"type":"string"},"db":{"type":"string"},"service":{"type":"string"},"source_type":{"type":"string"},"source_id":{"type":"string"},"text":{"type":"string"},"documents":{"type":"array"},"query":{"type":"string"},"limit":{"type":"integer"},"min_score":{"type":"number"}}}))
 
     GUIDE = <<-GUIDE
@@ -15,14 +18,18 @@ module Memo
     database, USearch index, and embedding service.
 
     Management actions:
-      open   — Register and open a namespace. Params: ns, db, [service, format, api_key, model, index_dir]
+      open   — Open a namespace. Params: ns, db, [service, format, api_key, model, index_dir]
+               Namespaces come from memo-arcana's config file; registering
+               others this way needs MEMO_BUS_OPEN=1 on the server, and they
+               use only the api_key given here. Opening a registered
+               namespace again changes nothing (another db is refused).
       close  — Close a namespace. Params: ns
       list   — List registered namespaces.
 
     Data actions (all require `ns`):
       index        — Index a document. Params: ns, source_type, source_id, text
       index_batch  — Index multiple documents. Params: ns, documents (array of {source_type, source_id, text})
-      search       — Semantic search. Params: ns, query, limit (default 10), min_score (default 0.7), source_type
+      search       — Semantic search. Params: ns, query, limit (default 10, at most 1000), min_score (default 0.7), source_type
       delete       — Delete a document. Params: ns, source_id, source_type
       stats        — Get index statistics. Params: ns
 
@@ -130,7 +137,9 @@ module Memo
 
     private def handle_search(memo : Memo::Service, data : JSON::Any) : JSON::Any
       query = data["query"]?.try(&.as_s?) || raise "missing query"
-      limit = data["limit"]?.try(&.as_i?) || 10
+      limit = data["limit"]?.try(&.as_i64?) || 10_i64
+      raise ArgumentError.new("limit must be at least 1") if limit < 1
+      limit = {limit, MAX_LIMIT}.min
       min_score = data["min_score"]?.try(&.as_f?) || 0.7
       source_type = data["source_type"]?.try(&.as_s?)
 

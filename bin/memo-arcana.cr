@@ -19,6 +19,8 @@ require "arcana-core"
 #   MEMO_MAX_CONCURRENCY  — Requests handled at once (default: 32)
 #   MEMO_MAX_WAITING      — Requests waiting for a turn before memo answers "busy" (default: 8x concurrency)
 #   MEMO_SAVE_INTERVAL    — Seconds between checks for an index save that's due (default: 60)
+#   MEMO_BUS_OPEN         — Set to 1 to let `open` requests register namespaces the config
+#                           doesn't list (default: off; they pick their own database)
 
 include Memo::BusLog
 
@@ -30,6 +32,7 @@ max_waiting = (ENV["MEMO_MAX_WAITING"]?.try(&.to_i?)) || max_concurrency * 8
 save_interval = (ENV["MEMO_SAVE_INTERVAL"]? || "60").to_i
 
 namespaces = Memo::Namespaces.new
+namespaces.allow_open = {"1", "true", "yes"}.includes?(ENV["MEMO_BUS_OPEN"]?.try(&.downcase))
 if File.exists?(config_path)
   namespaces.load_config(config_path)
 end
@@ -41,12 +44,13 @@ STDERR.puts "#{DIM}┌───────────────────�
 STDERR.puts "#{DIM}│#{RESET} config     #{DIM}│#{RESET} #{File.exists?(config_path) ? config_path : "(none)"}"
 STDERR.puts "#{DIM}│#{RESET} namespaces #{DIM}│#{RESET} #{namespaces.configs.size} registered"
 STDERR.puts "#{DIM}│#{RESET} bus        #{DIM}│#{RESET} #{arcana_host}:#{arcana_port}"
+STDERR.puts "#{DIM}│#{RESET} bus open   #{DIM}│#{RESET} #{namespaces.allow_open? ? "allowed (MEMO_BUS_OPEN)" : "off: namespaces come from the config"}"
 STDERR.puts "#{DIM}│#{RESET} requests   #{DIM}│#{RESET} up to #{max_concurrency} at once, #{max_waiting} waiting"
 STDERR.puts "#{DIM}│#{RESET} saves      #{DIM}│#{RESET} checked every #{save_interval}s (due after 10,000 changes or 5 min)"
 STDERR.puts "#{DIM}└──────────────────────────────────────────────────#{RESET}"
 
 namespaces.configs.each_value do |c|
-  log "#{DIM}registered#{RESET} ns=#{BOLD}#{c.ns}#{RESET} #{DIM}db=#{truncate(c.db, 40)} preload=#{c.preload}#{RESET}"
+  log "#{DIM}registered#{RESET} ns=#{BOLD}#{c.ns}#{RESET} #{DIM}db=#{truncate(redact_db_url(c.db), 40)} preload=#{c.preload}#{RESET}"
 end
 namespaces.preload_all
 namespaces.services.each_key do |ns|

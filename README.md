@@ -475,9 +475,11 @@ namespaces:
 | `MEMO_MAX_CONCURRENCY` | `32` | Requests handled at once |
 | `MEMO_MAX_WAITING` | 8x concurrency | Requests waiting for a turn; beyond that, memo answers with an error carrying `"code": "busy"`, which callers can retry |
 | `MEMO_SAVE_INTERVAL` | `60` | Seconds between checks for an index save that's due |
+| `MEMO_BUS_OPEN` | off | Set to `1` to let `open` requests register namespaces the config doesn't list |
 
-Any client on the bus can open namespaces (including arbitrary database paths), so run it on a trusted bus.
-See [SECURITY.md](SECURITY.md).
+A namespace a client opens over the bus names its own database, so it gets only the `api_key` sent with
+it, never the server's. Opening a namespace that's already registered changes nothing. Any client on the
+bus can still read and write every namespace, so run it on a trusted bus. See [SECURITY.md](SECURITY.md).
 
 ## Providers
 

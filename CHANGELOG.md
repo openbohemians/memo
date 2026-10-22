@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **memo-arcana takes its namespaces from its config file.** An `open` request registers a namespace the
+  config doesn't list only when memo-arcana runs with `MEMO_BUS_OPEN=1`. An `open` for a configured
+  namespace still succeeds, so a client that opens its namespace when it connects keeps working once the
+  namespace is in `namespaces.yaml`.
+
+### Security
+- **A namespace opened over the bus doesn't get the server's API key.** Without an `api_key` in the
+  request, it fell back to `MEMO_API_KEY` or `OPENAI_API_KEY`, and its database, which the client names,
+  can set the provider's `base_url`, so the key could be sent anywhere. Only the config file's
+  namespaces fall back to those keys now.
+- **`open` can't redirect a registered namespace.** It replaced the namespace's settings, so the next
+  time the namespace opened (after a `close` or a restart) it used the database the request named.
+  Opening a registered namespace again now changes nothing, and with another database it's refused. A
+  namespace that fails to open is dropped, so a corrected `open` can follow.
+- **A search's `limit` is bounded.** USearch allocates room for `limit` results before it searches, so
+  `limit: 1000000000` took about 12 GB. The bus caps `limit` at 1000 and refuses one below 1, and memo
+  asks USearch for no more results than the index holds. With filters, a large `limit` also overflowed
+  in sizing the candidates.
+- **memo-arcana redacts database passwords in its startup log and error replies.** The startup log
+  printed each namespace's database URL as is, and the redaction missed `?password=` parameters and URLs
+  without a user name.
+
 ### Fixed
 - **Chunking is linear for non-ASCII text.** It indexed the text by character, which rescans a String
   from its start unless it's all ASCII, so a 200,000-character Cyrillic text took 28.6 s (a release

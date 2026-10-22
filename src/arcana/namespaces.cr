@@ -1,6 +1,7 @@
 require "wait_group"
 require "../memo"
 require "../memo/pg"
+require "./bus_log"
 
 module Memo
   # Registry of Memo::Service instances keyed by namespace (ns).
@@ -9,9 +10,9 @@ module Memo
   # providing true isolation between projects sharing one memo-arcana
   # process.
   #
-  # Namespaces can be opened explicitly via `open` or listed in a config
-  # file for preloading at boot. Once opened, services are cached in
-  # memory until explicitly closed (or the process exits).
+  # Namespaces are listed in a config file (some preloaded at boot), or
+  # registered with `open` when allow_open is set. Once opened, services
+  # are cached in memory until explicitly closed (or the process exits).
   class Namespaces
     # Configuration for a single namespace
     struct Config
@@ -24,6 +25,11 @@ module Memo
       getter index_dir : String?
       getter chunking_max_tokens : Int32
       getter preload : Bool
+      # Whether to fall back to MEMO_API_KEY or OPENAI_API_KEY when api_key
+      # isn't set. Only the config file's namespaces do: a namespace opened
+      # over the bus names its own database, whose stored base_url could
+      # send the key anywhere.
+      getter? env_api_key : Bool
 
       def initialize(
         @ns : String,
@@ -35,12 +41,17 @@ module Memo
         @index_dir : String? = nil,
         @chunking_max_tokens : Int32 = 2000,
         @preload : Bool = false,
+        @env_api_key : Bool = false,
       )
       end
     end
 
     getter configs : Hash(String, Config)
     getter services : Hash(String, Memo::Service)
+
+    # Whether `open` may register a namespace the config file doesn't list.
+    # Off by default, since the requester picks the database.
+    property? allow_open : Bool = false
 
     def initialize
       @configs = {} of String => Config
@@ -58,9 +69,29 @@ module Memo
     end
 
     # Register and immediately open a namespace. Returns the Service.
+    #
+    # A namespace already registered keeps its settings: opening it again
+    # with the same database just opens it, and with another one raises.
+    # Registering a new one needs allow_open, and it's dropped again if it
+    # fails to open, so a corrected open can follow.
     def open(config : Config) : Memo::Service
-      register(config)
-      get(config.ns)
+      added = @mutex.synchronize do
+        if existing = @configs[config.ns]?
+          raise "namespace '#{config.ns}' is already registered with another database" unless existing.db == config.db
+          false
+        else
+          raise "namespace '#{config.ns}' isn't configured, and memo-arcana doesn't allow opening others (MEMO_BUS_OPEN)" unless @allow_open
+          @configs[config.ns] = config
+          true
+        end
+      end
+
+      begin
+        get(config.ns)
+      rescue ex
+        @mutex.synchronize { @configs.delete(config.ns) if @configs[config.ns]? == config } if added
+        raise ex
+      end
     end
 
     # Get the Memo::Service for a namespace, opening it lazily if needed.
@@ -127,7 +158,7 @@ module Memo
         begin
           get(ns)
         rescue ex
-          STDERR.puts "memo-arcana: failed to preload '#{ns}': #{ex.message}"
+          STDERR.puts "memo-arcana: failed to preload '#{ns}': #{BusLog.redact_db_url(ex.message.to_s)}"
         end
       end
     end
@@ -199,6 +230,7 @@ module Memo
         index_dir: expand_env(block["index_dir"]?),
         chunking_max_tokens: chunking,
         preload: preload,
+        env_api_key: true,
       ))
     end
 
@@ -237,12 +269,14 @@ module Memo
       service_name = config.service || "mock"
       chunking = config.chunking_max_tokens
       chunking = 100 if service_name == "mock" && chunking == 2000
+      api_key = config.api_key
+      api_key ||= ENV["MEMO_API_KEY"]? || ENV["OPENAI_API_KEY"]? if config.env_api_key?
 
       svc = Memo::Service.new(
         db_path: config.db,
         service: config.service,
         format: config.format,
-        api_key: config.api_key || ENV["MEMO_API_KEY"]? || ENV["OPENAI_API_KEY"]?,
+        api_key: api_key,
         model: config.model,
         index_dir: config.index_dir,
         chunking_max_tokens: chunking,

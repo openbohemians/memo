@@ -242,6 +242,22 @@ describe Memo::Search do
         index.close
       end
     end
+
+    it "takes a limit larger than the index" do
+      with_test_service do |memo|
+        3.times { |i| memo.index(source_type: "doc", source_id: i.to_i64, text: "purple gorilla number #{i}") }
+
+        memo.search(query: "purple gorilla", limit: Int32::MAX, min_score: -1.0).size.should eq 3
+      end
+    end
+
+    it "takes a limit larger than the index with filters" do
+      with_test_service do |memo|
+        3.times { |i| memo.index(source_type: "doc", source_id: i.to_i64, text: "purple gorilla number #{i}") }
+
+        memo.search(query: "purple gorilla", limit: Int32::MAX, min_score: -1.0, source_type: "doc").size.should eq 3
+      end
+    end
   end
 
   describe ".mark_as_read" do

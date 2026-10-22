@@ -5,6 +5,8 @@ module Memo
   # Console logging for memo-arcana: colored, timestamped lines on STDERR,
   # with request parameters summarized and secrets redacted.
   module BusLog
+    extend self
+
     DIM    = "\e[2m"
     BOLD   = "\e[1m"
     RESET  = "\e[0m"
@@ -32,8 +34,15 @@ module Memo
       SENSITIVE_KEYS.any? { |s| k.includes?(s) }
     end
 
-    def redact_db_url(url : String) : String
-      url.gsub(/(:\/\/[^:]+:)[^@]+(@)/, "\\1***\\2")
+    # The text with *** for the passwords in any database URLs in it: the
+    # user's password (postgres://user:pass@host) and query parameters
+    # such as ?password= or &sslpassword=. Works on messages too.
+    def redact_db_url(text : String) : String
+      text
+        .gsub(/(:\/\/[^:\/?#@\s]*:)[^\/?#\s]*@/, "\\1***@")
+        .gsub(/([?&])([^=&#\s]*)=([^&#\s]*)/) do |param, match|
+          sensitive?(match[2]) ? "#{match[1]}#{match[2]}=***" : param
+        end
     end
 
     def summarize(data : JSON::Any) : String
