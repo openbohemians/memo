@@ -1,3 +1,15 @@
+memo-rag (0.14.1-1) unstable; urgency=high
+
+  * Search filters apply to every result: sources that share a text with
+    a matching one no longer come back when the filters exclude them.
+  * An id filter that names no source finds nothing, instead of being
+    dropped; search raises for filters it can't apply.
+  * An older text no longer overwrites a newer one indexed during its
+    embedding; deleting a source cancels its queued work; a blank text
+    removes the source's old chunks.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.14.0-1) unstable; urgency=medium
 
   * Requires arcana-core 0.20 and arcana-ai 0.6.1 or later (were 0.16
