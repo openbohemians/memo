@@ -1,3 +1,11 @@
+memo-rag (0.13.2-1) unstable; urgency=medium
+
+  * Opening a service by format and model uses the service found instead
+    of adding a copy of it, which made the next such open fail with
+    "more than one row".
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.13.1-1) unstable; urgency=medium
 
   * Token counts come from arcana-ai's usage, ahead of the removal of
