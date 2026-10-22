@@ -1,3 +1,11 @@
+memo-rag (0.15.0-1) unstable; urgency=medium
+
+  * Requires pg 0.31 and crystal-db 0.15 (were pg 0.30 and crystal-db
+    0.14), so memo resolves alongside projects on sqlite3 0.24. No memo
+    code changed.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.14.3-1) unstable; urgency=high
 
   * Databases sharing an index directory keep separate index files: each

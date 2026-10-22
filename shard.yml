@@ -1,5 +1,5 @@
 name: memo
-version: 0.14.3
+version: 0.15.0
 
 description: |
   Memo - Semantic search and vector storage library for Crystal.
