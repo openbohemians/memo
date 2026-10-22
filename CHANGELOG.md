@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **No chunk exceeds `chunking_max_tokens`.** A sentence too long for the limit, or a text without
   punctuation, stayed one chunk, which a provider rejects on every retry; such a range is now split at
   the last space that fits, or at the limit itself. Combining small chunks also stops at the limit.
+- **Indexing a new source id from several fibers or processes at once doesn't fail.** Resolving the id
+  looked it up, then inserted it, so on PostgreSQL a concurrent `index` of the same new id could fail
+  with a duplicate-key error. The insert now does nothing when the id exists, and the lookup repeats.
 
 ## [0.14.1] - 2026-10-22
 

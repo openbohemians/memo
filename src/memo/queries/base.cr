@@ -145,11 +145,14 @@ module Memo
 
     abstract def insert_source(source_type : String, created_at : Int64) : Int64
 
-    abstract def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64
+    # Insert a source unless one with this id exists (another writer may
+    # have added it since the caller looked). Returns its id, or nil if it
+    # existed.
+    abstract def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64?
 
-    abstract def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64
+    abstract def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64?
 
-    abstract def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64
+    abstract def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64?
 
     abstract def find_source_int(source_type : String, external_id : Int64) : Int64?
 

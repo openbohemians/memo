@@ -278,16 +278,20 @@ module Memo
       @db.exec("INSERT INTO memo_sources (source_type, created_at) VALUES (?, ?)", source_type, created_at).last_insert_id
     end
 
-    def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
+    # last_insert_id is stale when DO NOTHING inserted nothing
+    def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64?
+      result = @db.exec("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING", source_type, external_id, created_at)
+      result.last_insert_id if result.rows_affected == 1
     end
 
-    def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
+    def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64?
+      result = @db.exec("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING", source_type, external_id, created_at)
+      result.last_insert_id if result.rows_affected == 1
     end
 
-    def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64
-      @db.exec("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES (?, ?, ?)", source_type, external_id, created_at).last_insert_id
+    def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64?
+      result = @db.exec("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING", source_type, external_id, created_at)
+      result.last_insert_id if result.rows_affected == 1
     end
 
     def find_source_int(source_type : String, external_id : Int64) : Int64?

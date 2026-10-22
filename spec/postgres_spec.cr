@@ -222,4 +222,37 @@ describe "PostgreSQL backend" do
       service.close
     end
   end
+
+  it "resolves and indexes a new source id from concurrent fibers" do
+    with_pg_database do |url, index_dir|
+      service = open_pg(url, index_dir)
+      # The race is in timing, so run it for many new ids
+      resolved = Channel({Int64, Int64 | Exception}).new
+      (1_i64..20_i64).each do |external_id|
+        8.times do
+          spawn do
+            resolved.send({external_id, Memo::SourceRegistry.resolve(service.db, "doc", external_id)})
+          rescue ex
+            resolved.send({external_id, ex})
+          end
+        end
+      end
+      results = Array.new(160) { resolved.receive }
+      results.map(&.[1]).select(Exception).map(&.message).should be_empty
+      results.group_by(&.[0]).transform_values(&.map(&.[1]).uniq!.size).values.uniq!.should eq [1]
+
+      indexed = Channel(Exception?).new
+      8.times do
+        spawn do
+          service.index(source_type: "doc", source_id: 77_i64, text: "the same text")
+          indexed.send(nil)
+        rescue ex
+          indexed.send(ex)
+        end
+      end
+      Array.new(8) { indexed.receive }.compact.map(&.message).should be_empty
+      pg_count(service, "memo_sources WHERE external_int = 77").should eq 1
+      service.close
+    end
+  end
 end

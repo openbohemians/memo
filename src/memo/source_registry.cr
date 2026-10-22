@@ -7,7 +7,9 @@ module Memo
       db.memo_queries.insert_source(source_type, Time.utc.to_unix_ms)
     end
 
-    # Resolve external ID to internal ID, creating source record if needed
+    # Resolve external ID to internal ID, creating source record if needed.
+    # Another writer may create the same source between the lookup and the
+    # insert; then the insert does nothing and the second lookup finds it.
     def resolve(
       db : DBHandle,
       source_type : String,
@@ -16,21 +18,22 @@ module Memo
       q = db.memo_queries
       now = Time.utc.to_unix_ms
 
-      case external_id
-      when Int64
-        internal_id = q.find_source_int(source_type, external_id)
-        return internal_id if internal_id
-        q.insert_source_int(source_type, external_id, now)
-      when Bytes
-        internal_id = q.find_source_blob(source_type, external_id)
-        return internal_id if internal_id
-        q.insert_source_blob(source_type, external_id, now)
-      else # String
-        ext_str = external_id.as(String)
-        internal_id = q.find_source_text(source_type, ext_str)
-        return internal_id if internal_id
-        q.insert_source_text(source_type, ext_str, now)
-      end
+      internal_id = case external_id
+                    when Int64
+                      q.find_source_int(source_type, external_id) ||
+                        q.insert_source_int(source_type, external_id, now) ||
+                        q.find_source_int(source_type, external_id)
+                    when Bytes
+                      q.find_source_blob(source_type, external_id) ||
+                        q.insert_source_blob(source_type, external_id, now) ||
+                        q.find_source_blob(source_type, external_id)
+                    else # String
+                      ext_str = external_id.as(String)
+                      q.find_source_text(source_type, ext_str) ||
+                        q.insert_source_text(source_type, ext_str, now) ||
+                        q.find_source_text(source_type, ext_str)
+                    end
+      internal_id || raise "Source #{source_type}/#{external_id} was deleted while being created"
     end
 
     # Get external ID and source_type from internal ID

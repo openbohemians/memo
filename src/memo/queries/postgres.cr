@@ -360,16 +360,18 @@ module Memo
       @db.scalar("INSERT INTO memo_sources (source_type, created_at) VALUES ($1, $2) RETURNING id", source_type, created_at).as(Int64)
     end
 
-    def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64
-      @db.scalar("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES ($1, $2, $3) RETURNING id", source_type, external_id, created_at).as(Int64)
+    # DO NOTHING waits for a competing insert of the same id to commit, so
+    # the caller's next lookup finds it
+    def insert_source_int(source_type : String, external_id : Int64, created_at : Int64) : Int64?
+      @db.query_one?("INSERT INTO memo_sources (source_type, external_int, created_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id", source_type, external_id, created_at, as: Int64)
     end
 
-    def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64
-      @db.scalar("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES ($1, $2, $3) RETURNING id", source_type, external_id, created_at).as(Int64)
+    def insert_source_text(source_type : String, external_id : String, created_at : Int64) : Int64?
+      @db.query_one?("INSERT INTO memo_sources (source_type, external_text, created_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id", source_type, external_id, created_at, as: Int64)
     end
 
-    def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64
-      @db.scalar("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES ($1, $2, $3) RETURNING id", source_type, external_id, created_at).as(Int64)
+    def insert_source_blob(source_type : String, external_id : Bytes, created_at : Int64) : Int64?
+      @db.query_one?("INSERT INTO memo_sources (source_type, external_blob, created_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id", source_type, external_id, created_at, as: Int64)
     end
 
     def find_source_int(source_type : String, external_id : Int64) : Int64?
