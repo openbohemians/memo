@@ -30,10 +30,10 @@ dependencies:
     version: ~> 0.1
   arcana-core:
     github: trans/arcana-core
-    version: ~> 0.16.0
+    version: ~> 0.20.0
   arcana-ai:
     github: trans/arcana-ai
-    version: ~> 0.5.1
+    version: ~> 0.6.1
   markterm:
     github: ralsina/markterm
     version: 0.6.3
