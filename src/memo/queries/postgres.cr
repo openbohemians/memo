@@ -1046,13 +1046,12 @@ module Memo
       placeholders = external_ids.each_with_index.map { |_, i| "$#{i + 3}" }.join(", ")
       @db.query(
         <<-SQL,
-          SELECT s.external_int, e.eid
+          SELECT DISTINCT ON (s.external_int) s.external_int, e.eid
           FROM memo_sources s
           JOIN memo_chunks c ON c.source_id = s.id
           JOIN memo_embeddings e ON c.hash = e.hash AND e.service_id = $1
           WHERE s.source_type = $2
             AND s.external_int IN (#{placeholders})
-          GROUP BY s.external_int, e.eid
           ORDER BY s.external_int, c."offset"
         SQL
 

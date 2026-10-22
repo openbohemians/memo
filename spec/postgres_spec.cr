@@ -278,6 +278,20 @@ describe "PostgreSQL backend" do
     end
   end
 
+  it "clusters consecutive sources with similar embeddings" do
+    with_pg_database do |url, index_dir|
+      service = open_pg(url, index_dir)
+      (1_i64..3_i64).each { |i| service.index(source_type: "event", source_id: i, text: "the dragon attacks the village") }
+      (4_i64..6_i64).each { |i| service.index(source_type: "event", source_id: i, text: "a quiet morning at the market") }
+
+      clusters = Memo::Clustering.sequential(db: service.db, service_id: service.service_id,
+        usearch_index: service.usearch_index, source_type: "event", external_ids: (1_i64..6_i64).to_a,
+        threshold: 0.99, min_cluster_size: 3)
+      clusters.map(&.source_ids).should eq [[1_i64, 2_i64, 3_i64], [4_i64, 5_i64, 6_i64]]
+      service.close
+    end
+  end
+
   it "deletes a service with vocabulary and cached queries" do
     with_pg_database do |url, index_dir|
       service = open_pg(url, index_dir)

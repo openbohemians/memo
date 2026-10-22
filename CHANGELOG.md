@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     itself before deleting anything (raising `USearchIndex::InUse` if another process has the index
     open), and leaves the lock file in place.
   - It refuses to delete the service the `Service` is using.
+- **`Clustering.sequential` works on PostgreSQL.** Its query grouped by source and embedding but ordered
+  by chunk offset, which PostgreSQL rejects. Each source is now represented by its first chunk's
+  embedding on both databases; on SQLite it was whichever chunk the grouping happened to pick.
 
 ## [0.15.1] - 2026-10-22
 

@@ -946,21 +946,26 @@ module Memo
     ) : Array({Int64, Int64})
       results = [] of {Int64, Int64}
       placeholders = external_ids.map { "?" }.join(", ")
+      # Each source's first chunk: with MIN(), SQLite takes the other
+      # columns from the row that has the minimum
       @db.query(
         <<-SQL,
-          SELECT s.external_int, e.rowid
+          SELECT s.external_int, e.rowid, MIN(c.offset)
           FROM memo_sources s
           JOIN memo_chunks c ON c.source_id = s.id
           JOIN memo_embeddings e ON c.hash = e.hash AND e.service_id = ?
           WHERE s.source_type = ?
             AND s.external_int IN (#{placeholders})
           GROUP BY s.external_int
-          ORDER BY s.external_int, c.offset
+          ORDER BY s.external_int
         SQL
 
         args: [service_id, source_type] + external_ids.map(&.as(DB::Any))
       ) do |rs|
-        rs.each { results << {rs.read(Int64), rs.read(Int64)} }
+        rs.each do
+          results << {rs.read(Int64), rs.read(Int64)}
+          rs.read(Int64?)
+        end
       end
       results
     end
