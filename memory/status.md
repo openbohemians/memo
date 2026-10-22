@@ -5,7 +5,7 @@
 - **0.14.0 released 2026-10-22** (tag `v0.14.0` at `7717f7a`): requires arcana-core
   ~> 0.20.0 and arcana-ai ~> 0.6.1 (`e901e59`). A minor bump because library users must
   move to the same arcana. No code, schema or API changes. `@datadungeon` and `@ipck`
-  were told on 2026-10-22 (`mail/sent/`).
+  were told on 2026-10-22 (`mail/sent/`), and goldfish got a note in its inbox the same day.
 - **0.13.2 released 2026-10-22** (tag `v0.13.2` at `c3db595`), ahead of a deployment:
   opening a service by format and model uses the service found instead of adding a
   `<format>/<model>` copy, which made the next such open raise "more than one row"
@@ -27,7 +27,10 @@
 
 - **goldfish**: `Memory#about` still reads `memo_texts`. It breaks once goldfish builds
   against 0.13. The fix went to goldfish's inbox on 2026-10-11 (`mail/sent/`); goldfish has
-  no agent, so the user makes the change.
+  no agent, so the user makes the change. Still open on 2026-10-22: goldfish follows memo's
+  `main`, so its next `shards update` brings 0.14.0, which also needs arcana-core 0.20. Its
+  no-key path opens memo with `format: "mock"` and no model, which memo has refused since
+  `0d2815e`. The 2026-10-22 inbox note covers both.
 - **Old token counts**: **fixed in `6794fea`, released in 0.13.1** (2026-10-14).
   memo reads `usage.input` in its arcana and bus providers and requires arcana-ai ~> 0.5.1.
   `@arcana` asked for this on 2026-10-13 (`mail/received/`), and was told it's done on
