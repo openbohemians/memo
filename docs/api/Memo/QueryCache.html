@@ -594,7 +594,7 @@ DB is bounded by max_db_entries (oldest evicted on prune).</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L10" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L10" target="_blank">
         memo/query_cache.cr
       </a>
     
@@ -643,6 +643,13 @@ DB is bounded by max_db_entries (oldest evicted on prune).</p>
         <a href="#clear-instance-method" class="signature"><strong>#clear</strong></a>
         
           <div class="summary"><p>Clear all cached entries (memory and DB)</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#for_service%28service_id%3AInt64%29%3AQueryCache-instance-method" class="signature"><strong>#for_service</strong>(service_id : Int64) : QueryCache</a>
+        
+          <div class="summary"><p>A cache like this one for another service: its vectors are another model's, so they can't be shared</p></div>
         
       </li>
     
@@ -749,7 +756,7 @@ DB is bounded by max_db_entries (oldest evicted on prune).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L24" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L24" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -786,7 +793,29 @@ DB is bounded by max_db_entries (oldest evicted on prune).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L83" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L89" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="for_service(service_id:Int64):QueryCache-instance-method">
+      <div class="signature">
+        
+        def <strong>for_service</strong>(service_id : Int64) : <a href="../Memo/QueryCache.html">QueryCache</a>
+
+        <a class="method-permalink" href="#for_service%28service_id%3AInt64%29%3AQueryCache-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>A cache like this one for another service: its vectors are another
+model's, so they can't be shared</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L45" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -808,7 +837,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L51" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -829,7 +858,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L92" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L98" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -845,7 +874,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L16" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L16" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -861,7 +890,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L12" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L12" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -877,7 +906,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L11" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L11" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -893,7 +922,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L20" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L20" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -914,7 +943,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L70" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L76" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -935,7 +964,7 @@ Returns {embedding, token_count} or nil on miss.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/query_cache.cr#L78" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/query_cache.cr#L84" target="_blank">View source</a>]
         
       </div>
     </div>

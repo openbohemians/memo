@@ -607,7 +607,7 @@ notes.openai--text-embedding-3-small--1536.usearch</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L13" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L13" target="_blank">
         memo/usearch_index.cr
       </a>
     
@@ -695,7 +695,7 @@ with fallback to /var/lib/memo/indices for system users.</p>
       <li class="entry-summary">
         <a href="#delete_file%28path%3AString%29-instance-method" class="signature"><strong>#delete_file</strong>(path : String)</a>
         
-          <div class="summary"><p>Delete the index file (and its journal checkpoint and lock) from disk.</p></div>
+          <div class="summary"><p>Delete the index file and its journal checkpoint from disk.</p></div>
         
       </li>
     
@@ -832,7 +832,7 @@ Embedding is converted from Float64 to Float32 at this boundary.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L159" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L161" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -853,7 +853,7 @@ Embedding is converted from Float64 to Float32 at this boundary.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L133" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L133" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -874,7 +874,7 @@ Embedding is converted from Float64 to Float32 at this boundary.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L138" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L138" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -889,13 +889,15 @@ Embedding is converted from Float64 to Float32 at this boundary.</p>
       
         <div class="doc">
           
-          <p>Delete the index file (and its journal checkpoint and lock) from disk.</p>
+          <p>Delete the index file and its journal checkpoint from disk. The lock
+file stays: deleted while another process held it, the next open
+would lock a new file at the same path, and both would hold the index.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L144" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L146" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -918,7 +920,7 @@ of its graph to find matches that sparse.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L245" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L247" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -941,7 +943,7 @@ Use this with a Set of valid rowids from SQL pre-filtering.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L227" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L229" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -964,7 +966,7 @@ or nil if the key doesn't exist.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L259" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L261" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -987,7 +989,7 @@ Path-unsafe characters in format/model are replaced with hyphens.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L36" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L36" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1010,7 +1012,7 @@ If no stem is provided, uses &quot;memo&quot; as default.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L46" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1033,7 +1035,7 @@ index and whether it was loaded from the file.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L68" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L68" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1058,7 +1060,7 @@ included).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L114" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L114" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1081,7 +1083,7 @@ empty index with cosine metric and f16 quantization.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1102,7 +1104,7 @@ empty index with cosine metric and f16 quantization.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L175" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L177" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1125,7 +1127,7 @@ mid-save leaves the previous file intact.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L84" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L84" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1150,7 +1152,7 @@ writers out until this returns.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L97" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L97" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1173,7 +1175,7 @@ Cosine distance = 1 - similarity, so similarity = 1 - distance.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L217" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L219" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1194,7 +1196,7 @@ Cosine distance = 1 - similarity, so similarity = 1 - distance.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.1/src/memo/usearch_index.cr#L151" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/usearch_index.cr#L153" target="_blank">View source</a>]
         
       </div>
     </div>
