@@ -10,6 +10,7 @@
   checked live against files 0.14.2 wrote: one database adopts its file, and with two that
   shared it, the owner adopts it and the other rebuilds. A rebuild adds about 450
   vectors/s at 1536 dimensions. An older memo reading the new checkpoints rebuilds.
+  `@datadungeon` and `@ipck` were told of 0.14.2 and 0.14.3 the same day (`mail/sent/`).
 - **0.14.2 released 2026-10-22** (tag `v0.14.2` at `f4f8a57`): the review's second batch.
   Chunking is linear for non-ASCII text, and no chunk exceeds `max_tokens` (`02f6baa`). A
   new source id resolves safely under concurrent writers (`c3f93d1`). memo-arcana
@@ -48,6 +49,11 @@
 
 ## Open
 
+- **pg 0.31 for @ipck**: **Open.** On 2026-10-22 ipck asked memo to move pg from `~> 0.30.0`
+  to `~> 0.31.0` (`mail/received/`). pg 0.30 needs crystal-db 0.14, which holds ipck's sqlite3
+  below 0.24.0. Tried the same day: `shards update pg db sqlite3` gives pg 0.31.0, db 0.15.0
+  and sqlite3 0.24.0, with no code changes, and the full suite passes with Postgres. Every
+  library user would need crystal-db 0.15 too, so it would be 0.15.0. Waiting on the user.
 - **goldfish**: `Memory#about` still reads `memo_texts`. It breaks once goldfish builds
   against 0.13. The fix went to goldfish's inbox on 2026-10-11 (`mail/sent/`); goldfish has
   no agent, so the user makes the change. Still open on 2026-10-22: goldfish follows memo's
