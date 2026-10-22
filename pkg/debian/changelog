@@ -1,3 +1,12 @@
+memo-rag (0.15.4-1) unstable; urgency=medium
+
+  * The memo CLI is built with jargon 0.22.1. Shell completions are now
+    small scripts that ask memo for candidates on each Tab. key:value no
+    longer sets an option (key=value and --key=value still do), and
+    memo index takes every non-flag word after the files as a file.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.15.3-1) unstable; urgency=medium
 
   * memo index -r skips symlinks inside the tree, records files by
