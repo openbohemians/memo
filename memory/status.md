@@ -6,7 +6,7 @@
   opening a service by format and model uses the service found instead of adding a
   `<format>/<model>` copy, which made the next such open raise "more than one row"
   (`c0d5315`). `@datadungeon` reported it on 2026-10-20 (`mail/received/`) and works
-  around it by opening by name (DataDungeon 0.15.7). They haven't been told it's fixed.
+  around it by opening by name (DataDungeon 0.15.7). Told of the fix and release on 2026-10-22 (`mail/sent/`).
 - **0.13.1 released 2026-10-14** (tag `v0.13.1` at `60833b6`): token counts come from
   arcana-ai's `usage` (`6794fea`). It needs arcana-ai ~> 0.5.1. No schema or API changes.
 - **0.13.0 released 2026-10-11** (tag `v0.13.0` at `5f51edd`, with Arch and Debian
