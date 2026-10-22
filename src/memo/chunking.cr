@@ -20,9 +20,43 @@ module Memo
       def size : Int32
         end_pos - start_pos
       end
+    end
 
-      def slice(text : String) : String
-        text[start_pos, size]
+    # Internal: the text as characters, with each one's byte offset.
+    # Indexing a String by character rescans it from the start unless it's
+    # all ASCII, which made chunking quadratic for most other languages.
+    private struct Chars
+      getter text : String
+
+      def initialize(@text : String)
+        @chars = Array(Char).new(text.bytesize)
+        @byte_at = Array(Int32).new(text.bytesize + 1)
+        reader = Char::Reader.new(text)
+        while reader.has_next?
+          @chars << reader.current_char
+          @byte_at << reader.pos
+          reader.next_char
+        end
+        @byte_at << text.bytesize
+      end
+
+      def [](pos : Int32) : Char
+        @chars[pos]
+      end
+
+      def bytesize(range : Range) : Int32
+        @byte_at[range.end_pos] - @byte_at[range.start_pos]
+      end
+
+      def slice(range : Range) : String
+        @text.byte_slice(@byte_at[range.start_pos], bytesize(range))
+      end
+
+      # The furthest end (at most `end_pos`) for a range from `start_pos`
+      # of no more than `max_bytes`
+      def end_within(start_pos : Int32, end_pos : Int32, max_bytes : Float64) : Int32
+        first = @byte_at[start_pos]
+        (start_pos + 1..end_pos).bsearch { |pos| @byte_at[pos] - first > max_bytes }.try(&.- 1) || end_pos
       end
     end
 
@@ -50,35 +84,38 @@ module Memo
       # Return empty if no non-whitespace content
       return [] of {String, Int32, Int32} if content_start.nil?
 
+      chars = Chars.new(text)
       content_range = Range.new(content_start, content_end)
       ratio = config.tokens_per_byte
-      content_text = content_range.slice(text)
-      token_count = estimate_tokens(content_text, ratio)
+      token_count = estimate_tokens(chars.bytesize(content_range), ratio)
 
-      ranges = if token_count < config.no_chunk_threshold
+      ranges = if token_count < config.no_chunk_threshold && token_count <= config.max_tokens
                  # Keep whole content as single chunk
                  [content_range]
                else
                  # Split on paragraphs, then sentences if needed
-                 para_ranges = split_paragraphs(text, content_range)
-                 sentence_ranges = para_ranges.flat_map { |r| maybe_split_sentences(text, r, config, ratio) }
-                 combine_small_ranges(text, sentence_ranges, config, ratio)
+                 para_ranges = split_paragraphs(chars, content_range)
+                 sentence_ranges = para_ranges.flat_map { |r| maybe_split_sentences(chars, r, config, ratio) }
+                 combine_small_ranges(chars, sentence_ranges, config, ratio)
                end
 
       # Convert ranges to output tuples
       ranges.map do |range|
-        chunk = range.slice(text)
-        {chunk, range.start_pos, range.size}
+        {chars.slice(range), range.start_pos, range.size}
       end
     end
 
     # Estimate token count using tokens_per_byte ratio
     def estimate_tokens(text : String, tokens_per_byte : Float64 = 0.25) : Int32
-      (text.bytesize * tokens_per_byte).round.to_i
+      estimate_tokens(text.bytesize, tokens_per_byte)
+    end
+
+    private def estimate_tokens(bytesize : Int32, tokens_per_byte : Float64) : Int32
+      (bytesize * tokens_per_byte).round.to_i
     end
 
     # Split on paragraph breaks (\n\n+), returning ranges of trimmed content
-    private def split_paragraphs(text : String, content_range : Range) : Array(Range)
+    private def split_paragraphs(text : Chars, content_range : Range) : Array(Range)
       ranges = [] of Range
       pos = content_range.start_pos
       end_pos = content_range.end_pos
@@ -125,20 +162,55 @@ module Memo
       ranges
     end
 
-    # Split paragraph on sentences if it's too large
-    private def maybe_split_sentences(text : String, range : Range, config : Config::Chunking, ratio : Float64) : Array(Range)
-      chunk_text = range.slice(text)
-      token_count = estimate_tokens(chunk_text, ratio)
+    # Split paragraph on sentences if it's too large, and any sentence
+    # still too large at spaces (see split_to_fit)
+    private def maybe_split_sentences(text : Chars, range : Range, config : Config::Chunking, ratio : Float64) : Array(Range)
+      token_count = estimate_tokens(text.bytesize(range), ratio)
 
       if token_count > config.max_tokens
-        split_sentences(text, range)
+        split_sentences(text, range).flat_map { |sentence| split_to_fit(text, sentence, config.max_tokens, ratio) }
       else
         [range]
       end
     end
 
+    # Split a range over max_tokens (a long sentence, or text without
+    # punctuation) into pieces within it: each ends at the last whitespace
+    # that fits, or, with none, at the limit itself. Providers reject an
+    # input over their limit, so no chunk may exceed it.
+    private def split_to_fit(text : Chars, range : Range, max_tokens : Int32, ratio : Float64) : Array(Range)
+      return [range] if ratio <= 0 || estimate_tokens(text.bytesize(range), ratio) <= max_tokens
+
+      max_bytes = max_tokens / ratio
+      pieces = [] of Range
+      pos = range.start_pos
+      end_pos = range.end_pos
+
+      while pos < end_pos
+        while pos < end_pos && text[pos].whitespace?
+          pos += 1
+        end
+        break if pos >= end_pos
+
+        cut = {text.end_within(pos, end_pos, max_bytes), pos + 1}.max
+        if cut < end_pos
+          space = (pos + 1...cut).reverse_each.find { |i| text[i].whitespace? }
+          cut = space if space
+        end
+
+        piece_end = cut
+        while piece_end > pos && text[piece_end - 1].whitespace?
+          piece_end -= 1
+        end
+        pieces << Range.new(pos, piece_end)
+        pos = cut
+      end
+
+      pieces
+    end
+
     # Split on sentence boundaries: . ! ? ; followed by whitespace
-    private def split_sentences(text : String, range : Range) : Array(Range)
+    private def split_sentences(text : Chars, range : Range) : Array(Range)
       ranges = [] of Range
       pos = range.start_pos
       end_pos = range.end_pos
@@ -197,9 +269,10 @@ module Memo
       ranges.empty? ? [range] : ranges
     end
 
-    # Combine ranges that are too small
-    # Combined range spans from first chunk's start to last chunk's end
-    private def combine_small_ranges(text : String, ranges : Array(Range), config : Config::Chunking, ratio : Float64) : Array(Range)
+    # Combine ranges that are too small, while the result stays within
+    # max_tokens. Combined range spans from first chunk's start to last
+    # chunk's end.
+    private def combine_small_ranges(text : Chars, ranges : Array(Range), config : Config::Chunking, ratio : Float64) : Array(Range)
       return ranges if ranges.empty?
 
       result = [] of Range
@@ -214,12 +287,11 @@ module Memo
           break
         end
 
-        tokens = estimate_tokens(range.slice(text), ratio)
+        tokens = estimate_tokens(text.bytesize(range), ratio)
+        combined = Range.new(range.start_pos, ranges[i + 1].end_pos)
 
-        if tokens < config.min_tokens
+        if tokens < config.min_tokens && estimate_tokens(text.bytesize(combined), ratio) <= config.max_tokens
           # Combine with next range - span from this start to next end
-          next_range = ranges[i + 1]
-          combined = Range.new(range.start_pos, next_range.end_pos)
           ranges[i + 1] = combined
           # Don't add current range, continue with combined
         else

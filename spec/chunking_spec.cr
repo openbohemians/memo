@@ -132,5 +132,52 @@ describe Memo::Chunking do
       size.should eq(text.size)
       text[offset, size].should eq(chunk_text)  # Exact match guaranteed
     end
+
+    it "chunks long non-ASCII text in linear time, at the right offsets" do
+      config = Memo::Config::Chunking.new(min_tokens: 100, max_tokens: 500, no_chunk_threshold: 500)
+      sentence = "Съешь же ещё этих мягких французских булок, да выпей чаю. "
+      text = (1..60).map { (sentence * 30).strip }.join("\n\n") # ~100k characters
+
+      chunks = [] of {String, Int32, Int32}
+      elapsed = Time.measure { chunks = Memo::Chunking.chunk_text(text, config) }
+      elapsed.should be < 2.seconds # was ~7 s (release build) when quadratic
+
+      chunks.size.should be > 1
+      chunks.each { |(chunk, offset, size)| text[offset, size].should eq chunk }
+    end
+
+    it "splits text without punctuation to fit max_tokens" do
+      config = Memo::Config::Chunking.new(min_tokens: 100, max_tokens: 500, no_chunk_threshold: 500)
+      text = (["word"] * 10_000).join(" ") # 49,999 bytes, one "sentence"
+
+      chunks = Memo::Chunking.chunk_text(text, config)
+      chunks.size.should be > 1
+      chunks.each do |(chunk, offset, size)|
+        Memo::Chunking.estimate_tokens(chunk).should be <= 500
+        text[offset, size].should eq chunk
+        chunk.should_not start_with(" ")
+        chunk.should_not end_with(" ")
+      end
+      chunks.map(&.[0]).join(" ").should eq text
+    end
+
+    it "splits a run without spaces at the limit itself" do
+      config = Memo::Config::Chunking.new(min_tokens: 10, max_tokens: 100, no_chunk_threshold: 100)
+      text = "x" * 1000
+
+      chunks = Memo::Chunking.chunk_text(text, config)
+      chunks.all? { |(chunk, _, _)| Memo::Chunking.estimate_tokens(chunk) <= 100 }.should be_true
+      chunks.map(&.[0]).join.should eq text
+    end
+
+    it "doesn't combine small ranges past max_tokens" do
+      config = Memo::Config::Chunking.new(min_tokens: 300, max_tokens: 500, no_chunk_threshold: 500)
+      small = (["tiny"] * 100).join(" ") + "."     # 125 tokens: under min_tokens
+      paragraph = (["word"] * 320).join(" ") + "." # 400 tokens: with a small one, over max_tokens
+      text = [small, paragraph, small, paragraph].join("\n\n")
+
+      chunks = Memo::Chunking.chunk_text(text, config)
+      chunks.each { |(chunk, _, _)| Memo::Chunking.estimate_tokens(chunk).should be <= 500 }
+    end
   end
 end

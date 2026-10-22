@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Chunking is linear for non-ASCII text.** It indexed the text by character, which rescans a String
+  from its start unless it's all ASCII, so a 200,000-character Cyrillic text took 28.6 s (a release
+  build) and blocked every other fiber meanwhile. It now takes 13 ms.
+- **No chunk exceeds `chunking_max_tokens`.** A sentence too long for the limit, or a text without
+  punctuation, stayed one chunk, which a provider rejects on every retry; such a range is now split at
+  the last space that fits, or at the limit itself. Combining small chunks also stops at the limit.
+
 ## [0.14.1] - 2026-10-22
 
 ### Fixed

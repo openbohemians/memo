@@ -57,10 +57,10 @@ private def internal_id(memo : Memo::Service, id : Int64) : Int64
   Memo::SourceRegistry.get_internal(memo.db, "doc", id) || raise "no source #{id}"
 end
 
-# A paragraph that makes a chunk of its own: memo combines chunks under 100
-# tokens, and can't split one sentence
+# A paragraph that makes a chunk of its own: within the 100-token limit, but
+# too large to combine with another under it
 private def paragraph(word : String) : String
-  ([word] * 90).join(" ") + "."
+  ([word] * 60).join(" ") + "."
 end
 
 private def paragraphs(*words : String) : String
