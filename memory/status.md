@@ -1,7 +1,12 @@
 # Status
 
-*Updated 2026-10-14*
+*Updated 2026-10-22*
 
+- **0.13.2 released 2026-10-22** (tag `v0.13.2` at `c3db595`), ahead of a deployment:
+  opening a service by format and model uses the service found instead of adding a
+  `<format>/<model>` copy, which made the next such open raise "more than one row"
+  (`c0d5315`). `@datadungeon` reported it on 2026-10-20 (`mail/received/`) and works
+  around it by opening by name (DataDungeon 0.15.7). They haven't been told it's fixed.
 - **0.13.1 released 2026-10-14** (tag `v0.13.1` at `60833b6`): token counts come from
   arcana-ai's `usage` (`6794fea`). It needs arcana-ai ~> 0.5.1. No schema or API changes.
 - **0.13.0 released 2026-10-11** (tag `v0.13.0` at `5f51edd`, with Arch and Debian
@@ -27,3 +32,7 @@
 - **Consumers need arcana-ai 0.5**: DataDungeon, copious, ipck and justice are on arcana-ai
   0.4.0 and build against memo's working tree, so they fail until `shards update
   arcana-ai`. Both agents were told on 2026-10-14 (`mail/sent/`).
+- **arcana pins lag**: memo pins arcana-core ~> 0.16.0 and arcana-ai ~> 0.5.1, while
+  0.20.0 and 0.6.1 are out (2026-10-22). A project on the newer ones can't resolve
+  memo alongside them. Whether memo-arcana on arcana-core 0.16 suits the deployed bus is
+  `@arcana`'s call; not asked yet.
