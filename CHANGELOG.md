@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **`use_service` switches everything that belongs to a service.** It kept the previous service's query
+  cache, so a query searched before the switch used the old model's vector, and new queries were saved
+  under the old service. It now starts a cache for the new service (same sizes), chunks with the new
+  service's tokens per byte, and refuses a service whose `max_tokens` is below the chunk size, as opening
+  one by name does. It swaps the index while holding the write lock, and if the new index can't be opened
+  (another process holds it), it stays on the current service.
+
 ## [0.15.1] - 2026-10-22
 
 ### Fixed

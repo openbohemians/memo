@@ -271,6 +271,64 @@ describe Memo::Service do
           end
         end
       end
+
+      it "caches queries under the new service" do
+        with_test_db_path do |db_path|
+          service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+          service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          service.search("purple gorilla")
+
+          service.use_service("mock2")
+          service.search("purple gorilla")
+          service.query_cache.hits.should eq 0 # the first service's vector isn't the new one's
+          service.close
+
+          # The query was saved for mock2
+          reopened = Memo::Service.new(db_path: db_path, service: "mock2", chunking_max_tokens: 50)
+          reopened.search("purple gorilla")
+          reopened.query_cache.hits.should eq 1
+          reopened.close
+        end
+      end
+
+      it "checks the chunk size against the new service's limit" do
+        with_test_service do |service|
+          service.create_service(name: "small", format: "mock", model: "mock-small", dimensions: 8, max_tokens: 40)
+          expect_raises(ArgumentError, /exceeds service limit/) do
+            service.use_service("small")
+          end
+          service.service_name.should eq "mock"
+        end
+      end
+
+      it "chunks with the new service's tokens per byte" do
+        with_test_db_path do |db_path|
+          service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+          info = service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          Memo::Storage.update_tokens_per_byte(service.db, info.id, 1.0)
+          ratio = service.get_service("mock2").not_nil!.tokens_per_byte
+          ratio.should_not eq service.chunking_config.tokens_per_byte
+
+          service.use_service("mock2")
+          service.chunking_config.tokens_per_byte.should eq ratio
+          service.close
+        end
+      end
+
+      it "stays on the current service when the new one's index is in use" do
+        with_test_db_path do |db_path|
+          service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+          service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          holder = Memo::Service.new(db_path: db_path, service: "mock2", chunking_max_tokens: 50)
+
+          expect_raises(Memo::USearchIndex::InUse) { service.use_service("mock2") }
+          service.service_name.should eq "mock"
+          service.index(source_type: "doc", source_id: 1_i64, text: "still writable")
+          service.search("still writable").first.source_id.should eq 1
+          holder.close
+          service.close
+        end
+      end
     end
   end
 end

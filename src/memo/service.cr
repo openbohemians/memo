@@ -752,19 +752,22 @@ module Memo
     # writes wait. close calls this; for routine saves prefer
     # save_index_if_due (memo also schedules those itself after writes).
     def save_index
-      @write_lock.synchronize do
-        next if @usearch_index.closed? || (@unsaved_changes == 0 && !@index_out_of_step)
+      @write_lock.synchronize { save_index_locked }
+    end
 
-        if @index_out_of_step
-          # A failed update left committed changes out of the index; the
-          # journal has them
-          IndexJournal.catch_up(@db, @usearch_index, @service_id, @index_path)
-          @index_out_of_step = false
-        end
-        IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
-        @unsaved_changes = 0
-        @saved_at = Time.instant
+    # save_index, holding @write_lock
+    private def save_index_locked : Nil
+      return if @usearch_index.closed? || (@unsaved_changes == 0 && !@index_out_of_step)
+
+      if @index_out_of_step
+        # A failed update left committed changes out of the index; the
+        # journal has them
+        IndexJournal.catch_up(@db, @usearch_index, @service_id, @index_path)
+        @index_out_of_step = false
       end
+      IndexJournal.checkpoint(@db, @usearch_index, @service_id, @index_path)
+      @unsaved_changes = 0
+      @saved_at = Time.instant
     end
 
     # Save if the policy says it's time: index_save_changes unsaved changes,
@@ -878,8 +881,13 @@ module Memo
 
     # Switch to a different service
     #
-    # Changes the current provider and service configuration.
-    # The api_key is required for non-mock services.
+    # Changes the current provider and service configuration, along with
+    # the index, query cache and chunking that go with it. The chunk size
+    # stays, and must fit the new service's max_tokens. The api_key is
+    # required for non-mock services.
+    #
+    # Writes wait while it switches. Don't call it while searches are
+    # running, since they read the index it closes.
     #
     # Example:
     # ```
@@ -888,30 +896,44 @@ module Memo
     def use_service(name : String, api_key : String? = nil)
       svc = ServiceProvider.get_by_name(@db, name)
       raise ArgumentError.new("Service '#{name}' not found") unless svc
+      if @chunking_config.max_tokens > svc.max_tokens
+        raise ArgumentError.new("chunking_max_tokens (#{@chunking_config.max_tokens}) exceeds service limit (#{svc.max_tokens})")
+      end
 
       # Create provider instance from stored config
       provider_instance = Providers::Registry.create(svc.format, api_key, svc.model, svc.base_url, svc.dimensions)
       raise ArgumentError.new("Unknown format: #{svc.format}") unless provider_instance
 
-      # Save and close the current service's index
-      save_index
-      @usearch_index.close
-      @index_lock.close
+      @write_lock.synchronize do
+        # Save and close the current service's index, then open the new one's
+        save_index_locked
+        @usearch_index.close
+        @index_lock.close
+        path = index_path_for(svc.format, svc.model, svc.dimensions)
+        begin
+          opened = IndexJournal.open(@db, path, svc.dimensions, svc.id,
+            legacy_index_path_for(svc.format, svc.model, svc.dimensions))
+        rescue ex
+          # Stay on the current service (e.g. the new index is InUse)
+          @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, @dimensions, @service_id,
+            legacy_index_path_for(@service_format, @service_model, @dimensions))
+          raise ex
+        end
+        @usearch_index, @index_recovery, @index_lock = opened
+        @index_path = path
+        @index_out_of_step = false
+        @unsaved_changes = 0
+        @saved_at = Time.instant
 
-      @provider = provider_instance
-      @service_name = name
-      @service_id = svc.id
-      @service_format = svc.format
-      @service_model = svc.model
-      @dimensions = svc.dimensions
-
-      # Open USearch index for the new service
-      @index_path = index_path_for(svc.format, svc.model, svc.dimensions)
-      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id,
-        legacy_index_path_for(svc.format, svc.model, svc.dimensions))
-      @index_out_of_step = false
-      @unsaved_changes = 0
-      @saved_at = Time.instant
+        @provider = provider_instance
+        @service_name = name
+        @service_id = svc.id
+        @service_format = svc.format
+        @service_model = svc.model
+        @dimensions = svc.dimensions
+        @chunking_config = @chunking_config.with_tokens_per_byte(svc.tokens_per_byte)
+        @query_cache = @query_cache.for_service(svc.id)
+      end
     end
 
     # Where a service's index file goes. Beside a SQLite file, it's named

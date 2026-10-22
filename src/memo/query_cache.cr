@@ -40,6 +40,12 @@ module Memo
       warm_from_db if @db && @max_entries > 0
     end
 
+    # A cache like this one for another service: its vectors are another
+    # model's, so they can't be shared
+    def for_service(service_id : Int64) : QueryCache
+      QueryCache.new(@max_entries, @max_db_entries, @db, service_id)
+    end
+
     # Look up a cached embedding for a query string.
     # Returns {embedding, token_count} or nil on miss.
     def get(query : String) : {Array(Float64), Int32}?
