@@ -266,9 +266,11 @@ module Memo
     private def open_service(ns : String) : Memo::Service
       config = @mutex.synchronize { @configs[ns]? } || raise "namespace not registered: #{ns}"
 
-      service_name = config.service || "mock"
+      # The mock service allows 100 tokens, so the default chunk size is too
+      # big for it. Other namespaces keep the default, including one named
+      # only by format, or by neither (the database's default service).
       chunking = config.chunking_max_tokens
-      chunking = 100 if service_name == "mock" && chunking == 2000
+      chunking = 100 if (config.service || config.format) == "mock" && chunking == 2000
       api_key = config.api_key
       api_key ||= ENV["MEMO_API_KEY"]? || ENV["OPENAI_API_KEY"]? if config.env_api_key?
 

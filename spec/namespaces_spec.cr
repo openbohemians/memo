@@ -101,6 +101,25 @@ describe Memo::Namespaces do
     end
   end
 
+  it "limits the default chunk size only for the mock service" do
+    with_test_db_path do |a_path|
+      with_test_db_path do |b_path|
+        with_test_db_path do |c_path|
+          namespaces = Memo::Namespaces.new
+          namespaces.register(Memo::Namespaces::Config.new(ns: "by-format", db: a_path, format: "openai",
+            model: "text-embedding-3-small", api_key: "sk-test"))
+          namespaces.register(Memo::Namespaces::Config.new(ns: "default", db: b_path, api_key: "sk-test"))
+          namespaces.register(Memo::Namespaces::Config.new(ns: "mock", db: c_path, service: "mock"))
+
+          namespaces.get("by-format").chunking_config.max_tokens.should eq 2000
+          namespaces.get("default").chunking_config.max_tokens.should eq 2000
+          namespaces.get("mock").chunking_config.max_tokens.should eq 100
+          namespaces.close_all
+        end
+      end
+    end
+  end
+
   it "gives the server's API key only to namespaces from the config file" do
     with_test_db_path do |db_path|
       with_test_db_path do |other_path|

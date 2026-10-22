@@ -37,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stayed in its file for good, taking up a nearest-neighbor slot. Saving now applies such removals
   first. Replaying the journal also looked vectors up by id alone, so on SQLite, where a deleted
   embedding's id can be reused, a service could replay another service's vector into its index.
+- **memo-arcana chunks a namespace at the mock service's 100 tokens only when it uses mock.** A
+  namespace named only by `format` (say `openai`), or by neither `service` nor `format` (the database's
+  default service, `openai` in a new one), was taken for mock and chunked at 100 tokens instead of the
+  default 2000. Its texts get larger chunks the next time they're indexed with changed text.
 
 ## [0.15.1] - 2026-10-22
 
