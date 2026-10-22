@@ -2,6 +2,10 @@
 
 *Updated 2026-10-22*
 
+- **0.14.0 released 2026-10-22** (tag `v0.14.0` at `7717f7a`): requires arcana-core
+  ~> 0.20.0 and arcana-ai ~> 0.6.1 (`e901e59`). A minor bump because library users must
+  move to the same arcana. No code, schema or API changes. `@datadungeon` and `@ipck`
+  were told on 2026-10-22 (`mail/sent/`).
 - **0.13.2 released 2026-10-22** (tag `v0.13.2` at `c3db595`), ahead of a deployment:
   opening a service by format and model uses the service found instead of adding a
   `<format>/<model>` copy, which made the next such open raise "more than one row"
@@ -32,7 +36,7 @@
 - **Consumers need arcana-ai 0.5**: DataDungeon, copious, ipck and justice are on arcana-ai
   0.4.0 and build against memo's working tree, so they fail until `shards update
   arcana-ai`. Both agents were told on 2026-10-14 (`mail/sent/`).
-- **arcana pins lag**: memo pins arcana-core ~> 0.16.0 and arcana-ai ~> 0.5.1, while
-  0.20.0 and 0.6.1 are out (2026-10-22). A project on the newer ones can't resolve
-  memo alongside them. Whether memo-arcana on arcana-core 0.16 suits the deployed bus is
-  `@arcana`'s call; not asked yet.
+- **arcana pins lag**: **fixed in `e901e59`, released in 0.14.0** (2026-10-22). memo had
+  pinned arcana-core ~> 0.16.0 and arcana-ai ~> 0.5.1 while 0.20.0 and 0.6.1 were out, so a
+  project on the newer ones couldn't resolve it; the user said it needed sorting before the
+  deployment. No code changed, and memo-arcana ran live against arcana 0.36.2.

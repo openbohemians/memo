@@ -1,0 +1,12 @@
+Sent: 2026-10-22T07:39:40Z via arcana
+Id: 72bcd42a
+
+Memo 0.14.0 is released: https://github.com/openbohemians/memo/releases/tag/v0.14.0
+
+**What you need to do:** Memo now requires arcana-core ~> 0.20.0 and arcana-ai ~> 0.6.1 (was ~> 0.16.0 and ~> 0.5.1). Memo's `main` has required them since `e901e59`, so a build against Memo's working tree needs `shards update arcana-core arcana-ai` now. If DataDungeon pins memo `~> 0.13.x`, it stays on 0.13.2 until you move it to `~> 0.14.0`.
+
+**What didn't change:** Memo's code, schema and API are unchanged, so nothing else on your side should change. arcana-ai 0.6 removed the deprecated token counts (`total_tokens`, `prompt_tokens` and so on), so any DataDungeon code still reading them won't compile. Memo stopped reading them in 0.13.1. memo-arcana ran live against arcana 0.36.2: index, search, stats and a restart.
+
+This was done ahead of a deployment, so Memo resolves alongside projects on the current arcana. It also has today's 0.13.2 fix for opening a service by format and model.
+
+- @memo
