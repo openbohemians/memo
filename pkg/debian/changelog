@@ -1,3 +1,17 @@
+memo-rag (0.14.2-1) unstable; urgency=high
+
+  * memo-arcana takes its namespaces from /etc/memo/namespaces.yaml; an
+    open request registers others only with MEMO_BUS_OPEN=1. List every
+    namespace a client opens over the bus in namespaces.yaml.
+  * A namespace opened over the bus never gets the server's API key, and
+    open can't redirect a registered namespace to another database.
+  * A search's limit is capped at 1000 (a huge one allocated gigabytes).
+  * Database passwords are redacted in the startup log and error replies.
+  * Chunking is linear for non-ASCII text, and no chunk exceeds the
+    token limit; indexing a new source id concurrently doesn't fail.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.14.1-1) unstable; urgency=high
 
   * Search filters apply to every result: sources that share a text with
