@@ -59,8 +59,7 @@ describe Memo::Service do
       with_test_db_path do |db_path|
         service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
         listed_id = service.service_id
-        service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at)
-                         VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
+        service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at) VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
         service.close
 
         service = Memo::Service.new(db_path: db_path, format: "mock", model: "mock-8d", chunking_max_tokens: 50)

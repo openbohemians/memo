@@ -193,8 +193,7 @@ describe "PostgreSQL backend" do
     with_pg_database do |url, index_dir|
       service = open_pg(url, index_dir)
       listed_id = service.service_id
-      service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at)
-                       VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
+      service.db.exec("INSERT INTO memo_services (name, format, model, dimensions, max_tokens, created_at) VALUES ('mock/mock-8d', 'mock', 'mock-8d', 8, 100, 0)")
       service.close
 
       service = Memo::Service.new(db_path: url, index_dir: index_dir, format: "mock", model: "mock-8d", chunking_max_tokens: 50)
