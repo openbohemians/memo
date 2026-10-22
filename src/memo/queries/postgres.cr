@@ -807,37 +807,53 @@ module Memo
     end
 
     def fetch_search_results(
-      rowids : Array(Int64),
       service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      rowids : Array(Int64),
       include_text : Bool,
+      per_embedding : Int32,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
-      text_select = include_text ? ", SUBSTR(st.content, c.\"offset\" + 1, c.size) AS chunk_text" : ""
-      text_join = include_text ? "LEFT JOIN memo_contents st ON st.id = c.content_id" : ""
+      # ct, not st: the filters' text_join takes st
+      text_select = include_text ? ", SUBSTR(ct.content, c.\"offset\" + 1, c.size) AS chunk_text" : ""
+      content_join = include_text ? "LEFT JOIN memo_contents ct ON ct.id = c.content_id" : ""
 
-      placeholders = rowids.each_with_index.map { |_, i| "$#{i + 1}" }.join(", ")
-      service_param_idx = rowids.size + 1
+      # Rowids take $1..$n, then the clauses' ? placeholders, then the cap
+      placeholders = (1..rowids.size).join(", ") { |k| "$#{k}" }
+      pg_where, last = Postgres.number_placeholders(where_clauses, after: rowids.size)
 
+      # hits: the passing chunks, numbered within each embedding
       results = [] of {UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?}
       @db.query(
         <<-SQL,
-          SELECT e.eid, c.id, c.hash, c.source_type, c.source_id,
+          WITH hits AS (
+            SELECT e.eid AS embedding_id, c.id AS chunk_id,
+                   ROW_NUMBER() OVER (PARTITION BY e.eid ORDER BY c.id) AS n
+            FROM memo_embeddings e
+            JOIN memo_chunks c ON c.hash = e.hash
+            #{text_join}
+            #{fts_join}
+            WHERE e.eid IN (#{placeholders}) AND #{pg_where.join(" AND ")}
+          )
+          SELECT h.embedding_id, c.id, c.hash, c.source_type, c.source_id,
                  s.external_int, s.external_text, s.external_blob,
                  c.pair_id, ps.external_int, ps.external_text, ps.external_blob,
                  c.parent_id, prs.external_int, prs.external_text, prs.external_blob,
                  c."offset", c.size, c.match_count, c.read_count
                  #{text_select}
-          FROM memo_embeddings e
-          JOIN memo_chunks c ON c.hash = e.hash
+          FROM hits h
+          JOIN memo_chunks c ON c.id = h.chunk_id
           JOIN memo_sources s ON c.source_id = s.id
           LEFT JOIN memo_sources ps ON c.pair_id = ps.id
           LEFT JOIN memo_sources prs ON c.parent_id = prs.id
-          #{text_join}
-          WHERE e.eid IN (#{placeholders})
-            AND e.service_id = $#{service_param_idx}
+          #{content_join}
+          WHERE h.n <= $#{last + 1}
         SQL
 
 
-        args: rowids.map(&.as(DB::Any)) + [service_id.as(DB::Any)]
+        args: rowids.map(&.as(DB::Any)) + params + [per_embedding.as(DB::Any)]
       ) do |rs|
         rs.each do
           results << {

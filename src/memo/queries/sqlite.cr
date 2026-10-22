@@ -713,34 +713,50 @@ module Memo
     end
 
     def fetch_search_results(
-      rowids : Array(Int64),
       service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      rowids : Array(Int64),
       include_text : Bool,
+      per_embedding : Int32,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
-      text_select = include_text ? ", SUBSTR(st.content, c.offset + 1, c.size) AS chunk_text" : ""
-      text_join = include_text ? "LEFT JOIN memo_contents st ON st.id = c.content_id" : ""
-      placeholders = rowids.map { "?" }.join(", ")
+      # ct, not st: the filters' text_join takes st
+      text_select = include_text ? ", SUBSTR(ct.content, c.offset + 1, c.size) AS chunk_text" : ""
+      content_join = include_text ? "LEFT JOIN memo_contents ct ON ct.id = c.content_id" : ""
+      placeholders = Array.new(rowids.size, "?").join(", ")
 
+      # hits: the passing chunks, numbered within each embedding. The
+      # CROSS JOIN fixes the join order, as in filter_candidates.
       results = [] of {UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?}
       @db.query(
         <<-SQL,
-          SELECT e.rowid, c.id, c.hash, c.source_type, c.source_id,
+          WITH hits AS (
+            SELECT e.rowid AS embedding_id, c.id AS chunk_id,
+                   ROW_NUMBER() OVER (PARTITION BY e.rowid ORDER BY c.id) AS n
+            FROM memo_embeddings e
+            CROSS JOIN memo_chunks c INDEXED BY memo_idx_chunks_hash ON c.hash = e.hash
+            #{text_join}
+            #{fts_join}
+            WHERE e.rowid IN (#{placeholders}) AND #{where_clauses.join(" AND ")}
+          )
+          SELECT h.embedding_id, c.id, c.hash, c.source_type, c.source_id,
                  s.external_int, s.external_text, s.external_blob,
                  c.pair_id, ps.external_int, ps.external_text, ps.external_blob,
                  c.parent_id, prs.external_int, prs.external_text, prs.external_blob,
                  c.offset, c.size, c.match_count, c.read_count
                  #{text_select}
-          FROM memo_embeddings e
-          JOIN memo_chunks c ON c.hash = e.hash
+          FROM hits h
+          JOIN memo_chunks c ON c.id = h.chunk_id
           JOIN memo_sources s ON c.source_id = s.id
           LEFT JOIN memo_sources ps ON c.pair_id = ps.id
           LEFT JOIN memo_sources prs ON c.parent_id = prs.id
-          #{text_join}
-          WHERE e.rowid IN (#{placeholders})
-            AND e.service_id = ?
+          #{content_join}
+          WHERE h.n <= ?
         SQL
 
-        args: rowids.map(&.as(DB::Any)) + [service_id.as(DB::Any)]
+        args: rowids.map(&.as(DB::Any)) + params + [per_embedding.as(DB::Any)]
       ) do |rs|
         rs.each do
           results << {

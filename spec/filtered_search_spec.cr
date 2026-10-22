@@ -77,3 +77,94 @@ describe "Filtered search" do
     end
   end
 end
+
+private def typed_ids(results : Array(Memo::Search::Result)) : Array({String, Int64})
+  results.map { |r| {r.source_type, r.source_id.as(Int64)} }.sort!
+end
+
+# Sources 1 (private) and 2 (public) share a text; 3 (public) has its own
+private def with_shared_text(&)
+  with_test_service do |service|
+    service.index(source_type: "private", source_id: 1_i64, text: "the secret plan")
+    service.index(source_type: "public", source_id: 2_i64, text: "the secret plan")
+    service.index(source_type: "public", source_id: 3_i64, text: "an open letter")
+    yield service
+  end
+end
+
+describe "Filtered search over a text several sources share" do
+  it "returns only the sources a source_type filter passes" do
+    with_shared_text do |service|
+      results = service.search(query: "the secret plan", limit: 1, min_score: -1.0, source_type: "public")
+      typed_ids(results).should eq [{"public", 2_i64}]
+    end
+  end
+
+  it "returns only the sources sql_where passes" do
+    with_shared_text do |service|
+      results = service.search(query: "the secret plan", min_score: -1.0,
+        sql_where: "c.source_type = ?", sql_where_args: ["public"] of DB::Any)
+      typed_ids(results).should eq [{"public", 2_i64}, {"public", 3_i64}]
+    end
+  end
+
+  it "returns only the source an id filter names" do
+    with_shared_text do |service|
+      results = service.search(query: "the secret plan", min_score: -1.0, source_type: "private", source_id: 1_i64)
+      typed_ids(results).should eq [{"private", 1_i64}]
+    end
+  end
+
+  it "returns only the sources like and match pass" do
+    with_shared_text do |service|
+      typed_ids(service.search(query: "the secret plan", min_score: -1.0, source_type: "public", like: "%secret%"))
+        .should eq [{"public", 2_i64}]
+      typed_ids(service.search(query: "the secret plan", min_score: -1.0, source_type: "public", match: "secret"))
+        .should eq [{"public", 2_i64}]
+    end
+  end
+
+  it "fetches no more of one embedding's chunks than the limit" do
+    with_test_service do |service|
+      (1..30).each { |i| service.index(source_type: "doc", source_id: i.to_i64, text: "the same words") }
+      rowid = service.db.scalar("SELECT rowid FROM memo_embeddings").as(Int64)
+      rows = service.db.memo_queries.fetch_search_results(
+        service.service_id, [service.service_id.as(DB::Any)], ["e.service_id = ?"], "", "", [rowid], false, 3)
+      rows.size.should eq 3
+
+      results = service.search(query: "the same words", limit: 3, min_score: -1.0)
+      ids(results).should eq [1_i64, 2_i64, 3_i64]
+    end
+  end
+end
+
+describe "Search id filters" do
+  it "find nothing for an id that names no source" do
+    with_test_service do |service|
+      service.index(source_type: "doc", source_id: 1_i64, text: "alpha")
+      service.search(query: "alpha", min_score: -1.0, source_type: "doc", source_id: 999_i64).should be_empty
+      service.search(query: "alpha", min_score: -1.0, source_type: "doc", pair_id: 999_i64).should be_empty
+      service.search(query: "alpha", min_score: -1.0, source_type: "doc", parent_id: 999_i64).should be_empty
+      service.search(query: "alpha", min_score: -1.0, source_type: "doc", source_id: 1_i64).size.should eq 1
+    end
+  end
+
+  it "need a source_type" do
+    with_test_service do |service|
+      expect_raises(ArgumentError, /need source_type/) do
+        service.search(query: "alpha", source_id: 1_i64)
+      end
+    end
+  end
+
+  it "refuse like and match when the text isn't stored" do
+    with_test_db_path do |db_path|
+      service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50, store_text: false)
+      service.index(source_type: "doc", source_id: 1_i64, text: "alpha")
+      expect_raises(ArgumentError, /store_text/) { service.search(query: "alpha", like: "%alpha%") }
+      expect_raises(ArgumentError, /store_text/) { service.search(query: "alpha", match: "alpha") }
+      service.search(query: "alpha", min_score: -1.0).size.should eq 1
+      service.close
+    end
+  end
+end

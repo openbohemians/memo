@@ -507,6 +507,34 @@ module Memo
     ) : {Array(Search::Result), Search::Timings}
       t_start = Time.instant
 
+      like_patterns = case like
+                      when String then [like]
+                      when Array  then like
+                      else             nil
+                      end
+
+      # A filter memo can't apply is an error, not dropped: dropping it would
+      # widen the search past what the caller scoped it to
+      if (source_id || pair_id || parent_id) && source_type.nil?
+        raise ArgumentError.new("source_id, pair_id and parent_id need source_type")
+      end
+      if !@text_storage && ((like_patterns && !like_patterns.empty?) || (match && !match.empty?))
+        raise ArgumentError.new("like and match need the text, which isn't stored (store_text: false)")
+      end
+
+      # Resolve external IDs to internal IDs for filtering. An id that names
+      # no source matches nothing.
+      internal_source_id = internal_pair_id = internal_parent_id = nil
+      if type = source_type
+        internal_source_id = source_id.try { |id| SourceRegistry.get_internal(@db, type, id) }
+        internal_pair_id = pair_id.try { |id| SourceRegistry.get_internal(@db, type, id) }
+        internal_parent_id = parent_id.try { |id| SourceRegistry.get_internal(@db, type, id) }
+        if (source_id && !internal_source_id) || (pair_id && !internal_pair_id) || (parent_id && !internal_parent_id)
+          total_ms = (Time.instant - t_start).total_milliseconds.round(1)
+          return {[] of Search::Result, Search::Timings.new(total_ms: total_ms)}
+        end
+      end
+
       # Generate query embedding (check cache first)
       t_embed_start = Time.instant
       cached = @query_cache.get(query)
@@ -517,11 +545,6 @@ module Memo
         @query_cache.put(query, query_embedding, _tokens)
       end
       t_embed_end = Time.instant
-
-      # Resolve external IDs to internal IDs for filtering
-      internal_source_id = source_id && source_type ? SourceRegistry.get_internal(@db, source_type, source_id) : nil
-      internal_pair_id = pair_id && source_type ? SourceRegistry.get_internal(@db, source_type, pair_id) : nil
-      internal_parent_id = parent_id && source_type ? SourceRegistry.get_internal(@db, source_type, parent_id) : nil
 
       filters = if source_type || internal_source_id || internal_pair_id || internal_parent_id
                   Search::Filters.new(
@@ -534,12 +557,6 @@ module Memo
                   nil
                 end
 
-      like_patterns = case like
-                      when String then [like]
-                      when Array  then like
-                      else             nil
-                      end
-
       # Vector + metadata search
       t_search_start = Time.instant
       results = Search.semantic(
@@ -551,8 +568,8 @@ module Memo
         min_score: min_score,
         filters: filters,
         sql_where: sql_where,
-        like: @text_storage ? like_patterns : nil,
-        match: @text_storage ? match : nil,
+        like: like_patterns,
+        match: match,
         include_text: @text_storage && include_text,
         sql_where_args: sql_where_args, track_matches: @track_matches
       )

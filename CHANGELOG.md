@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Search filters apply to every result, including sources that share a text.** Since 0.13.0 a text is
+  stored and embedded once however many sources have it. The filters (`source_type`, ids, `sql_where`,
+  `like`, `match`) picked the matching embeddings, but the results then listed every source with that
+  text, including sources the filters exclude. A search for `source_type: "public", limit: 1` could
+  return only a private source. Results now hold only chunks that pass the filters, on SQLite and
+  PostgreSQL. The fetch also stops at `limit` chunks per embedding, so a text shared by many sources no
+  longer loads them all.
+- **An id filter that names no source finds nothing.** `source_id`, `pair_id` or `parent_id` that doesn't
+  resolve used to be dropped, which widened the search to everything.
+
+### Changed
+- **`search` raises `ArgumentError` for filters it can't apply,** instead of ignoring them:
+  - `source_id`, `pair_id` or `parent_id` given without `source_type`;
+  - `like` or `match` on a service with `store_text: false`.
+
 ## [0.14.0] - 2026-10-22
 
 ### Changed

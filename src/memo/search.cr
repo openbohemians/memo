@@ -86,10 +86,11 @@ module Memo
       track_matches : Bool = true,
     ) : Array(Result)
       has_filters = filters || sql_where || (like && !like.empty?) || (match && !match.empty?)
+      clauses = filter_clauses(db, service_id, filters, sql_where, like, match, sql_where_args)
 
       # Get nearest neighbor candidates from USearch
       usearch_results = if has_filters
-                          search_filtered(db, usearch_index, embedding, service_id, limit, min_score, filters, sql_where, like, match, sql_where_args)
+                          search_filtered(db, usearch_index, embedding, service_id, limit, min_score, clauses)
                         else
                           USearchIndex.search(usearch_index, embedding, limit)
                         end
@@ -107,7 +108,7 @@ module Memo
       return [] of Result if scores.empty?
 
       # Batch-fetch chunk metadata for matching rowids
-      fetch_results(db, service_id, scores, limit, include_text, track_matches)
+      fetch_results(db, service_id, scores, limit, include_text, track_matches, clauses)
     end
 
     # Mark chunks as read (increment read_count)
@@ -154,14 +155,8 @@ module Memo
       service_id : Int64,
       limit : Int32,
       min_score : Float64,
-      filters : Filters?,
-      sql_where : String?,
-      like : Array(String)?,
-      match : String?,
-      sql_where_args : Array(DB::Any),
+      clauses : FilterClauses,
     ) : Array(USearch::SearchResult)
-      clauses = filter_clauses(db, service_id, filters, sql_where, like, match, sql_where_args)
-
       k = {limit * 4, 40}.max
       max_candidates = {MAX_CANDIDATES, limit * 25}.max
       2.times do |round|
@@ -276,7 +271,9 @@ module Memo
       FilterClauses.new(where_clauses, params, text_join, fts_join)
     end
 
-    # Fetch chunk metadata for USearch results
+    # Fetch chunk metadata for USearch results: the chunks that pass the
+    # filters (an embedding's other chunks may belong to sources they
+    # exclude), and no more of one embedding's than can make the results
     private def fetch_results(
       db : DB::Database,
       service_id : Int64,
@@ -284,9 +281,12 @@ module Memo
       limit : Int32,
       include_text : Bool,
       track_matches : Bool,
+      clauses : FilterClauses,
     ) : Array(Result)
       rowids = scores.keys.map(&.to_i64)
-      rows = db.memo_queries.fetch_search_results(rowids, service_id, include_text)
+      rows = db.memo_queries.fetch_search_results(
+        service_id, clauses.params, clauses.where, clauses.text_join, clauses.fts_join,
+        rowids, include_text, limit)
 
       results = rows.map do |row|
         embedding_rowid, chunk_id, hash, source_type, internal_source_id, external_int, external_text, external_blob, internal_pair_id, pair_external_int, pair_external_text, pair_external_blob, internal_parent_id, parent_external_int, parent_external_text, parent_external_blob, offset, size, match_count, read_count, text_content = row
@@ -306,7 +306,7 @@ module Memo
         )
       end
 
-      results.sort_by! { |r| -r.score }
+      results.sort_by! { |r| {-r.score, r.chunk_id} }
       results = results.first(limit)
       Storage.increment_match_count(db, results.map(&.chunk_id)) if track_matches
       results

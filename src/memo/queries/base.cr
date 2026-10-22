@@ -320,10 +320,18 @@ module Memo
       candidate_ids : Array(Int64),
     ) : Set(UInt64)
 
+    # The chunks of `rowids`' embeddings that pass the filter clauses, at most
+    # `per_embedding` of each. An embedding is shared by every chunk with its
+    # text, so its other chunks may belong to sources the filters exclude.
     abstract def fetch_search_results(
-      rowids : Array(Int64),
       service_id : Int64,
+      params : Array(DB::Any),
+      where_clauses : Array(String),
+      text_join : String,
+      fts_join : String,
+      rowids : Array(Int64),
       include_text : Bool,
+      per_embedding : Int32,
     ) : Array({UInt64, Int64, Bytes, String, Int64, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int64?, Int64?, String?, Bytes?, Int32?, Int32, Int32, Int32, String?})
 
     # =========================================================================

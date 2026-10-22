@@ -203,4 +203,23 @@ describe "PostgreSQL backend" do
       service.close
     end
   end
+
+  it "returns only the sources the filters pass, when sources share a text" do
+    with_pg_database do |url, index_dir|
+      service = open_pg(url, index_dir)
+      service.index(source_type: "private", source_id: 1_i64, text: "the secret plan")
+      service.index(source_type: "public", source_id: 2_i64, text: "the secret plan")
+      service.index(source_type: "public", source_id: 3_i64, text: "an open letter")
+
+      found = ->(results : Array(Memo::Search::Result)) { results.map { |result| {result.source_type, result.source_id.as(Int64)} }.sort! }
+      found.call(service.search(query: "the secret plan", limit: 1, min_score: -1.0, source_type: "public"))
+        .should eq [{"public", 2_i64}]
+      found.call(service.search(query: "the secret plan", min_score: -1.0, sql_where: "c.source_type = ?", sql_where_args: ["public"] of DB::Any))
+        .should eq [{"public", 2_i64}, {"public", 3_i64}]
+      found.call(service.search(query: "the secret plan", min_score: -1.0, source_type: "public", match: "secret"))
+        .should eq [{"public", 2_i64}]
+      service.search(query: "the secret plan", min_score: -1.0, source_type: "public", source_id: 999_i64).should be_empty
+      service.close
+    end
+  end
 end
