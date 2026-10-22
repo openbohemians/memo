@@ -578,7 +578,7 @@
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L2" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L2" target="_blank">
         memo/queries/sqlite.cr
       </a>
     
@@ -644,6 +644,13 @@
     
       <li class="entry-summary">
         <a href="#clear_queue%3AInt32-instance-method" class="signature"><strong>#clear_queue</strong> : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#complete_queue_item%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ABool-instance-method" class="signature"><strong>#complete_queue_item</strong>(id : Int64, text : String, processed_at : Int64) : Bool</a>
+        
+          <div class="summary"><p>The mark_queue_* methods take the item's text as it was read, and do nothing if it has changed since: the source was queued again, and the newer text still needs embedding.</p></div>
         
       </li>
     
@@ -740,6 +747,11 @@
       </li>
     
       <li class="entry-summary">
+        <a href="#delete_queue_item%28source_id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_queue_item</strong>(source_id : Int64) : Nil</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#delete_service%28id%3AInt64%29%3ANil-instance-method" class="signature"><strong>#delete_service</strong>(id : Int64) : Nil</a>
         
       </li>
@@ -799,7 +811,9 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="signature"><strong>#fetch_search_results</strong>(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</a>
+        <a href="#fetch_search_results%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Crowids%3AArray%28Int64%29%2Cinclude_text%3ABool%2Cper_embedding%3AInt32%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="signature"><strong>#fetch_search_results</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, rowids : Array(Int64), include_text : Bool, per_embedding : Int32) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</a>
+        
+          <div class="summary"><p>The chunks of <code>rowids</code>' embeddings that pass the filter clauses, at most <code>per_embedding</code> of each.</p></div>
         
       </li>
     
@@ -942,7 +956,9 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method" class="signature"><strong>#get_queue_attempts</strong>(id : Int64) : Int32</a>
+        <a href="#get_queue_attempts%28id%3AInt64%29%3AInt32%7CNil-instance-method" class="signature"><strong>#get_queue_attempts</strong>(id : Int64) : Int32 | Nil</a>
+        
+          <div class="summary"><p>nil once the item is gone (its source deleted)</p></div>
         
       </li>
     
@@ -1117,19 +1133,7 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="signature"><strong>#mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
         <a href="#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="signature"><strong>#mark_queue_retry</strong>(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil</a>
-        
-      </li>
-    
-      <li class="entry-summary">
-        <a href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="signature"><strong>#mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil</a>
-        
-          <div class="summary"><p>The mark_queue_* methods take the item's text as it was read, and do nothing if it has changed since: the source was queued again, and the newer text still needs embedding.</p></div>
         
       </li>
     
@@ -1300,6 +1304,11 @@
     clear_queue</a>, 
     
   
+    <a href="../../Memo/Queries.html#complete_queue_item%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ABool-instance-method" class="tooltip">
+      <span>complete_queue_item(id : Int64, text : String, processed_at : Int64) : Bool</span>
+    complete_queue_item</a>, 
+    
+  
     <a href="../../Memo/Queries.html#count_chunks_by_hash%28hash%3ABytes%29%3AInt64-instance-method" class="tooltip">
       <span>count_chunks_by_hash(hash : Bytes) : Int64</span>
     count_chunks_by_hash</a>, 
@@ -1390,6 +1399,11 @@
     delete_index_data</a>, 
     
   
+    <a href="../../Memo/Queries.html#delete_queue_item%28source_id%3AInt64%29%3ANil-instance-method" class="tooltip">
+      <span>delete_queue_item(source_id : Int64) : Nil</span>
+    delete_queue_item</a>, 
+    
+  
     <a href="../../Memo/Queries.html#delete_service%28id%3AInt64%29%3ANil-instance-method" class="tooltip">
       <span>delete_service(id : Int64) : Nil</span>
     delete_service</a>, 
@@ -1445,8 +1459,8 @@
     enqueue</a>, 
     
   
-    <a href="../../Memo/Queries.html#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="tooltip">
-      <span>fetch_search_results(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</span>
+    <a href="../../Memo/Queries.html#fetch_search_results%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Crowids%3AArray%28Int64%29%2Cinclude_text%3ABool%2Cper_embedding%3AInt32%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method" class="tooltip">
+      <span>fetch_search_results(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, rowids : Array(Int64), include_text : Bool, per_embedding : Int32) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))</span>
     fetch_search_results</a>, 
     
   
@@ -1580,8 +1594,8 @@
     get_query_cache</a>, 
     
   
-    <a href="../../Memo/Queries.html#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method" class="tooltip">
-      <span>get_queue_attempts(id : Int64) : Int32</span>
+    <a href="../../Memo/Queries.html#get_queue_attempts%28id%3AInt64%29%3AInt32%7CNil-instance-method" class="tooltip">
+      <span>get_queue_attempts(id : Int64) : Int32 | Nil</span>
     get_queue_attempts</a>, 
     
   
@@ -1745,19 +1759,9 @@
     mark_queue_failed</a>, 
     
   
-    <a href="../../Memo/Queries.html#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil</span>
-    mark_queue_item_success</a>, 
-    
-  
     <a href="../../Memo/Queries.html#mark_queue_retry%28id%3AInt64%2Ctext%3AString%2Cattempts%3AInt32%2Cerror_message%3AString%7CNil%29%3ANil-instance-method" class="tooltip">
       <span>mark_queue_retry(id : Int64, text : String, attempts : Int32, error_message : String | Nil) : Nil</span>
     mark_queue_retry</a>, 
-    
-  
-    <a href="../../Memo/Queries.html#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method" class="tooltip">
-      <span>mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil</span>
-    mark_queue_success</a>, 
     
   
     <a href="../../Memo/Queries.html#max_index_log_seq%28service_id%3AInt64%29%3AInt64-instance-method" class="tooltip">
@@ -1974,7 +1978,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L235" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L235" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2001,7 +2005,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L239" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L239" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2017,7 +2021,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L506" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L509" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2042,7 +2046,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L514" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L517" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2058,7 +2062,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L76" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L76" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2074,7 +2078,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L791" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L810" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2090,7 +2094,36 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L510" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L513" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="complete_queue_item(id:Int64,text:String,processed_at:Int64):Bool-instance-method">
+      <div class="signature">
+        
+        def <strong>complete_queue_item</strong>(id : Int64, text : String, processed_at : Int64) : Bool
+
+        <a class="method-permalink" href="#complete_queue_item%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ABool-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>The mark_queue_* methods take the item's text as it was read, and do
+nothing if it has changed since: the source was queued again, and the
+newer text still needs embedding.
+Mark the item done if it still holds <code>text</code> (nothing changed it since
+it was read). Returns whether it did.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L473" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2106,7 +2139,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L265" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L265" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2122,7 +2155,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L132" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L132" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2138,7 +2171,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L128" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L128" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2154,7 +2187,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L396" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L396" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2170,7 +2203,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L779" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L798" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2186,7 +2219,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L604" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L607" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2202,7 +2235,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L600" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L603" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2218,7 +2251,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L611" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L614" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2234,7 +2267,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L143" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L143" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2250,7 +2283,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L826" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L845" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2266,7 +2299,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L440" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L440" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2282,7 +2315,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L227" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L227" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2298,7 +2331,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L231" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L231" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2314,7 +2347,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L116" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L116" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2330,7 +2363,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L269" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L269" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2346,7 +2379,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L120" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L120" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2362,7 +2395,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L384" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L384" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2387,7 +2420,23 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L909" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L928" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="delete_queue_item(source_id:Int64):Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>delete_queue_item</strong>(source_id : Int64) : Nil
+
+        <a class="method-permalink" href="#delete_queue_item%28source_id%3AInt64%29%3ANil-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L499" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2403,7 +2452,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L124" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L124" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2419,7 +2468,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L334" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L334" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2435,7 +2484,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L338" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L338" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2451,7 +2500,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L326" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L326" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2467,7 +2516,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L330" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L330" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2483,7 +2532,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L822" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L841" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2499,7 +2548,7 @@ service}</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L436" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L436" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2525,7 +2574,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L250" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L250" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2550,7 +2599,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L842" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L861" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2566,7 +2615,7 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L850" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L869" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2582,23 +2631,34 @@ vector (one without has been lost: embed it again)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L448" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L448" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="fetch_search_results(rowids:Array(Int64),service_id:Int64,include_text:Bool):Array(Tuple(UInt64,Int64,Bytes,String,Int64,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int32|Nil,Int32,Int32,Int32,String|Nil))-instance-method">
+    <div class="entry-detail" id="fetch_search_results(service_id:Int64,params:Array(DB::Any),where_clauses:Array(String),text_join:String,fts_join:String,rowids:Array(Int64),include_text:Bool,per_embedding:Int32):Array(Tuple(UInt64,Int64,Bytes,String,Int64,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int64|Nil,Int64|Nil,String|Nil,Bytes|Nil,Int32|Nil,Int32,Int32,Int32,String|Nil))-instance-method">
       <div class="signature">
         
-        def <strong>fetch_search_results</strong>(rowids : Array(Int64), service_id : Int64, include_text : Bool) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))
+        def <strong>fetch_search_results</strong>(service_id : Int64, params : Array(DB::Any), where_clauses : Array(String), text_join : String, fts_join : String, rowids : Array(Int64), include_text : Bool, per_embedding : Int32) : Array(Tuple(UInt64, Int64, Bytes, String, Int64, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int64 | Nil, Int64 | Nil, String | Nil, Bytes | Nil, Int32 | Nil, Int32, Int32, Int32, String | Nil))
 
-        <a class="method-permalink" href="#fetch_search_results%28rowids%3AArray%28Int64%29%2Cservice_id%3AInt64%2Cinclude_text%3ABool%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method">#</a>
+        <a class="method-permalink" href="#fetch_search_results%28service_id%3AInt64%2Cparams%3AArray%28DB%3A%3AAny%29%2Cwhere_clauses%3AArray%28String%29%2Ctext_join%3AString%2Cfts_join%3AString%2Crowids%3AArray%28Int64%29%2Cinclude_text%3ABool%2Cper_embedding%3AInt32%29%3AArray%28Tuple%28UInt64%2CInt64%2CBytes%2CString%2CInt64%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt64%7CNil%2CInt64%7CNil%2CString%7CNil%2CBytes%7CNil%2CInt32%7CNil%2CInt32%2CInt32%2CInt32%2CString%7CNil%29%29-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>The chunks of <code>rowids</code>' embeddings that pass the filter clauses, at most
+<code>per_embedding</code> of each. An embedding is shared by every chunk with its
+text, so its other chunks may belong to sources the filters exclude.</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L715" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L718" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2624,7 +2684,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L682" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L685" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2640,7 +2700,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L534" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L537" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2656,7 +2716,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L11" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L11" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2672,7 +2732,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L301" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L301" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2688,7 +2748,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L313" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L313" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2704,7 +2764,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L293" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L293" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2720,7 +2780,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L305" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L305" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2736,7 +2796,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L297" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L297" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2752,7 +2812,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L309" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L309" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2777,7 +2837,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L3" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L3" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2802,7 +2862,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L566" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L569" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2818,7 +2878,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L213" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L213" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2834,7 +2894,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L197" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L197" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2850,7 +2910,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L638" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L641" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2866,7 +2926,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L69" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L69" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2882,7 +2942,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L108" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L108" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2898,7 +2958,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L171" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L171" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2914,7 +2974,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L175" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L175" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2930,7 +2990,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L418" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L418" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2946,7 +3006,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L372" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L372" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2962,7 +3022,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L366" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L366" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -2978,7 +3038,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L378" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L378" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3003,7 +3063,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L886" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L905" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3019,7 +3079,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L584" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L587" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3035,7 +3095,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L462" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L462" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3051,23 +3111,32 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L764" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L783" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="get_queue_attempts(id:Int64):Int32-instance-method">
+    <div class="entry-detail" id="get_queue_attempts(id:Int64):Int32|Nil-instance-method">
       <div class="signature">
         
-        def <strong>get_queue_attempts</strong>(id : Int64) : Int32
+        def <strong>get_queue_attempts</strong>(id : Int64) : Int32 | Nil
 
-        <a class="method-permalink" href="#get_queue_attempts%28id%3AInt64%29%3AInt32-instance-method">#</a>
+        <a class="method-permalink" href="#get_queue_attempts%28id%3AInt64%29%3AInt32%7CNil-instance-method">#</a>
       </div>
+      
+        <div class="doc">
+          
+            <div class="doc-inherited">
+              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
+            </div>
+          
+          <p>nil once the item is gone (its source deleted)</p>
+        </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L477" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L480" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3083,7 +3152,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L492" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L495" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3099,7 +3168,7 @@ cost depends on the number of candidates, not the collection)</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L795" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L814" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3121,7 +3190,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L37" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L37" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3137,7 +3206,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L26" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L26" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3153,7 +3222,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L55" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L55" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3169,7 +3238,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L62" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L62" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3185,7 +3254,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L592" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L595" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3201,7 +3270,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L317" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L317" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3226,7 +3295,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L559" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L562" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3242,7 +3311,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L622" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L625" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3258,7 +3327,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L47" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L47" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3274,7 +3343,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L818" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L837" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3290,7 +3359,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L404" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L404" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3306,7 +3375,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L201" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L201" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3322,7 +3391,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L207" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L207" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3347,7 +3416,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L867" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L886" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3363,7 +3432,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L183" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L183" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3379,7 +3448,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L163" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L163" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3395,7 +3464,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L15" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L15" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3420,7 +3489,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L147" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L147" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3436,7 +3505,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L277" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L277" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3452,7 +3521,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L289" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L289" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3468,7 +3537,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L281" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L281" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3484,7 +3553,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L285" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L285" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3509,7 +3578,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L573" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L576" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3525,7 +3594,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L388" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L388" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3541,7 +3610,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L84" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L84" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3557,7 +3626,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L93" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L93" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3573,7 +3642,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L342" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L342" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3589,7 +3658,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L919" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L938" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3605,7 +3674,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L863" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L882" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3621,23 +3690,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L481" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="mark_queue_item_success(id:Int64,text:String,processed_at:Int64,attempts:Int32):Nil-instance-method">
-      <div class="signature">
-        
-        def <strong>mark_queue_item_success</strong>(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
-
-        <a class="method-permalink" href="#mark_queue_item_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%2Cattempts%3AInt32%29%3ANil-instance-method">#</a>
-      </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L496" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L484" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3653,34 +3706,7 @@ earlier added when opening it by format and model</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L488" target="_blank">View source</a>]
-        
-      </div>
-    </div>
-  
-    <div class="entry-detail" id="mark_queue_success(id:Int64,text:String,processed_at:Int64):Nil-instance-method">
-      <div class="signature">
-        
-        def <strong>mark_queue_success</strong>(id : Int64, text : String, processed_at : Int64) : Nil
-
-        <a class="method-permalink" href="#mark_queue_success%28id%3AInt64%2Ctext%3AString%2Cprocessed_at%3AInt64%29%3ANil-instance-method">#</a>
-      </div>
-      
-        <div class="doc">
-          
-            <div class="doc-inherited">
-              Description copied from class <a href="../../Memo/Queries.html">Memo::Queries</a>
-            </div>
-          
-          <p>The mark_queue_* methods take the item's text as it was read, and do
-nothing if it has changed since: the source was queued again, and the
-newer text still needs embedding.</p>
-        </div>
-      
-      <br/>
-      <div>
-        
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L473" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L491" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3696,7 +3722,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L878" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L897" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3712,7 +3738,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L882" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L901" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3728,7 +3754,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L783" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L802" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3744,7 +3770,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L500" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L503" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3769,7 +3795,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L538" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L541" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3785,7 +3811,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L657" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L660" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3801,7 +3827,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L139" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L139" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3817,7 +3843,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L555" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L558" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3833,7 +3859,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L80" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L80" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3849,7 +3875,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L893" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L912" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3865,7 +3891,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L588" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L591" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3881,7 +3907,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L551" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L554" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3897,7 +3923,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L901" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L920" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3913,7 +3939,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L547" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L550" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3929,7 +3955,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L102" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L102" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3945,7 +3971,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L51" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L51" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3961,7 +3987,7 @@ newer text still needs embedding.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L432" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L432" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -3987,7 +4013,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L522" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L525" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4003,7 +4029,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L358" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L358" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4019,7 +4045,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L771" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L790" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4035,7 +4061,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L811" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L830" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4051,7 +4077,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L410" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L410" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -4076,7 +4102,7 @@ stores the hash alone.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.14.0/src/memo/queries/sqlite.cr#L830" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.14.1/src/memo/queries/sqlite.cr#L849" target="_blank">View source</a>]
         
       </div>
     </div>
