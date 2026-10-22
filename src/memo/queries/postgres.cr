@@ -557,12 +557,15 @@ module Memo
       items
     end
 
-    def mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil
-      @db.exec("UPDATE memo_embed_queue SET status = 0, text = NULL, processed_at = $1, attempts = attempts + 1 WHERE id = $2 AND text = $3", processed_at, id, text)
+    def complete_queue_item(id : Int64, text : String, processed_at : Int64) : Bool
+      @db.exec(
+        "UPDATE memo_embed_queue SET status = 0, text = NULL, processed_at = $1, attempts = attempts + 1 WHERE id = $2 AND text = $3",
+        processed_at, id, text
+      ).rows_affected == 1
     end
 
-    def get_queue_attempts(id : Int64) : Int32
-      @db.query_one("SELECT attempts FROM memo_embed_queue WHERE id = $1", id, as: Int32)
+    def get_queue_attempts(id : Int64) : Int32?
+      @db.query_one?("SELECT attempts FROM memo_embed_queue WHERE id = $1", id, as: Int32)
     end
 
     def mark_queue_failed(id : Int64, text : String, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
@@ -580,8 +583,8 @@ module Memo
       @db.query_one?("SELECT id, text FROM memo_embed_queue WHERE source_id = $1 AND status = -1", source_id, as: {Int64, String})
     end
 
-    def mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
-      @db.exec("UPDATE memo_embed_queue SET status = 0, text = NULL, processed_at = $1, attempts = $2 WHERE id = $3 AND text = $4", processed_at, attempts, id, text)
+    def delete_queue_item(source_id : Int64) : Nil
+      @db.exec("DELETE FROM memo_embed_queue WHERE source_id = $1", source_id)
     end
 
     def queue_stats : {Int64, Int64}

@@ -220,9 +220,12 @@ module Memo
     # The mark_queue_* methods take the item's text as it was read, and do
     # nothing if it has changed since: the source was queued again, and the
     # newer text still needs embedding.
-    abstract def mark_queue_success(id : Int64, text : String, processed_at : Int64) : Nil
+    # Mark the item done if it still holds `text` (nothing changed it since
+    # it was read). Returns whether it did.
+    abstract def complete_queue_item(id : Int64, text : String, processed_at : Int64) : Bool
 
-    abstract def get_queue_attempts(id : Int64) : Int32
+    # nil once the item is gone (its source deleted)
+    abstract def get_queue_attempts(id : Int64) : Int32?
 
     abstract def mark_queue_failed(id : Int64, text : String, error_message : String?, attempts : Int32, processed_at : Int64) : Nil
 
@@ -230,7 +233,7 @@ module Memo
 
     abstract def get_queue_item(source_id : Int64) : {Int64, String}?
 
-    abstract def mark_queue_item_success(id : Int64, text : String, processed_at : Int64, attempts : Int32) : Nil
+    abstract def delete_queue_item(source_id : Int64) : Nil
 
     abstract def queue_stats : {Int64, Int64}
 

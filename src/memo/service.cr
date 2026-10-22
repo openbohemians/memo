@@ -666,6 +666,11 @@ module Memo
       set_source_content(cnn, internal_source_id, nil)
       content_ids.each { |content_id| q.release_content(content_id) }
 
+      # Queued work for the source is cancelled too, including work being
+      # embedded right now (see embed_and_store_internal), so nothing
+      # brings the source back
+      q.delete_queue_item(internal_source_id)
+
       deleted_count
     end
 
@@ -1056,7 +1061,7 @@ module Memo
     # rate limits and add complexity without benefit.
     #
     # A source queued again while its item is being embedded stays pending,
-    # with its new text, and is embedded next.
+    # with its new text, and is embedded next; the older text isn't written.
     def process_queue : Int32
       q = @db.memo_queries
       max_retries = @queue_config.max_retries
@@ -1074,12 +1079,13 @@ module Memo
               internal_source_id: internal_source_id,
               text: text,
               internal_pair_id: pair_id,
-              internal_parent_id: parent_id
+              internal_parent_id: parent_id,
+              queued: {id, stored_text}
             )
-            q.mark_queue_success(id, stored_text, Time.utc.to_unix_ms)
             processed += stored if stored > 0 # -1: unchanged
           rescue ex
             attempts = q.get_queue_attempts(id)
+            next unless attempts # deleted meanwhile
             new_attempts = attempts + 1
 
             if new_attempts >= max_retries
@@ -1123,15 +1129,14 @@ module Memo
 
       while attempts < max_retries
         begin
-          chunks_stored = embed_and_store_internal(
+          return embed_and_store_internal(
             source_type: source_type,
             internal_source_id: internal_source_id,
             text: text,
             internal_pair_id: pair_id,
-            internal_parent_id: parent_id
+            internal_parent_id: parent_id,
+            queued: {id, stored_text}
           )
-          q.mark_queue_item_success(id, stored_text, Time.utc.to_unix_ms, attempts + 1)
-          return chunks_stored
         rescue ex
           last_error = ex
           attempts += 1
@@ -1786,27 +1791,41 @@ module Memo
     # API: the others (the unchanged parts of an edited text, or a text
     # another source has too) reuse the one stored.
     #
-    # Returns number of chunks successfully stored, or -1 if skipped
-    # (already indexed with this text, pair_id and parent_id).
+    # `queued` is the queue item ({id, stored text}) this work came from. It
+    # is marked done in the same transaction as the write, and only if it
+    # still holds this text: if the source was queued again or deleted while
+    # this text was being embedded, nothing is written, since the newer work
+    # (or the delete) wins.
+    #
+    # Returns number of chunks successfully stored (0 when superseded), or
+    # -1 if skipped (already indexed with this text, pair_id and parent_id).
     private def embed_and_store_internal(
       source_type : String,
       internal_source_id : Int64,
       text : String,
       internal_pair_id : Int64? = nil,
       internal_parent_id : Int64? = nil,
+      queued : {Int64, String}? = nil,
     ) : Int32
       content_hash = Storage.compute_hash(text)
-      return -1 if indexed?(internal_source_id, content_hash, source_type, internal_pair_id, internal_parent_id)
+      if indexed?(internal_source_id, content_hash, source_type, internal_pair_id, internal_parent_id)
+        queued.try { |(id, stored_text)| @db.memo_queries.complete_queue_item(id, stored_text, Time.utc.to_unix_ms) }
+        return -1
+      end
 
-      # Chunk text (returns tuples of {text, offset, size})
+      # Chunk text (returns tuples of {text, offset, size}). A blank text has
+      # none, and still replaces the source's old chunks.
       chunks = Chunking.chunk_text(text, @chunking_config)
-      return 0 if chunks.empty?
 
       new_word_freqs, existing_word_freqs = vocab_terms(text)
 
       with_embeddings(chunks.map(&.[0]), new_word_freqs.map(&.word)) do |fetched|
         stored = 0
         write_transaction do |cnn, pending|
+          if (work = queued) && !cnn.memo_queries.complete_queue_item(work[0], work[1], Time.utc.to_unix_ms)
+            next # superseded
+          end
+
           stored = replace_chunks(
             cnn, pending, fetched, internal_source_id, source_type, text, content_hash, chunks,
             internal_pair_id, internal_parent_id

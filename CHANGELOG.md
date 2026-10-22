@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer loads them all.
 - **An id filter that names no source finds nothing.** `source_id`, `pair_id` or `parent_id` that doesn't
   resolve used to be dropped, which widened the search to everything.
+- **An older text no longer overwrites a newer one.** A text is embedded outside the write lock. If its
+  source was indexed again during that call, the older text was then written over the newer one, and
+  it stayed: the queue held no work to repair it. Queue work now completes in the same transaction as
+  its write, and only if the queue still holds that text; otherwise nothing is written. `process_queue`
+  had the same race with items queued again after its batch was read.
+- **Deleted sources stay deleted.** `delete` left the source's queued work behind, so `process_queue`,
+  or an embedding already under way, brought the source back. Deleting now cancels the work.
+- **Indexing a blank text removes the source's old chunks.** They used to stay searchable while the
+  source pointed at the blank text.
 
 ### Changed
 - **`search` raises `ArgumentError` for filters it can't apply,** instead of ignoring them:

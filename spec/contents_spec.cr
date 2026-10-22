@@ -198,8 +198,9 @@ describe "Content-addressed storage" do
         nil
       end
 
+      # Both are embedded, but only the newer is written
       begin
-        embedded_during { memo.process_queue.should eq 2 }.should eq ["a purple gorilla", "a grape ape"]
+        embedded_during { memo.process_queue.should eq 1 }.should eq ["a purple gorilla", "a grape ape"]
       ensure
         Memo::Providers::Mock.on_embed = nil
       end
@@ -304,6 +305,84 @@ describe Memo::Migration do
     with_test_db_path do |db_path|
       open_memo(db_path).tap(&.db.exec("UPDATE memo_meta SET value = '99' WHERE key = 'schema_version'")).close
       expect_raises(Memo::Migration::NewerSchema, "schema version 99") { open_memo(db_path) }
+    end
+  end
+end
+
+# The texts of a doc's chunks, and the doc's own text, from the tables
+private def chunk_texts(service : Memo::Service, id : Int64) : Array(String)
+  service.db.query_all(<<-SQL, id, as: String)
+    SELECT SUBSTR(ct.content, c.offset + 1, c.size) FROM memo_chunks c
+    JOIN memo_contents ct ON ct.id = c.content_id JOIN memo_sources s ON s.id = c.source_id
+    WHERE s.source_type = 'doc' AND s.external_int = ? ORDER BY c.offset
+    SQL
+end
+
+private def doc_text(service : Memo::Service, id : Int64) : String?
+  service.db.query_one?(<<-SQL, id, as: String?)
+    SELECT ct.content FROM memo_sources s JOIN memo_contents ct ON ct.id = s.content_id
+    WHERE s.source_type = 'doc' AND s.external_int = ?
+    SQL
+end
+
+describe "Queue work overtaken while it's embedded" do
+  it "isn't written when the source is indexed again meanwhile" do
+    with_test_service do |service|
+      Memo::Providers::Mock.on_embed = ->(_texts : Array(String)) do
+        Memo::Providers::Mock.on_embed = nil
+        service.index(source_type: "doc", source_id: 1_i64, text: "the newer version")
+        nil
+      end
+      service.index(source_type: "doc", source_id: 1_i64, text: "the older version").should eq 0
+
+      chunk_texts(service, 1).should eq ["the newer version"]
+      doc_text(service, 1).should eq "the newer version"
+      service.queue_stats.pending.should eq 0
+    ensure
+      Memo::Providers::Mock.on_embed = nil
+    end
+  end
+
+  it "doesn't bring back a source deleted meanwhile" do
+    with_test_service do |service|
+      Memo::Providers::Mock.on_embed = ->(_texts : Array(String)) do
+        Memo::Providers::Mock.on_embed = nil
+        service.delete(1_i64, "doc")
+        nil
+      end
+      service.index(source_type: "doc", source_id: 1_i64, text: "a deleted text")
+
+      chunk_texts(service, 1).should be_empty
+      doc_text(service, 1).should be_nil
+      service.search(query: "a deleted text", min_score: -1.0).should be_empty
+    ensure
+      Memo::Providers::Mock.on_embed = nil
+    end
+  end
+end
+
+describe "Deleting a source" do
+  it "cancels its queued work" do
+    with_test_service do |service|
+      service.enqueue(source_type: "doc", source_id: 1_i64, text: "a deleted text")
+      service.delete(1_i64, "doc")
+
+      service.process_queue.should eq 0
+      chunk_texts(service, 1).should be_empty
+      service.search(query: "a deleted text", min_score: -1.0).should be_empty
+    end
+  end
+end
+
+describe "Indexing a blank text" do
+  it "removes the source's old chunks" do
+    with_test_service do |service|
+      service.index(source_type: "doc", source_id: 1_i64, text: "old text about apples")
+      service.index(source_type: "doc", source_id: 1_i64, text: "   ").should eq 0
+
+      chunk_texts(service, 1).should be_empty
+      service.search(query: "old text about apples", min_score: -1.0).should be_empty
+      service.queue_stats.pending.should eq 0
     end
   end
 end
