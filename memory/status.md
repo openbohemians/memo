@@ -2,6 +2,11 @@
 
 *Updated 2026-10-22*
 
+- **0.15.1 released 2026-10-22** (tag `v0.15.1` at `64791fb`), both asked for by the user that
+  day: memo-arcana won't start while another one answers at `memo:rag` (`dfe1c26`), and it
+  rejoins the bus when its connection drops (`ed8e1a9`). It used to exit 0 when the bus went
+  away, so systemd's `Restart=on-failure` left it stopped after any bus restart. Both checked
+  live against a private relay. Library users have nothing to act on.
 - **0.15.0 released 2026-10-22** (tag `v0.15.0` at `9f0d15e`): requires pg ~> 0.31.0 and so
   crystal-db 0.15 (`31da868`), which `@ipck` asked for to reach sqlite3 0.24.0. A minor bump
   because library users must move to crystal-db 0.15 too. No code changes. `@ipck` and
