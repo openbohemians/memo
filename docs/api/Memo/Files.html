@@ -603,7 +603,7 @@ and file metadata tracking for incremental updates.</p>
   </h2>
   
     
-      <a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L10" target="_blank">
+      <a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L10" target="_blank">
         memo/files.cr
       </a>
     
@@ -676,7 +676,21 @@ and file metadata tracking for incremental updates.</p>
       <li class="entry-summary">
         <a href="#file_info%28path%3AString%2Croot%3AString%29%3AFileInfo-instance-method" class="signature"><strong>#file_info</strong>(path : String, root : String) : FileInfo</a>
         
-          <div class="summary"><p>Get file info (path, hash, mtime, size)</p></div>
+          <div class="summary"><p><span class="flag red">DEPRECATED</span>  Paths are absolute now; use <code><a href="../Memo/Files.html#file_info%28path%3AString%29%3AFileInfo-instance-method">#file_info(path)</a></code></p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#file_info%28path%3AString%29%3AFileInfo-instance-method" class="signature"><strong>#file_info</strong>(path : String) : FileInfo</a>
+        
+          <div class="summary"><p>Get file info (path, hash, mtime, size).</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#find%28db%3ADBHandle%2Cpath%3AString%2Croot%3AString%2Crekey%3ABool%3Dtrue%29%3AFileRecord%7CNil-instance-method" class="signature"><strong>#find</strong>(db : DBHandle, path : String, root : String, rekey : Bool = <span class="n">true</span>) : FileRecord | Nil</a>
+        
+          <div class="summary"><p>The record for the file at <code>path</code> (absolute, as file_info gives it).</p></div>
         
       </li>
     
@@ -719,6 +733,13 @@ and file metadata tracking for incremental updates.</p>
         <a href="#store%28db%3ADBHandle%2Csource_id%3AInt64%2Cinfo%3AFileInfo%29-instance-method" class="signature"><strong>#store</strong>(db : DBHandle, source_id : Int64, info : FileInfo)</a>
         
           <div class="summary"><p>Store file record in database</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#under%28db%3ADBHandle%2Croot%3AString%29%3AArray%28Tuple%28Int64%2CString%29%29-instance-method" class="signature"><strong>#under</strong>(db : DBHandle, root : String) : Array(Tuple(Int64, String))</a>
+        
+          <div class="summary"><p>The files recorded under directory <code>root</code> (absolute), as {source_id, path}</p></div>
         
       </li>
     
@@ -769,7 +790,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L70" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L73" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -790,7 +811,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L86" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L89" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -811,7 +832,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L63" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L66" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -832,7 +853,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L97" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L100" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -853,7 +874,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L155" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L182" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -874,7 +895,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L140" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L167" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -889,13 +910,60 @@ and file metadata tracking for incremental updates.</p>
       
         <div class="doc">
           
-          <p>Get file info (path, hash, mtime, size)</p>
+          <p><span class="flag red">DEPRECATED</span>  Paths are absolute now; use <code><a href="../Memo/Files.html#file_info%28path%3AString%29%3AFileInfo-instance-method">#file_info(path)</a></code></p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L109" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L123" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="file_info(path:String):FileInfo-instance-method">
+      <div class="signature">
+        
+        def <strong>file_info</strong>(path : String) : <a href="../Memo/Files/FileInfo.html">FileInfo</a>
+
+        <a class="method-permalink" href="#file_info%28path%3AString%29%3AFileInfo-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Get file info (path, hash, mtime, size). The path is absolute with
+symlinks resolved, so a file has one record however it's reached.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L113" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="find(db:DBHandle,path:String,root:String,rekey:Bool=true):FileRecord|Nil-instance-method">
+      <div class="signature">
+        
+        def <strong>find</strong>(db : <a href="../Memo/DBHandle.html">DBHandle</a>, path : String, root : String, rekey : Bool = <span class="n">true</span>) : <a href="../Memo/Files/FileRecord.html">FileRecord</a> | Nil
+
+        <a class="method-permalink" href="#find%28db%3ADBHandle%2Cpath%3AString%2Croot%3AString%2Crekey%3ABool%3Dtrue%29%3AFileRecord%7CNil-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The record for the file at <code>path</code> (absolute, as file_info gives it).
+Before memo keyed files by absolute path, it keyed them by their path
+relative to the directory indexed (<code>root</code>, absolute with symlinks
+resolved): a record under that key is found too, and with <code>rekey</code>
+moved to <code>path</code>.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L142" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -916,7 +984,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L130" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L157" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -937,7 +1005,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L125" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L133" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -958,7 +1026,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L135" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L162" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -979,7 +1047,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L150" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L177" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1000,7 +1068,7 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L145" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L172" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1021,7 +1089,28 @@ and file metadata tracking for incremental updates.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L120" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L128" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="under(db:DBHandle,root:String):Array(Tuple(Int64,String))-instance-method">
+      <div class="signature">
+        
+        def <strong>under</strong>(db : <a href="../Memo/DBHandle.html">DBHandle</a>, root : String) : Array(Tuple(Int64, String))
+
+        <a class="method-permalink" href="#under%28db%3ADBHandle%2Croot%3AString%29%3AArray%28Tuple%28Int64%2CString%29%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>The files recorded under directory <code>root</code> (absolute), as {source_id, path}</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L152" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -1038,7 +1127,10 @@ and file metadata tracking for incremental updates.</p>
           
           <p>Walk directory and yield text files, respecting ignore patterns</p>
 <p>Uses ignoreme for .gitignore-style filtering.
-Uses magic.cr to detect and skip binary files.</p>
+Uses magic.cr to detect and skip binary files.
+Symlinks inside the tree are skipped, to files and directories alike:
+they can lead out of it (a checkout could link to your home directory)
+or loop. The root itself may be one.</p>
 <p>Options:</p>
 <ul>
 <li>root: Directory to walk</li>
@@ -1049,7 +1141,7 @@ Uses magic.cr to detect and skip binary files.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/openbohemians/memo/blob/v0.15.2/src/memo/files.cr#L44" target="_blank">View source</a>]
+          [<a href="https://github.com/openbohemians/memo/blob/v0.15.3/src/memo/files.cr#L47" target="_blank">View source</a>]
         
       </div>
     </div>

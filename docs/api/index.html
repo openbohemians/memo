@@ -613,6 +613,10 @@ memo index -r .                    # Recursively index current directory
 memo index -r /path/to/project     # Recursively index specific path
 memo index -r . --dry-run          # Preview without indexing
 memo index -r . --full             # Force re-index all files</code></pre>
+<p>A recursive index follows the directory's <code>.gitignore</code> and skips binary files and symlinks. Files are
+recorded by absolute path, so a file is one record whichever directory you index it from. Indexing a
+directory again re-embeds only the files that changed, and removes from the index the files it no
+longer finds there (deleted, or ignored now).</p>
 <p><strong>Index text from stdin:</strong></p>
 <pre><code class="language-bash">echo &quot;Your document text&quot; | memo index
 echo &quot;Document&quot; | memo index --source-type=article --source-id=1</code></pre>
