@@ -2,6 +2,17 @@
 
 *Updated 2026-10-22*
 
+- **0.15.3 released 2026-10-22** (tag `v0.15.3` at `6bd5d44`): `memo index -r` fixes, the
+  last of the review's findings except 14 (`f509649`). The walk skips symlinks inside the
+  tree. Files are keyed by real absolute path, and a record under the old relative key is
+  taken over, keeping its id, when its file is indexed again (checked against a 0.15.2
+  database). A run where text moves between files no longer fails for good. Indexing a
+  directory removes the files under it that it no longer finds. No library consumer calls
+  file indexing (checked 2026-10-22), so only the CLI's output changed. Specs that index
+  files must require memo before `spec`: the magic shard closes libmagic in an `at_exit`.
+  The CLI's `-s mock` can't index: it has no chunk-size option, and 2000 exceeds the mock's
+  100 (any service under 2000 tokens is refused the same way). `@datadungeon` was told the
+  same day (`mail/sent/`).
 - **0.15.2 released 2026-10-22** (tag `v0.15.2` at `05a0bec`): the review's later findings,
   which the user asked to fix in full. `use_service` switches the query cache, chunking and
   index together (`9f23a1c`). Opening by format and model uses the stored `base_url`
@@ -10,7 +21,7 @@
   logged removals are applied before a checkpoint, and replay looks vectors up per service,
   since SQLite reuses freed embedding rowids (`44aebdc`). memo-arcana caps chunking at 100 only
   for mock namespaces (`9a0f6e1`). `@datadungeon` and `@ipck` were told the same day
-  (`mail/sent/`). Still to do: the CLI's `memo index` (finding 21).
+  (`mail/sent/`).
 - **0.15.1 released 2026-10-22** (tag `v0.15.1` at `64791fb`), both asked for by the user that
   day: memo-arcana won't start while another one answers at `memo:rag` (`dfe1c26`), and it
   rejoins the bus when its connection drops (`ed8e1a9`). It used to exit 0 when the bus went
