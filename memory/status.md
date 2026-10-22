@@ -2,6 +2,15 @@
 
 *Updated 2026-10-22*
 
+- **0.15.2 released 2026-10-22** (tag `v0.15.2` at `05a0bec`): the review's later findings,
+  which the user asked to fix in full. `use_service` switches the query cache, chunking and
+  index together (`9f23a1c`). Opening by format and model uses the stored `base_url`
+  (`562633f`). `delete_service` works on PostgreSQL and spares other services' chunks and
+  held lock files (`6df4d15`). Clustering works on PostgreSQL (`568452e`). Another service's
+  logged removals are applied before a checkpoint, and replay looks vectors up per service,
+  since SQLite reuses freed embedding rowids (`44aebdc`). memo-arcana caps chunking at 100 only
+  for mock namespaces (`9a0f6e1`). `@datadungeon` and `@ipck` were told the same day
+  (`mail/sent/`). Still to do: the CLI's `memo index` (finding 21).
 - **0.15.1 released 2026-10-22** (tag `v0.15.1` at `64791fb`), both asked for by the user that
   day: memo-arcana won't start while another one answers at `memo:rag` (`dfe1c26`), and it
   rejoins the bus when its connection drops (`ed8e1a9`). It used to exit 0 when the bus went
