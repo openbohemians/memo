@@ -2,6 +2,14 @@
 
 *Updated 2026-10-22*
 
+- **0.15.4 released 2026-10-22** (tag `v0.15.4` at `1c6a326`): the CLI is built with jargon
+  0.22.1, at the user's request (`99bb95c`, `b5f47e7`). jargon's completion scripts now call
+  the program's hidden `__complete` verb, so `bin/memo.cr` calls `handle_completion` before
+  `parse`. `shard.yml` keeps `~> 0.16`: only the CLI uses jargon, and ipck pins jargon
+  `~> 0.16.0` (copious does through artistry, which uses jargon as a schema validator), so a
+  higher floor would keep them from resolving memo. A mistyped option value gets two errors;
+  that's jargon's, and the user said jargon is fixing it (2026-10-22). `@datadungeon` was
+  told the same day (`mail/sent/`).
 - **0.15.3 released 2026-10-22** (tag `v0.15.3` at `6bd5d44`): `memo index -r` fixes, the
   last of the review's findings except 14 (`f509649`). The walk skips symlinks inside the
   tree. Files are keyed by real absolute path, and a record under the old relative key is
