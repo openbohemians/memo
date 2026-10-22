@@ -1,6 +1,6 @@
 # Maintainer: trans
 pkgname=memo
-pkgver=0.14.2
+pkgver=0.14.3
 pkgrel=1
 pkgdesc="Semantic search and vector storage CLI"
 arch=('x86_64')

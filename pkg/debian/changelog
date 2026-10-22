@@ -1,3 +1,13 @@
+memo-rag (0.14.3-1) unstable; urgency=high
+
+  * Databases sharing an index directory keep separate index files: each
+    PostgreSQL namespace without its own index_dir used the same file in
+    /var/lib/memo/indices. Files are now named after the database's name
+    and id, and an existing file is adopted by the database it belongs
+    to, so upgrading doesn't rebuild it.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.14.2-1) unstable; urgency=high
 
   * memo-arcana takes its namespaces from /etc/memo/namespaces.yaml; an
