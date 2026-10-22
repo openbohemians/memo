@@ -130,7 +130,7 @@ module Memo
       inserted : Bool,
     ) : Nil
       q = cnn.memo_queries
-      return if !inserted && q.get_vector(embedding_id)
+      return if !inserted && q.get_vector(embedding_id, service_id)
 
       q.upsert_vector(embedding_id, service_id, Storage.encode_vector(vector))
       q.log_index_change(service_id, embedding_id)
@@ -139,12 +139,8 @@ module Memo
 
     # Record the removal of every service's embedding of `hash`, inside the
     # caller's transaction. Only `service_id`'s index is open here; other
-    # services pick up their removals from the log when they next open.
-    #
-    # Limitation: if another Service has one of those indexes open at the
-    # same time, its next save can checkpoint past the removal, leaving a
-    # stale vector in that index. Searches filter it out (its embedding row
-    # is gone), but it takes up one of the nearest-neighbor slots.
+    # services pick up their removals from the log when they next open, or
+    # at their next checkpoint if they're open now.
     def record_removals(
       cnn : DB::Connection,
       pending : USearchIndex::Pending,
@@ -163,13 +159,18 @@ module Memo
     # the saved file includes, then prune the log up to it. The file is
     # written on a separate thread (see USearchIndex.save_in_background).
     #
-    # The caller must make sure every committed change has been applied to
-    # `index`, and keep writers out until this returns, or the checkpoint
-    # would claim changes the file lacks.
+    # The caller must make sure every change it committed has been applied
+    # to `index`, and keep writers out until this returns, or the checkpoint
+    # would claim changes the file lacks. Removals other services logged for
+    # this one (see record_removals) are applied here.
     def checkpoint(db : DB::Database, index : USearch::Index, service_id : Int64, path : String) : Nil
       q = db.memo_queries
       pruned_through = q.get_index_state(service_id).try(&.[0]) || 0_i64
       seq = {q.max_index_log_seq(service_id), pruned_through}.max
+      saved_through = read_checkpoint(path).try(&.seq) || 0_i64
+      q.index_removals_between(service_id, saved_through, seq).each do |embedding_id|
+        USearchIndex.remove(index, embedding_id.to_u64)
+      end
 
       USearchIndex.save_in_background(index, path)
       write_checkpoint(path, Checkpoint.new(seq, Memo::Database.id(db), service_id))
@@ -201,7 +202,7 @@ module Memo
       q = db.memo_queries
       ids = q.index_changes_since(service_id, checkpoint)
       ids.each_with_index(1) do |embedding_id, n|
-        if blob = q.get_vector(embedding_id)
+        if blob = q.get_vector(embedding_id, service_id)
           USearchIndex.add(index, embedding_id.to_u64, Storage.decode_vector(blob))
         else
           USearchIndex.remove(index, embedding_id.to_u64)

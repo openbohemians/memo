@@ -364,7 +364,7 @@ module Memo
 
     abstract def upsert_vector(embedding_id : Int64, service_id : Int64, vector : Bytes) : Nil
 
-    abstract def get_vector(embedding_id : Int64) : Bytes?
+    abstract def get_vector(embedding_id : Int64, service_id : Int64) : Bytes?
 
     abstract def delete_vector(embedding_id : Int64) : Nil
 
@@ -382,6 +382,10 @@ module Memo
 
     # Distinct embedding ids logged after `seq`
     abstract def index_changes_since(service_id : Int64, seq : Int64) : Array(Int64)
+
+    # Embeddings logged for the service after `after` and through `through`
+    # that it no longer has (no row, no vector): removals
+    abstract def index_removals_between(service_id : Int64, after : Int64, through : Int64) : Array(Int64)
 
     abstract def max_index_log_seq(service_id : Int64) : Int64
 

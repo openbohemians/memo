@@ -329,6 +329,60 @@ describe Memo::IndexJournal do
     end
   end
 
+  it "applies removals another service logged while it was open, before saving past them" do
+    with_test_db_path do |db_path|
+      setup = open_service(db_path)
+      setup.create_service(name: "mock-b", format: "mock", model: "mock-b", dimensions: 8, max_tokens: 100)
+      setup.close
+
+      a = open_service(db_path)
+      b = open_service(db_path, "mock-b")
+      b.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      a.index(source_type: "doc", source_id: 9_i64, text: "a quiet morning at the market") # so no id is reused
+      orphaned = b.db.scalar("SELECT rowid FROM memo_embeddings WHERE service_id = ?", b.service_id).as(Int64)
+
+      # A removes the content for both while B is open; B then saves
+      a.delete(1_i64, "doc")
+      b.index(source_type: "doc", source_id: 2_i64, text: "tiny haunted robot")
+      b.save_index
+      b.usearch_index.contains?(orphaned.to_u64).should be_false
+      b.close
+
+      b = open_service(db_path, "mock-b")
+      b.usearch_index.contains?(orphaned.to_u64).should be_false
+      b.usearch_index.size.should eq 1
+      b.close
+      a.close
+    end
+  end
+
+  it "replays a removal as one, after another service's embedding reuses its id" do
+    with_test_db_path do |db_path|
+      setup = open_service(db_path)
+      setup.create_service(name: "mock-b", format: "mock", model: "mock-b", dimensions: 8, max_tokens: 100)
+      setup.close
+
+      b = open_service(db_path, "mock-b")
+      b.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      removed = b.db.scalar("SELECT rowid FROM memo_embeddings WHERE service_id = ?", b.service_id).as(Int64)
+      b.close
+
+      # A removes the content for both, then stores an embedding that
+      # SQLite gives the freed id
+      a = open_service(db_path)
+      a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      a.delete(1_i64, "doc")
+      a.index(source_type: "doc", source_id: 2_i64, text: "tiny haunted robot")
+      a.db.scalar("SELECT service_id FROM memo_embeddings WHERE rowid = ?", removed).should eq a.service_id
+      a.close
+
+      b = open_service(db_path, "mock-b")
+      b.usearch_index.contains?(removed.to_u64).should be_false
+      b.close
+    end
+  end
+
   it "removes a deleted service's vectors and journal" do
     with_test_db_path do |db_path|
       setup = open_service(db_path)

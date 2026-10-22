@@ -31,6 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Clustering.sequential` works on PostgreSQL.** Its query grouped by source and embedding but ordered
   by chunk offset, which PostgreSQL rejects. Each source is now represented by its first chunk's
   embedding on both databases; on SQLite it was whichever chunk the grouping happened to pick.
+- **Removed vectors don't linger in another service's index.** Deleting a text logs its removal for
+  every service that embedded it, but only the deleting service's index applied it. With another
+  service's index open meanwhile, that index's next save checkpointed past the removal, so the vector
+  stayed in its file for good, taking up a nearest-neighbor slot. Saving now applies such removals
+  first. Replaying the journal also looked vectors up by id alone, so on SQLite, where a deleted
+  embedding's id can be reused, a service could replay another service's vector into its index.
 
 ## [0.15.1] - 2026-10-22
 

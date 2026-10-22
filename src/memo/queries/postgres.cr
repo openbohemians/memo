@@ -936,8 +936,8 @@ module Memo
       )
     end
 
-    def get_vector(embedding_id : Int64) : Bytes?
-      @db.query_one?("SELECT vector FROM memo_vectors WHERE embedding_id = $1", embedding_id, as: Bytes)
+    def get_vector(embedding_id : Int64, service_id : Int64) : Bytes?
+      @db.query_one?("SELECT vector FROM memo_vectors WHERE embedding_id = $1 AND service_id = $2", embedding_id, service_id, as: Bytes)
     end
 
     def delete_vector(embedding_id : Int64) : Nil
@@ -991,6 +991,21 @@ module Memo
         "SELECT DISTINCT embedding_id FROM memo_index_log WHERE service_id = $1 AND seq > $2",
         service_id, seq
       ) do |rs|
+        rs.each { ids << rs.read(Int64) }
+      end
+      ids
+    end
+
+    def index_removals_between(service_id : Int64, after : Int64, through : Int64) : Array(Int64)
+      ids = [] of Int64
+      @db.query(<<-SQL, service_id, after, through) do |rs|
+        SELECT DISTINCT l.embedding_id FROM memo_index_log l
+        WHERE l.service_id = $1 AND l.seq > $2 AND l.seq <= $3
+          AND NOT EXISTS (SELECT 1 FROM memo_vectors v
+                          WHERE v.embedding_id = l.embedding_id AND v.service_id = l.service_id)
+          AND NOT EXISTS (SELECT 1 FROM memo_embeddings e
+                          WHERE e.eid = l.embedding_id AND e.service_id = l.service_id)
+        SQL
         rs.each { ids << rs.read(Int64) }
       end
       ids
