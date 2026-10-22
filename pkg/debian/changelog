@@ -1,3 +1,13 @@
+memo-rag (0.15.1-1) unstable; urgency=medium
+
+  * memo-arcana rejoins the bus when its connection drops. It exited
+    with status 0 when the bus restarted, so systemd left it stopped.
+  * memo-arcana won't start while another one serves memo:rag: a second
+    instance shared the address, and when either stopped, the bus
+    dropped it for both.
+
+ -- trans <trans@github.com>  Thu, 22 Oct 2026 00:00:00 +0000
+
 memo-rag (0.15.0-1) unstable; urgency=medium
 
   * Requires pg 0.31 and crystal-db 0.15 (were pg 0.30 and crystal-db
