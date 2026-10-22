@@ -38,7 +38,7 @@ shards:
 
   jargon:
     git: https://github.com/trans/jargon.git
-    version: 0.16.0
+    version: 0.22.0
 
   magic:
     git: https://github.com/naqvis/magic.cr.git

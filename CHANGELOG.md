@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **The `memo` CLI is built with jargon 0.22** (was 0.16). Library users are unaffected: memo still
+  accepts jargon 0.16 and later, and only the CLI uses it.
+  - Shell completion scripts are now small shims that ask `memo` for the candidates on each Tab, so
+    they keep up with the CLI without being regenerated. Reinstall them once
+    (`memo --completions fish > ~/.config/fish/completions/memo.fish`); the packages install the new
+    ones.
+  - `key:value` no longer sets an option; `key=value` and `--key=value` still do.
+  - `memo index` takes every word after the files that isn't a flag as another file, so
+    `memo index a.md source-type=x` now looks for a file named `source-type=x`. Use
+    `--source-type=x`.
+
 ## [0.15.3] - 2026-10-22
 
 ### Fixed

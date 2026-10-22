@@ -26,6 +26,10 @@ module Memo::CLI
     cli.subcommand("stats", json: Jargon.merge(STATS_SCHEMA, GLOBAL_SCHEMA))
     cli.subcommand("service", service_cli)
 
+    # The completion scripts (--completions) ask memo for candidates on each
+    # Tab, through jargon's hidden __complete verb: answer and exit
+    cli.handle_completion(args)
+
     # Handle --version before parsing
     if args.includes?("--version") || args.includes?("-v")
       puts "memo #{VERSION}"
