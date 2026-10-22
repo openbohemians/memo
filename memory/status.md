@@ -2,6 +2,12 @@
 
 *Updated 2026-10-22*
 
+- **0.14.1 released 2026-10-22** (tag `v0.14.1` at `4e2b072`): the first batch of fixes from
+  an independent review (Codex, 2026-10-22). Search filters now apply to every result, which
+  matters because sources sharing a text used to leak past them (`1e54b50`). Unresolved id
+  filters find nothing. Queue work is written only while current, and deletes cancel it
+  (`4da6638`). `@datadungeon` and `@ipck` were told the same day (`mail/sent/`). More batches
+  are coming; the user agreed to fix the findings in order and release in batches.
 - **0.14.0 released 2026-10-22** (tag `v0.14.0` at `7717f7a`): requires arcana-core
   ~> 0.20.0 and arcana-ai ~> 0.6.1 (`e901e59`). A minor bump because library users must
   move to the same arcana. No code, schema or API changes. `@datadungeon` and `@ipck`
