@@ -2,6 +2,14 @@
 
 *Updated 2026-10-22*
 
+- **0.14.3 released 2026-10-22** (tag `v0.14.3` at `288eca5`): every PostgreSQL database's
+  index, and every index in an `index_dir`, had one shared file name. Those files are now
+  named `<database name>-<id8>.…`, with a random id kept in `memo_meta.database_id`, and the
+  checkpoint records the database and service ids (`9386a56`). On upgrade, a file under the
+  old name is adopted by the database whose first 32 stored vectors it holds. That was
+  checked live against files 0.14.2 wrote: one database adopts its file, and with two that
+  shared it, the owner adopts it and the other rebuilds. A rebuild adds about 450
+  vectors/s at 1536 dimensions. An older memo reading the new checkpoints rebuilds.
 - **0.14.2 released 2026-10-22** (tag `v0.14.2` at `f4f8a57`): the review's second batch.
   Chunking is linear for non-ASCII text, and no chunk exceeds `max_tokens` (`02f6baa`). A
   new source id resolves safely under concurrent writers (`c3f93d1`). memo-arcana
