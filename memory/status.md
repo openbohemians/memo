@@ -2,6 +2,10 @@
 
 *Updated 2026-10-22*
 
+- **0.15.0 released 2026-10-22** (tag `v0.15.0` at `9f0d15e`): requires pg ~> 0.31.0 and so
+  crystal-db 0.15 (`31da868`), which `@ipck` asked for to reach sqlite3 0.24.0. A minor bump
+  because library users must move to crystal-db 0.15 too. No code changes. `@ipck` and
+  `@datadungeon` were told the same day, and goldfish got a note in its inbox (`mail/sent/`).
 - **0.14.3 released 2026-10-22** (tag `v0.14.3` at `288eca5`): every PostgreSQL database's
   index, and every index in an `index_dir`, had one shared file name. Those files are now
   named `<database name>-<id8>.…`, with a random id kept in `memo_meta.database_id`, and the
@@ -49,17 +53,12 @@
 
 ## Open
 
-- **pg 0.31 for @ipck**: **Open.** On 2026-10-22 ipck asked memo to move pg from `~> 0.30.0`
-  to `~> 0.31.0` (`mail/received/`). pg 0.30 needs crystal-db 0.14, which holds ipck's sqlite3
-  below 0.24.0. Tried the same day: `shards update pg db sqlite3` gives pg 0.31.0, db 0.15.0
-  and sqlite3 0.24.0, with no code changes, and the full suite passes with Postgres. Every
-  library user would need crystal-db 0.15 too, so it would be 0.15.0. Waiting on the user.
 - **goldfish**: `Memory#about` still reads `memo_texts`. It breaks once goldfish builds
   against 0.13. The fix went to goldfish's inbox on 2026-10-11 (`mail/sent/`); goldfish has
   no agent, so the user makes the change. Still open on 2026-10-22: goldfish follows memo's
-  `main`, so its next `shards update` brings 0.14.0, which also needs arcana-core 0.20. Its
-  no-key path opens memo with `format: "mock"` and no model, which memo has refused since
-  `0d2815e`. The 2026-10-22 inbox note covers both.
+  `main`, so its next `shards update` brings 0.15.0, which also needs arcana-core 0.20 and
+  crystal-db 0.15. Its no-key path opens memo with `format: "mock"` and no model, which memo
+  has refused since `0d2815e`. The two 2026-10-22 inbox notes (0.14.0 and 0.15.0) cover these.
 - **Old token counts**: **fixed in `6794fea`, released in 0.13.1** (2026-10-14).
   memo reads `usage.input` in its arcana and bus providers and requires arcana-ai ~> 0.5.1.
   `@arcana` asked for this on 2026-10-13 (`mail/received/`), and was told it's done on
