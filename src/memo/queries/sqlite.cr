@@ -596,6 +596,10 @@ module Memo
       @db.exec("INSERT OR REPLACE INTO memo_meta (key, value) VALUES (?, ?)", key, value)
     end
 
+    def add_meta(key : String, value : String) : Nil
+      @db.exec("INSERT OR IGNORE INTO memo_meta (key, value) VALUES (?, ?)", key, value)
+    end
+
     def get_service_tokens_per_byte(service_id : Int64) : Float64?
       @db.query_one?("SELECT tokens_per_byte FROM memo_services WHERE id = ?", service_id, as: Float64)
     end

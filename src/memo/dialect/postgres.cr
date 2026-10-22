@@ -36,6 +36,10 @@ module Memo
         nil
       end
 
+      def database_name(db : DB::Database) : String?
+        db.query_one?("SELECT current_database()", as: String)
+      end
+
       def fts_join_sql : String
         "JOIN memo_contents fts_t ON fts_t.id = c.content_id"
       end

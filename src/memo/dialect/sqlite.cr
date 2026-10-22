@@ -53,6 +53,10 @@ module Memo
         )
       end
 
+      def database_name(db : DB::Database) : String?
+        nil
+      end
+
       # memo_contents_fts is an external-content table: rows are keyed by
       # the content's id, and MATCH looks them up without a second copy
       def fts_join_sql : String

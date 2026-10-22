@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Databases sharing an index directory keep separate index files.** Every PostgreSQL database's index
+  went in the same directory under the same name (`memo.<format>--<model>--<dimensions>.usearch`), and
+  so did every index in an `index_dir`. A second database open at the same time failed with `InUse`,
+  and one opened later could take the other's vectors for its own. Such a file is now named after the
+  database's name and a random id memo stores in it (`memo_meta.database_id`), for example
+  `wow_dev-3f9a1c2b.openai--text-embedding-3-small--1536.usearch`. An index beside a SQLite file keeps
+  its name. The checkpoint now records the database and service too, so a file from elsewhere is
+  rebuilt from stored vectors rather than used.
+- **Upgrading keeps the index.** A file under the old shared name is adopted by the database whose
+  vectors it holds, checked against a sample of its stored vectors, so it isn't rebuilt (a rebuild
+  adds about 450 vectors a second at 1536 dimensions). An older memo opening the new files rebuilds
+  them.
+- **`use_service` and `delete_service` use `index_dir`.** They built the index path without it, so
+  `delete_service` could delete another database's index file in the default directory.
+
 ## [0.14.2] - 2026-10-22
 
 ### Changed

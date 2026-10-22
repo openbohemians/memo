@@ -14,6 +14,9 @@ module Memo
   # Replay is idempotent: each logged embedding is set to its current state
   # in the database (added if it has a stored vector, removed otherwise).
   # A checkpoint that lags the file only costs extra replay.
+  #
+  # The checkpoint also records the database's id and the service's, so a
+  # file another database or service saved is rebuilt rather than trusted.
   module IndexJournal
     extend self
 
@@ -25,6 +28,19 @@ module Memo
     # Vectors read per query during a rebuild. Reading in pages keeps no
     # cursor open while other fibers run.
     REBUILD_PAGE = 256
+
+    # Stored vectors compared with a file that doesn't record whose it is,
+    # before adopting it (see adopt)
+    ADOPT_SAMPLE = 32
+
+    # What a checkpoint file records: the last log entry the index file
+    # includes, and whose index it is (files saved before memo recorded
+    # that don't say)
+    private record Checkpoint, seq : Int64, database_id : String? = nil, service_id : Int64? = nil do
+      def from_elsewhere?(database_id : String, service_id : Int64) : Bool
+        !@database_id.nil? && (@database_id != database_id || @service_id != service_id)
+      end
+    end
 
     # What opening the index took to bring it up to date.
     record Recovery,
@@ -40,10 +56,14 @@ module Memo
     # Lock and open the index at `path`, bringing it up to date with the
     # database. Returns the index, what recovery did, and the lock to hold
     # while the index is open (see USearchIndex.lock).
-    def open(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : {USearch::Index, Recovery, File}
+    #
+    # When there's no file at `path` yet, the one at `legacy_path` (where an
+    # earlier memo kept it) is adopted if it holds this service's vectors.
+    def open(db : DB::Database, path : String, dimensions : Int32, service_id : Int64,
+             legacy_path : String? = nil) : {USearch::Index, Recovery, File}
       lock = USearchIndex.lock(path)
       begin
-        index, recovery = open_locked(db, path, dimensions, service_id)
+        index, recovery = open_locked(db, path, dimensions, service_id, legacy_path)
         {index, recovery, lock}
       rescue ex
         lock.close
@@ -51,16 +71,17 @@ module Memo
       end
     end
 
-    private def open_locked(db : DB::Database, path : String, dimensions : Int32, service_id : Int64) : {USearch::Index, Recovery}
-      index, loaded = USearchIndex.load_or_create(path, dimensions)
+    private def open_locked(db : DB::Database, path : String, dimensions : Int32, service_id : Int64,
+                            legacy_path : String?) : {USearch::Index, Recovery}
       q = db.memo_queries
       pruned_through, backfilled = q.get_index_state(service_id) || {0_i64, false}
+      index, loaded, checkpoint = load(db, path, dimensions, service_id, legacy_path, backfilled)
       missing = backfilled ? 0 : backfill_vectors(db, index, service_id)
 
       # The file is usable if its checkpoint falls within the log: not before
       # the pruned entries, and not past the newest one (a file left over
       # from a different database).
-      saved_through = loaded ? (read_checkpoint(path) || 0_i64) : 0_i64
+      saved_through = checkpoint.try(&.seq) || 0_i64
       latest = {q.max_index_log_seq(service_id), pruned_through}.max
       recovery = if loaded && saved_through >= pruned_through && saved_through <= latest
                    Recovery.new(replayed: replay(db, index, service_id, saved_through), missing: missing)
@@ -73,6 +94,28 @@ module Memo
         checkpoint(db, index, service_id, path)
       end
       {index, recovery}
+    end
+
+    # The index file at `path` (or adopted from `legacy_path`), whether it
+    # was loaded, and its checkpoint. A file another database or service
+    # saved comes back empty, as not loaded.
+    private def load(db : DB::Database, path : String, dimensions : Int32, service_id : Int64,
+                     legacy_path : String?, backfilled : Bool) : {USearch::Index, Bool, Checkpoint?}
+      database_id = Memo::Database.id(db)
+      index, loaded = USearchIndex.load_or_create(path, dimensions)
+      checkpoint = loaded ? read_checkpoint(path) : nil
+      if !loaded && legacy_path && legacy_path != path &&
+         (adopted = adopt(db, legacy_path, path, dimensions, service_id, database_id, backfilled))
+        index.close
+        index, checkpoint = adopted
+        loaded = true
+      end
+
+      if loaded && checkpoint.try(&.from_elsewhere?(database_id, service_id))
+        index.clear
+        return {index, false, nil}
+      end
+      {index, loaded, checkpoint}
     end
 
     # Store a vector for an embedding row, inside the caller's transaction,
@@ -129,7 +172,7 @@ module Memo
       seq = {q.max_index_log_seq(service_id), pruned_through}.max
 
       USearchIndex.save_in_background(index, path)
-      write_checkpoint(path, seq)
+      write_checkpoint(path, Checkpoint.new(seq, Memo::Database.id(db), service_id))
       return if seq == pruned_through
 
       Memo::Database.transaction(db) do |cnn|
@@ -144,7 +187,7 @@ module Memo
     # is idempotent, so entries the index already has do no harm.
     def catch_up(db : DB::Database, index : USearch::Index, service_id : Int64, path : String) : Nil
       pruned_through = db.memo_queries.get_index_state(service_id).try(&.[0]) || 0_i64
-      saved_through = read_checkpoint(path) || 0_i64
+      saved_through = read_checkpoint(path).try(&.seq) || 0_i64
       if saved_through >= pruned_through
         replay(db, index, service_id, saved_through)
       else
@@ -209,15 +252,79 @@ module Memo
       missing
     end
 
-    private def read_checkpoint(index_path : String) : Int64?
-      path = USearchIndex.checkpoint_path(index_path)
-      File.exists?(path) ? File.read(path).strip.to_i64? : nil
+    # Move the index at `legacy_path` to `path` and return it loaded, with
+    # its checkpoint, if it's this service's. Earlier versions of memo gave
+    # every PostgreSQL database's index, and every index in an index_dir,
+    # the same name, so the file may be another database's: one that says
+    # whose it is must say this service's, and one that doesn't must hold
+    # the first stored vectors. (Before the vectors are stored, the one-time
+    # migration in backfill_vectors needs the file, so it's adopted as is.)
+    # Returns nil to leave the file alone.
+    private def adopt(db : DB::Database, legacy_path : String, path : String, dimensions : Int32,
+                      service_id : Int64, database_id : String, backfilled : Bool) : {USearch::Index, Checkpoint?}?
+      return unless File.exists?(legacy_path)
+      lock = begin
+        USearchIndex.lock(legacy_path)
+      rescue USearchIndex::InUse
+        return
+      end
+
+      begin
+        checkpoint = read_checkpoint(legacy_path)
+        return if checkpoint.try(&.from_elsewhere?(database_id, service_id))
+
+        index, loaded = USearchIndex.load_or_create(legacy_path, dimensions)
+        ours = loaded && (!backfilled || holds_stored_vectors?(db, index, service_id))
+        unless ours
+          index.close
+          return
+        end
+
+        File.rename(legacy_path, path)
+        legacy_checkpoint = USearchIndex.checkpoint_path(legacy_path)
+        File.rename(legacy_checkpoint, USearchIndex.checkpoint_path(path)) if File.exists?(legacy_checkpoint)
+        File.delete("#{legacy_path}.lock")
+        {index, checkpoint}
+      ensure
+        lock.close
+      end
     end
 
-    private def write_checkpoint(index_path : String, seq : Int64) : Nil
+    # Whether the index has the service's first stored vectors under their
+    # ids. Another database's file has other vectors under the same ids
+    # (every database's ids start at 1).
+    private def holds_stored_vectors?(db : DB::Database, index : USearch::Index, service_id : Int64) : Bool
+      sample = db.memo_queries.vectors_after(service_id, 0_i64, ADOPT_SAMPLE)
+      !sample.empty? && sample.all? do |embedding_id, blob|
+        found = USearchIndex.get_vector(index, embedding_id.to_u64)
+        found && similar?(found, Storage.decode_vector(blob))
+      end
+    end
+
+    # Equal up to the index's f16 quantization
+    private def similar?(a : Array(Float64), b : Array(Float64)) : Bool
+      return false unless a.size == b.size
+      dot = norm_a = norm_b = 0.0
+      a.each_with_index do |x, i|
+        dot += x * b[i]
+        norm_a += x * x
+        norm_b += b[i] * b[i]
+      end
+      norm_a > 0 && norm_b > 0 && dot / Math.sqrt(norm_a * norm_b) > 0.999
+    end
+
+    private def read_checkpoint(index_path : String) : Checkpoint?
+      path = USearchIndex.checkpoint_path(index_path)
+      return unless File.exists?(path)
+      fields = File.read(path).split
+      seq = fields[0]?.try(&.to_i64?) || return
+      Checkpoint.new(seq, fields[1]?, fields[2]?.try(&.to_i64?))
+    end
+
+    private def write_checkpoint(index_path : String, checkpoint : Checkpoint) : Nil
       path = USearchIndex.checkpoint_path(index_path)
       tmp = "#{path}.tmp"
-      File.write(tmp, seq.to_s)
+      File.write(tmp, "#{checkpoint.seq} #{checkpoint.database_id} #{checkpoint.service_id}")
       File.rename(tmp, path)
     end
   end

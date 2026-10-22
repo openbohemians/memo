@@ -18,6 +18,17 @@ module Memo
       Migration.run(db)
     end
 
+    # The database's id, made at random the first time it's asked for.
+    # Index files record it, so one left over from another database isn't
+    # taken for this one's.
+    def id(db : DBHandle) : String
+      q = db.memo_queries
+      q.get_meta("database_id") || begin
+        q.add_meta("database_id", Random::Secure.hex(16))
+        q.get_meta("database_id") || raise "memo_meta has no database_id"
+      end
+    end
+
     # Create database connection and initialize schema (standalone mode)
     #
     # Accepts either a file path (SQLite) or connection string (postgres://...).

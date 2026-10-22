@@ -391,13 +391,17 @@ end
 ## Storage
 
 Memo keeps its data in the database (a SQLite file at `db_path`, or PostgreSQL) and an index file per
-embedding service beside it:
+embedding service, beside the SQLite file or in `index_dir`:
 
 - **Database**: services, sources, texts (`memo_contents`: each distinct text once, by hash), chunks,
   embeddings (one per distinct chunk and service), the embed queue, every embedding's vector
   (`memo_vectors`, 16-bit floats), and a journal of index changes (`memo_index_log`)
-- **USearch index**: an HNSW index file per service (e.g. `memo.openai--text-embedding-3-small--1536.usearch`),
-  held in memory while open, with a `.checkpoint` and a `.lock` file beside it
+- **USearch index**: an HNSW index file per service, held in memory while open, with a `.checkpoint` and a
+  `.lock` file beside it. Beside `notes.db` it's `notes.openai--text-embedding-3-small--1536.usearch`. In
+  `index_dir` (PostgreSQL's default is `~/.local/share/memo/indices`, or `/var/lib/memo/indices` for a
+  system user) its name starts with the database's name and id instead, such as `wow_dev-3f9a1c2b.…`, so
+  databases can share the directory. The checkpoint records whose index it is: a file from another
+  database or service is rebuilt rather than used.
 
 The index is rebuilt from the database whenever it needs to be, so **backing up the database is enough**
 (e.g. Litestream for SQLite). Text storage can be disabled with `store_text: false` if you prefer to manage

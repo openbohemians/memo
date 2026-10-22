@@ -57,6 +57,12 @@ module Memo
       # PostgreSQL: returns nil (no local file)
       abstract def db_file_path(db : DB::Database) : String?
 
+      # The database's name on its server, for naming index files.
+      #
+      # SQLite: nil (the file names it)
+      # PostgreSQL: current_database()
+      abstract def database_name(db : DB::Database) : String?
+
       # Build FTS JOIN clause for search queries (joining a chunk's text).
       abstract def fts_join_sql : String
 

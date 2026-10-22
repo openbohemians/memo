@@ -684,6 +684,10 @@ module Memo
       )
     end
 
+    def add_meta(key : String, value : String) : Nil
+      @db.exec("INSERT INTO memo_meta (key, value) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING", key, value)
+    end
+
     def get_service_tokens_per_byte(service_id : Int64) : Float64?
       @db.query_one?("SELECT tokens_per_byte FROM memo_services WHERE id = $1", service_id, as: Float64)
     end

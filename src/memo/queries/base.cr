@@ -283,6 +283,9 @@ module Memo
 
     abstract def set_meta(key : String, value : String) : Nil
 
+    # Set a meta value unless the key already has one
+    abstract def add_meta(key : String, value : String) : Nil
+
     abstract def get_service_tokens_per_byte(service_id : Int64) : Float64?
 
     # =========================================================================

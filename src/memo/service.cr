@@ -108,6 +108,7 @@ module Memo
     getter db_path : String?
     getter index_path : String
     getter query_cache : QueryCache
+    @index_dir : String?
 
     # What opening the index took (journal replay, rebuild, missing vectors)
     getter index_recovery : IndexJournal::Recovery
@@ -211,8 +212,6 @@ module Memo
         @db.memo_dialect = Dialect.for(db_path)
         @db.memo_queries = Queries.for(@db, db_path)
         @db_path = nil
-        # Default index dir for PG if not provided
-        index_dir ||= USearchIndex::DEFAULT_INDEX_DIR
       else
         # SQLite: create parent directory and connect
         dir = File.dirname(db_path)
@@ -222,6 +221,7 @@ module Memo
       end
 
       @owns_db = true
+      @index_dir = index_dir
       @track_matches = track_matches
       @text_storage = store_text
       @build_vocab = build_vocab && store_text # vocab requires text storage
@@ -249,12 +249,9 @@ module Memo
       @dimensions = config.dimensions
 
       # Compute and open USearch HNSW index for this service
-      @index_path = if idx_dir = index_dir
-                      USearchIndex.index_path_in_dir(idx_dir, config.format, config.model, config.dimensions)
-                    else
-                      USearchIndex.index_path(db_path, config.format, config.model, config.dimensions)
-                    end
-      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
+      @index_path = index_path_for(config.format, config.model, config.dimensions)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id,
+        legacy_index_path_for(config.format, config.model, config.dimensions))
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -307,6 +304,7 @@ module Memo
     )
       @db = db
       @owns_db = false # Caller owns the connection
+      @index_dir = index_dir
       @track_matches = track_matches
       @text_storage = store_text
       @build_vocab = build_vocab && store_text # vocab requires text storage
@@ -336,14 +334,9 @@ module Memo
       @dimensions = config.dimensions
 
       # Compute and open USearch HNSW index for this service
-      @index_path = if idx_dir = index_dir
-                      USearchIndex.index_path_in_dir(idx_dir, config.format, config.model, config.dimensions)
-                    elsif resolved_db_path = @db_path
-                      USearchIndex.index_path(resolved_db_path, config.format, config.model, config.dimensions)
-                    else
-                      USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, config.format, config.model, config.dimensions)
-                    end
-      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id)
+      @index_path = index_path_for(config.format, config.model, config.dimensions)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, config.dimensions, @service_id,
+        legacy_index_path_for(config.format, config.model, config.dimensions))
 
       # Create chunking config with service's tokens_per_byte ratio
       @chunking_config = Config::Chunking.new(
@@ -859,12 +852,7 @@ module Memo
       result = ServiceProvider.delete(@db, svc.id, force)
       # Delete USearch index file if service was deleted
       if result
-        svc_index_path = if db_p = @db_path
-                           USearchIndex.index_path(db_p, svc.format, svc.model, svc.dimensions)
-                         else
-                           USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, svc.format, svc.model, svc.dimensions)
-                         end
-        USearchIndex.delete_file(svc_index_path)
+        USearchIndex.delete_file(index_path_for(svc.format, svc.model, svc.dimensions))
       end
       result
     end
@@ -918,15 +906,40 @@ module Memo
       @dimensions = svc.dimensions
 
       # Open USearch index for the new service
-      @index_path = if db_p = @db_path
-                      USearchIndex.index_path(db_p, svc.format, svc.model, svc.dimensions)
-                    else
-                      USearchIndex.index_path_in_dir(USearchIndex::DEFAULT_INDEX_DIR, svc.format, svc.model, svc.dimensions)
-                    end
-      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id)
+      @index_path = index_path_for(svc.format, svc.model, svc.dimensions)
+      @usearch_index, @index_recovery, @index_lock = IndexJournal.open(@db, @index_path, svc.dimensions, @service_id,
+        legacy_index_path_for(svc.format, svc.model, svc.dimensions))
       @index_out_of_step = false
       @unsaved_changes = 0
       @saved_at = Time.instant
+    end
+
+    # Where a service's index file goes. Beside a SQLite file, it's named
+    # after the file. Elsewhere (PostgreSQL, or an index_dir) it's named
+    # after the database's name and id, so databases sharing the directory
+    # don't share index files.
+    private def index_path_for(format : String, model : String, dimensions : Int32) : String
+      dir = @index_dir
+      if !dir && (path = @db_path)
+        USearchIndex.index_path(path, format, model, dimensions)
+      else
+        USearchIndex.index_path_in_dir(dir || USearchIndex::DEFAULT_INDEX_DIR, format, model, dimensions, index_stem)
+      end
+    end
+
+    # Where earlier versions kept the index in the directory case of
+    # index_path_for: the same name for every database (see
+    # IndexJournal.open)
+    private def legacy_index_path_for(format : String, model : String, dimensions : Int32) : String?
+      dir = @index_dir
+      return nil if !dir && @db_path
+      USearchIndex.index_path_in_dir(dir || USearchIndex::DEFAULT_INDEX_DIR, format, model, dimensions)
+    end
+
+    private def index_stem : String
+      name = @db_path.presence.try { |path| File.basename(path, File.extname(path)) } ||
+             @db.memo_dialect.database_name(@db) || "memo"
+      "#{name.gsub(/[^a-zA-Z0-9\-\._]/, "-")}-#{Database.id(@db)[0, 8]}"
     end
 
     # =========================================================================

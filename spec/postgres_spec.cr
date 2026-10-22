@@ -75,6 +75,9 @@ describe "PostgreSQL backend" do
       create_0_12_pg_database(url, index_dir)
       memo = open_pg(url, index_dir)
 
+      # The index file under its 0.12 name gave up its vectors, and took the new name
+      memo.index_recovery.missing.should eq 0
+      File.exists?(Memo::USearchIndex.index_path_in_dir(index_dir, "mock", "mock-8d", 8)).should be_false
       Memo::Migration.version(memo.db).should eq Memo::Migration::SCHEMA_VERSION
       memo.db.memo_dialect.table_exists?(memo.db, "memo_texts").should be_false
       memo.db.query_all("SELECT content FROM memo_contents ORDER BY id", as: String).should eq ["a purple gorilla", "a grape ape"]
@@ -87,6 +90,25 @@ describe "PostgreSQL backend" do
       memo.process_queue
       pg_ids(memo.search(query: "ape", min_score: -1.0, match: "grape")).should eq [3_i64]
       memo.close
+    end
+  end
+
+  it "keeps databases sharing an index_dir apart" do
+    with_pg_database do |a_url, index_dir|
+      with_pg_database do |b_url, _|
+        a = open_pg(a_url, index_dir)
+        b = open_pg(b_url, index_dir)
+        File.basename(a.index_path).should start_with "#{URI.parse(a_url).path.lchop('/')}-"
+        a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+        b.index(source_type: "doc", source_id: 1_i64, text: "grape ape")
+        a.close
+        b.close
+
+        a = open_pg(a_url, index_dir)
+        a.index_recovery.rebuilt.should eq 0
+        a.search(query: "purple gorilla", min_score: 0.99).size.should eq 1
+        a.close
+      end
     end
   end
 

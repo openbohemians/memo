@@ -32,6 +32,37 @@ private def finds?(service : Memo::Service, text : String, source_id : Int64) : 
   service.search(query: text, min_score: 0.0).any? { |r| r.source_id == source_id }
 end
 
+# The last journal entry the service's saved index includes
+private def saved_seq(service : Memo::Service) : Int64
+  File.read(Memo::USearchIndex.checkpoint_path(service.index_path)).split.first.to_i64
+end
+
+private def open_in(db_path : String, index_dir : String) : Memo::Service
+  Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50, index_dir: index_dir)
+end
+
+private def with_index_dir(&)
+  dir = File.tempname("memo_index")
+  Dir.mkdir_p(dir)
+  begin
+    yield dir
+  ensure
+    FileUtils.rm_rf(dir)
+  end
+end
+
+# Move the service's index file to where earlier versions kept it in
+# `index_dir`, with a checkpoint that doesn't say whose it is. Returns the
+# path.
+private def move_to_legacy_name(service : Memo::Service, index_dir : String) : String
+  legacy = Memo::USearchIndex.index_path_in_dir(index_dir, service.service_format, service.service_model, service.dimensions)
+  checkpoint = Memo::USearchIndex.checkpoint_path(service.index_path)
+  File.write(Memo::USearchIndex.checkpoint_path(legacy), File.read(checkpoint).split.first)
+  File.delete(checkpoint)
+  File.rename(service.index_path, legacy)
+  legacy
+end
+
 describe Memo::Storage do
   describe ".encode_vector" do
     it "round-trips values a half float represents exactly" do
@@ -67,11 +98,10 @@ describe Memo::IndexJournal do
   it "saves only when the index has changed" do
     with_test_db_path do |db_path|
       service = open_service(db_path)
-      checkpoint_path = Memo::USearchIndex.checkpoint_path(service.index_path)
 
       service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
       service.save_index
-      first = File.read(checkpoint_path)
+      first = saved_seq(service)
       saved_at = File.info(service.index_path).modification_time
 
       service.save_index # nothing changed: no write
@@ -79,7 +109,7 @@ describe Memo::IndexJournal do
 
       service.index(source_type: "doc", source_id: 2_i64, text: "tiny haunted robot")
       service.save_index
-      File.read(checkpoint_path).to_i64.should be > first.to_i64
+      saved_seq(service).should be > first
       service.close
     end
   end
@@ -94,7 +124,7 @@ describe Memo::IndexJournal do
       service.index(source_type: "doc", source_id: 2_i64, text: "document 2")
       20.times { break if File.exists?(service.index_path); sleep 10.milliseconds } # saves in a separate fiber
       File.exists?(service.index_path).should be_true
-      File.read(Memo::USearchIndex.checkpoint_path(service.index_path)).to_i64.should be > 0
+      saved_seq(service).should be > 0
       service.close
     end
   end
@@ -315,6 +345,104 @@ describe Memo::IndexJournal do
       count(a, "memo_index_log").should eq 0
       count(a, "memo_index_state WHERE service_id <> #{a.service_id}").should eq 0
       a.close
+    end
+  end
+
+  it "keeps databases sharing an index_dir apart" do
+    with_index_dir do |dir|
+      with_test_db_path do |a_path|
+        with_test_db_path do |b_path|
+          a = open_in(a_path, dir)
+          b = open_in(b_path, dir)
+          a.index_path.should_not eq b.index_path
+          a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+          b.index(source_type: "doc", source_id: 1_i64, text: "grape ape")
+          a.close
+          b.close
+
+          a = open_in(a_path, dir)
+          a.index_recovery.rebuilt.should eq 0
+          a.search(query: "purple gorilla", min_score: 0.99).size.should eq 1
+          a.close
+        end
+      end
+    end
+  end
+
+  it "rebuilds an index file another database saved" do
+    with_test_db_path do |a_path|
+      with_test_db_path do |b_path|
+        a = open_service(a_path)
+        a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+        a.close
+        b = open_service(b_path)
+        b.index(source_type: "doc", source_id: 1_i64, text: "grape ape")
+        b.close
+
+        # As a shared index_dir could leave it
+        File.copy(b.index_path, a.index_path)
+        File.copy(Memo::USearchIndex.checkpoint_path(b.index_path), Memo::USearchIndex.checkpoint_path(a.index_path))
+
+        a = open_service(a_path)
+        a.index_recovery.rebuilt.should eq 1
+        a.search(query: "purple gorilla", min_score: 0.99).size.should eq 1
+        a.close
+      end
+    end
+  end
+
+  it "adopts its index file from the name earlier versions gave it in an index_dir" do
+    with_index_dir do |dir|
+      with_test_db_path do |db_path|
+        memo = open_in(db_path, dir)
+        memo.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+        memo.close
+        legacy = move_to_legacy_name(memo, dir)
+
+        memo = open_in(db_path, dir)
+        memo.index_recovery.rebuilt.should eq 0
+        File.exists?(legacy).should be_false
+        memo.search(query: "purple gorilla", min_score: 0.99).size.should eq 1
+        memo.close
+      end
+    end
+  end
+
+  it "leaves another database's file at that earlier name alone" do
+    with_index_dir do |dir|
+      with_index_dir do |other_dir|
+        with_test_db_path do |a_path|
+          with_test_db_path do |b_path|
+            a = open_in(a_path, dir)
+            a.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+            a.close
+            Memo::USearchIndex.delete_file(a.index_path)
+
+            b = open_in(b_path, other_dir)
+            b.index(source_type: "doc", source_id: 1_i64, text: "grape ape")
+            b.close
+            legacy = move_to_legacy_name(b, dir)
+
+            a = open_in(a_path, dir)
+            a.index_recovery.rebuilt.should eq 1
+            File.exists?(legacy).should be_true
+            a.search(query: "purple gorilla", min_score: 0.99).size.should eq 1
+            a.close
+          end
+        end
+      end
+    end
+  end
+
+  it "records whose index a checkpoint is" do
+    with_test_db_path do |db_path|
+      memo = open_service(db_path)
+      memo.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla")
+      database_id = Memo::Database.id(memo.db)
+      memo.close
+
+      File.read(Memo::USearchIndex.checkpoint_path(memo.index_path)).split[1..]
+        .should eq [database_id, memo.service_id.to_s]
     end
   end
 end

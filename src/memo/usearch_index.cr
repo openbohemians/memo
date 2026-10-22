@@ -7,8 +7,9 @@ module Memo
   # and vector operations. All Float64↔Float32 conversion happens here.
   #
   # One index per service (isolated vector spaces). Index files are named
-  # by service format, model, and dimensions:
-  #   memo.openai--text-embedding-3-small--1536.usearch
+  # by a stem (see Service#index_path_for), then service format, model,
+  # and dimensions:
+  #   notes.openai--text-embedding-3-small--1536.usearch
   module USearchIndex
     extend self
 
