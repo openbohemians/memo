@@ -385,6 +385,18 @@ module Memo
       @db.exec("DELETE FROM memo_files WHERE source_id = ?", source_id).rows_affected
     end
 
+    def update_file_path(source_id : Int64, path : String) : Nil
+      @db.exec("UPDATE memo_files SET path = ? WHERE source_id = ?", path, source_id)
+    end
+
+    def files_under(prefix : String) : Array({Int64, String})
+      files = [] of {Int64, String}
+      @db.query("SELECT source_id, path FROM memo_files WHERE substr(path, 1, length(?)) = ? ORDER BY path", prefix, prefix) do |rs|
+        rs.each { files << {rs.read(Int64), rs.read(String)} }
+      end
+      files
+    end
+
     def list_files(limit : Int32, offset : Int32) : Array(Files::FileRecord)
       records = [] of Files::FileRecord
       @db.query("SELECT source_id, path, content_hash, mtime, size FROM memo_files ORDER BY path LIMIT ? OFFSET ?", limit, offset) do |rs|

@@ -309,4 +309,21 @@ describe "PostgreSQL backend" do
       service.close
     end
   end
+
+  it "takes over a file's record keyed the old way, and removes deleted files" do
+    with_pg_database do |url, index_dir|
+      with_test_tree({"a.md" => "apple pie recipe", "b.md" => "banana bread recipe"}) do |tree|
+        a, b = File.join(tree, "a.md"), File.join(tree, "b.md")
+        service = open_pg(url, index_dir)
+        service.index_files(tree)
+        service.db.exec("UPDATE memo_files SET path = 'a.md' WHERE path = $1", a)
+        File.delete(b)
+
+        service.index_files(tree).should eq({0, 1, 1})
+        service.list_files.map(&.path).should eq [a]
+        pg_count(service, "memo_chunks").should eq 1
+        service.close
+      end
+    end
+  end
 end

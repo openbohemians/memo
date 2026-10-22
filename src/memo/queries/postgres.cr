@@ -468,6 +468,18 @@ module Memo
       @db.exec("DELETE FROM memo_files WHERE source_id = $1", source_id).rows_affected
     end
 
+    def update_file_path(source_id : Int64, path : String) : Nil
+      @db.exec("UPDATE memo_files SET path = $1 WHERE source_id = $2", path, source_id)
+    end
+
+    def files_under(prefix : String) : Array({Int64, String})
+      files = [] of {Int64, String}
+      @db.query("SELECT source_id, path FROM memo_files WHERE starts_with(path, $1) ORDER BY path", prefix) do |rs|
+        rs.each { files << {rs.read(Int64), rs.read(String)} }
+      end
+      files
+    end
+
     def list_files(limit : Int32, offset : Int32) : Array(Files::FileRecord)
       records = [] of Files::FileRecord
       @db.query("SELECT source_id, path, content_hash, mtime, size FROM memo_files ORDER BY path LIMIT $1 OFFSET $2", limit, offset) do |rs|

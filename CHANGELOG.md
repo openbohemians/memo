@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **`memo index -r` handles symlinks, two projects, moved text and deleted files.**
+  - It followed symlinks, so a link to a directory outside the tree indexed that directory too, and a
+    link back up the tree aborted the run ("Too many levels of symbolic links"). Symlinks inside the
+    tree are skipped now, to files and directories alike. The directory you name may still be one.
+  - Files were recorded by their path relative to the directory indexed (or, for files named one by
+    one, the current directory), so `README.md` in one project and in another were one record, and
+    indexing either replaced the other. They're recorded by absolute path now, symlinks resolved. A
+    record from an earlier memo is taken over, keeping its id, the next time its file is indexed, and
+    isn't embedded again if the file hasn't changed.
+  - A run in which one file took up a text another dropped (a paragraph moved between files) failed
+    with "Embeddings kept disappearing while indexing", and so did every run after it. Embeddings the
+    files drop are now released only once every file in the run has its new chunks.
+  - Files deleted from the directory stayed in the index. Indexing a directory now removes the files
+    recorded under it that it no longer finds (deleted, or ignored now), listing each with `-`.
+- **Specs that index files no longer crash.** The magic shard closes its libmagic handles in an
+  `at_exit`, and handlers run last-registered first, so with `spec` required before memo the handles
+  were closed before the examples ran. memo's spec helper requires memo first; specs of your own that
+  index files through memo need the same order.
+
+### Changed
+- `Service#index_files` and `#index_file_list` give their block absolute paths, and `memo index --json`
+  lists them. The text output and `memo search` show a file's path relative to the current directory
+  when the file is under it. `index_files`'s block also gets `:removed` (`:would_remove` on a dry run),
+  and `memo index --json` counts them as `removed`.
+- `Files.file_info` takes just the path; the two-argument form is deprecated. `index_file_list`'s `root`
+  is used only to find records from earlier versions.
+
 ## [0.15.2] - 2026-10-22
 
 ### Fixed

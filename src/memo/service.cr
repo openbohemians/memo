@@ -1408,14 +1408,21 @@ module Memo
 
     # Index files from a directory
     #
-    # Walks directory, respects ignore files, skips binary files,
-    # and indexes text content. Tracks file metadata for incremental updates.
+    # Walks directory, respects ignore files, skips binary files and
+    # symlinks, and indexes text content. Tracks file metadata for
+    # incremental updates. Files are recorded by absolute path, and those
+    # recorded under the directory that the walk no longer finds (deleted,
+    # or ignored now) are removed from the index.
     #
     # Options:
     # - root: Directory to index
     # - ignore_file: Ignore file name (default ".gitignore")
     # - incremental: Skip unchanged files based on mtime (default true)
     # - dry_run: List files without indexing (default false)
+    #
+    # The block gets each file's absolute path and what happened to it:
+    # :indexed, :skipped or :removed (:would_index or :would_remove on a
+    # dry run).
     #
     # Returns tuple of (indexed_count, skipped_count, total_files)
     #
@@ -1430,20 +1437,22 @@ module Memo
       dry_run : Bool = false,
       &block : String, Symbol ->
     ) : {Int32, Int32, Int32}
-      root_path = Path.new(root).expand.to_s
+      root_path = File.realpath(Path.new(root).expand.to_s)
       indexed = 0
       skipped = 0
       total = 0
 
       # Collect files to index
       files_to_index = [] of {Int64, String, Files::FileInfo} # source_id, content, info
+      seen = Set(Int64).new
 
       Files.walk(root_path, ignore_file) do |file_path|
         total += 1
-        info = Files.file_info(file_path, root_path)
+        info = Files.file_info(file_path)
 
         # Check if already indexed
-        existing = Files.get_by_path(@db, info.path)
+        existing = Files.find(@db, info.path, root_path, rekey: !dry_run)
+        seen << existing.source_id if existing
 
         if existing && incremental && !Files.needs_update?(existing, info.mtime)
           skipped += 1
@@ -1466,17 +1475,38 @@ module Memo
                       SourceRegistry.create(@db, "file")
                     end
 
+        seen << source_id
         files_to_index << {source_id, content, info}
         block.call(info.path, :indexed)
       end
 
       # Batch process all files
-      return {0, skipped, total} if files_to_index.empty?
-
-      index_files_batched(files_to_index)
-      indexed = files_to_index.size
+      unless files_to_index.empty?
+        index_files_batched(files_to_index)
+        indexed = files_to_index.size
+      end
+      remove_files_not_seen(root_path, seen, dry_run, &block)
 
       {indexed, skipped, total}
+    end
+
+    # Remove from the index the files recorded under directory `root` that
+    # aren't in `seen`, telling the block about each
+    private def remove_files_not_seen(root : String, seen : Set(Int64), dry_run : Bool, &block : String, Symbol ->)
+      gone = Files.under(@db, root).reject { |source_id, _| seen.includes?(source_id) }
+      if dry_run
+        gone.each { |_, path| block.call(path, :would_remove) }
+        return
+      end
+      return if gone.empty?
+
+      write_transaction do |cnn, pending|
+        gone.each do |source_id, _|
+          delete_internal(cnn, pending, source_id)
+          Files.delete(cnn, source_id)
+        end
+      end
+      gone.each { |_, path| block.call(path, :removed) }
     end
 
     # Batch index multiple files with a single API call
@@ -1517,10 +1547,15 @@ module Memo
       chunk_texts = file_chunks.flat_map(&.map(&.[0]))
       with_embeddings(chunk_texts, new_vocab.map(&.word)) do |fetched|
         write_transaction do |cnn, pending|
+          # A chunk one file drops may be one another file is about to use,
+          # and was left out of `fetched` for having an embedding: release
+          # embeddings only once every file has its chunks
+          dropped = Set(Bytes).new
           files.each_with_index do |(source_id, content, info), i|
-            replace_chunks(cnn, pending, fetched, source_id, "file", content, info.content_hash, file_chunks[i])
+            replace_chunks(cnn, pending, fetched, source_id, "file", content, info.content_hash, file_chunks[i], dropped: dropped)
             Files.store(cnn, source_id, info)
           end
+          release_embeddings(cnn, pending, dropped)
 
           if @build_vocab
             new_vocab.each_with_index do |wf, idx|
@@ -1545,8 +1580,10 @@ module Memo
     # Index an explicit list of file paths
     #
     # Unlike index_files, this does not walk directories or use ignore files.
-    # Relative paths are resolved from `root` (defaults to Dir.current).
-    # Binary files are still skipped.
+    # Relative paths are resolved from the current directory. Binary files
+    # are still skipped. Files are recorded by absolute path; `root` only
+    # finds the records of files indexed before that, which were keyed by
+    # their path relative to it.
     #
     # Returns tuple of (indexed_count, skipped_count, total_files)
     def index_file_list(
@@ -1556,7 +1593,7 @@ module Memo
       dry_run : Bool = false,
       &block : String, Symbol ->
     ) : {Int32, Int32, Int32}
-      root_path = Path.new(root).expand.to_s
+      root_path = File.realpath(Path.new(root).expand.to_s)
       indexed = 0
       skipped = 0
       total = 0
@@ -1575,9 +1612,9 @@ module Memo
         end
 
         total += 1
-        info = Files.file_info(expanded, root_path)
+        info = Files.file_info(expanded)
 
-        existing = Files.get_by_path(@db, info.path)
+        existing = Files.find(@db, info.path, root_path, rekey: !dry_run)
 
         if existing && incremental && !Files.needs_update?(existing, info.mtime)
           skipped += 1
@@ -1989,7 +2026,9 @@ module Memo
     # Inside a write transaction: replace a source's chunks with `chunks`
     # of `text`, and point the source at the text. New embeddings come from
     # `fetched`. Embeddings and texts the old chunks used are deleted once
-    # nothing uses them. Returns the number of chunks stored.
+    # nothing uses them; given `dropped`, the hashes of the old chunks'
+    # embeddings are added to it instead, for the caller to release later.
+    # Returns the number of chunks stored.
     private def replace_chunks(
       cnn : DB::Connection,
       pending : USearchIndex::Pending,
@@ -2001,6 +2040,7 @@ module Memo
       chunks : Array({String, Int32, Int32}),
       internal_pair_id : Int64? = nil,
       internal_parent_id : Int64? = nil,
+      dropped : Set(Bytes)? = nil,
     ) : Int32
       q = cnn.memo_queries
       old_hashes = q.get_chunk_hashes(internal_source_id, nil)
@@ -2041,7 +2081,12 @@ module Memo
         stored += 1 if chunk_id > 0
       end
 
-      release_embeddings(cnn, pending, old_hashes.reject { |hash| hashes.includes?(hash) })
+      unused = old_hashes.reject { |hash| hashes.includes?(hash) }
+      if dropped
+        dropped.concat(unused)
+      else
+        release_embeddings(cnn, pending, unused)
+      end
       old_content_ids.each { |old_id| q.release_content(old_id) unless old_id == content_id }
       stored
     end

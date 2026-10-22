@@ -191,6 +191,11 @@ module Memo
 
     abstract def delete_file(source_id : Int64) : Int64
 
+    abstract def update_file_path(source_id : Int64, path : String) : Nil
+
+    # {source_id, path} of the files whose path starts with `prefix`
+    abstract def files_under(prefix : String) : Array({Int64, String})
+
     abstract def list_files(limit : Int32, offset : Int32) : Array(Files::FileRecord)
 
     abstract def count_files : Int64

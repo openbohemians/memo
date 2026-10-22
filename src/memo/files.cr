@@ -12,7 +12,7 @@ module Memo
 
     # File info for indexing
     struct FileInfo
-      getter path : String        # Relative path
+      getter path : String        # Absolute path, symlinks resolved
       getter content_hash : Bytes # SHA256 of content
       getter mtime : Int64        # Modification time (Unix ms)
       getter size : Int64         # File size in bytes
@@ -37,6 +37,9 @@ module Memo
     #
     # Uses ignoreme for .gitignore-style filtering.
     # Uses magic.cr to detect and skip binary files.
+    # Symlinks inside the tree are skipped, to files and directories alike:
+    # they can lead out of it (a checkout could link to your home directory)
+    # or loop. The root itself may be one.
     #
     # Options:
     # - root: Directory to walk
@@ -105,15 +108,20 @@ module Memo
       digest.final
     end
 
-    # Get file info (path, hash, mtime, size)
-    def file_info(path : String, root : String) : FileInfo
+    # Get file info (path, hash, mtime, size). The path is absolute with
+    # symlinks resolved, so a file has one record however it's reached.
+    def file_info(path : String) : FileInfo
       stat = File.info(path)
-      relative_path = Path.new(path).relative_to(root).to_s
       hash = content_hash(path)
       mtime = stat.modification_time.to_unix_ms
       size = stat.size
 
-      FileInfo.new(relative_path, hash, mtime, size)
+      FileInfo.new(File.realpath(path), hash, mtime, size)
+    end
+
+    @[Deprecated("Paths are absolute now; use `file_info(path)`")]
+    def file_info(path : String, root : String) : FileInfo
+      file_info(path)
     end
 
     # Store file record in database
@@ -124,6 +132,25 @@ module Memo
     # Get file record by path
     def get_by_path(db : DBHandle, path : String) : FileRecord?
       db.memo_queries.get_file_by_path(path)
+    end
+
+    # The record for the file at `path` (absolute, as file_info gives it).
+    # Before memo keyed files by absolute path, it keyed them by their path
+    # relative to the directory indexed (`root`, absolute with symlinks
+    # resolved): a record under that key is found too, and with `rekey`
+    # moved to `path`.
+    def find(db : DBHandle, path : String, root : String, rekey : Bool = true) : FileRecord?
+      if record = get_by_path(db, path)
+        return record
+      end
+      return unless record = get_by_path(db, Path.new(path).relative_to(root).to_s)
+      db.memo_queries.update_file_path(record.source_id, path) if rekey
+      FileRecord.new(record.source_id, path, record.content_hash, record.mtime, record.size)
+    end
+
+    # The files recorded under directory `root` (absolute), as {source_id, path}
+    def under(db : DBHandle, root : String) : Array({Int64, String})
+      db.memo_queries.files_under(root.rstrip('/') + "/")
     end
 
     # Get file record by content hash
@@ -167,6 +194,7 @@ module Memo
         next if entry == ".git"
 
         full_path = current / entry
+        next if File.symlink?(full_path.to_s)
         relative_path = full_path.relative_to(root).to_s
 
         # Check if ignored

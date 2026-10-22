@@ -30,6 +30,13 @@ module Memo::CLI::Commands::IndexFiles
     end
   end
 
+  # A file's path for display: relative to the current directory when the
+  # file is under it, absolute otherwise
+  def display_path(path : String) : String
+    cwd = Dir.current.rstrip('/') + "/"
+    path.starts_with?(cwd) ? path[cwd.size..] : path
+  end
+
   private def resolve_paths(files : Array(String), recursive : Bool) : {Array(String), Array(String)}
     file_paths = [] of String
     dir_paths = [] of String
@@ -59,6 +66,7 @@ module Memo::CLI::Commands::IndexFiles
   private def run_text(memo, file_paths, dir_paths, ignore_file, full)
     indexed = 0
     skipped = 0
+    removed = 0
     total = 0
 
     unless file_paths.empty?
@@ -69,7 +77,10 @@ module Memo::CLI::Commands::IndexFiles
         incremental: !full,
       ) do |file_path, status|
         case status
-        when :indexed then puts "  + #{file_path}"
+        when :indexed then puts "  + #{display_path(file_path)}"
+        when :removed
+          puts "  - #{display_path(file_path)}"
+          removed += 1
         when :skipped then nil
         end
       end
@@ -85,7 +96,10 @@ module Memo::CLI::Commands::IndexFiles
         incremental: !full,
       ) do |file_path, status|
         case status
-        when :indexed then puts "  + #{file_path}"
+        when :indexed then puts "  + #{display_path(file_path)}"
+        when :removed
+          puts "  - #{display_path(file_path)}"
+          removed += 1
         when :skipped then nil
         end
       end
@@ -95,13 +109,16 @@ module Memo::CLI::Commands::IndexFiles
     end
 
     puts
-    puts "Indexed: #{indexed}, Skipped: #{skipped}, Total: #{total}"
+    summary = "Indexed: #{indexed}, Skipped: #{skipped}"
+    summary += ", Removed: #{removed}" if removed > 0
+    puts "#{summary}, Total: #{total}"
   end
 
   private def run_json(memo, file_paths, dir_paths, ignore_file, full)
     results = [] of Hash(String, JSON::Any)
     indexed = 0
     skipped = 0
+    removed = 0
     total = 0
 
     unless file_paths.empty?
@@ -111,6 +128,7 @@ module Memo::CLI::Commands::IndexFiles
         root: root,
         incremental: !full,
       ) do |file_path, status|
+        removed += 1 if status == :removed
         results << {
           "path"   => JSON::Any.new(file_path),
           "status" => JSON::Any.new(status.to_s),
@@ -127,6 +145,7 @@ module Memo::CLI::Commands::IndexFiles
         ignore_file: ignore_file,
         incremental: !full,
       ) do |file_path, status|
+        removed += 1 if status == :removed
         results << {
           "path"   => JSON::Any.new(file_path),
           "status" => JSON::Any.new(status.to_s),
@@ -140,6 +159,7 @@ module Memo::CLI::Commands::IndexFiles
     output = {
       "indexed" => JSON::Any.new(indexed.to_i64),
       "skipped" => JSON::Any.new(skipped.to_i64),
+      "removed" => JSON::Any.new(removed.to_i64),
       "total"   => JSON::Any.new(total.to_i64),
       "dry_run" => JSON::Any.new(false),
       "files"   => JSON::Any.new(results.map { |h| JSON::Any.new(h) }),

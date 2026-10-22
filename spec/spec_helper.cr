@@ -1,5 +1,8 @@
-require "spec"
+# memo first: the magic shard closes its libmagic handles in an at_exit, and
+# at_exit handlers run last-registered first, so registering it before the
+# spec runner's keeps the handles open while the examples run
 require "../src/memo"
+require "spec"
 require "file_utils"
 
 # Delete a test database and every file beside it named after it: SQLite's
@@ -70,6 +73,21 @@ def with_test_db_path(&block : String ->)
     yield db_path
   ensure
     delete_test_files(db_path)
+  end
+end
+
+# A temporary directory holding `files` (relative path => text). Yields its
+# real path (symlinks resolved), the form memo records files under.
+def with_test_tree(files : Hash(String, String), &)
+  dir = File.tempname("memo_tree")
+  begin
+    files.each do |path, text|
+      Dir.mkdir_p(File.dirname(File.join(dir, path)))
+      File.write(File.join(dir, path), text)
+    end
+    yield File.realpath(dir)
+  ensure
+    FileUtils.rm_rf(dir)
   end
 end
 

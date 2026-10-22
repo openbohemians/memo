@@ -72,6 +72,11 @@ memo index -r . --dry-run          # Preview without indexing
 memo index -r . --full             # Force re-index all files
 ```
 
+A recursive index follows the directory's `.gitignore` and skips binary files and symlinks. Files are
+recorded by absolute path, so a file is one record whichever directory you index it from. Indexing a
+directory again re-embeds only the files that changed, and removes from the index the files it no
+longer finds there (deleted, or ignored now).
+
 **Index text from stdin:**
 
 ```bash

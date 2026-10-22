@@ -45,7 +45,7 @@ module Memo::CLI::Commands::Search
           source_display = if r.source_type == "file" && !r.source_id
             # Memo-managed file - look up path
             file_record = memo.get_file_by_source(r.internal_source_id)
-            path = file_record.try(&.path) || "unknown"
+            path = file_record.try { |record| IndexFiles.display_path(record.path) } || "unknown"
             "[F#{r.internal_source_id}] #{path}"
           elsif sid = r.source_id
             "#{r.source_type}:#{sid}"
