@@ -277,4 +277,22 @@ describe "PostgreSQL backend" do
       service.close
     end
   end
+
+  it "deletes a service with vocabulary and cached queries" do
+    with_pg_database do |url, index_dir|
+      service = open_pg(url, index_dir)
+      service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+      service.use_service("mock2")
+      service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+      service.search("purple gorilla")
+      id = service.service_id
+      service.use_service("mock")
+
+      service.delete_service("mock2", force: true).should be_true
+      service.get_service("mock2").should be_nil
+      pg_count(service, "memo_vocab WHERE service_id = #{id}").should eq 0
+      pg_count(service, "memo_query_cache WHERE service_id = #{id}").should eq 0
+      service.close
+    end
+  end
 end

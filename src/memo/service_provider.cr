@@ -129,10 +129,12 @@ module Memo
       Memo::Database.transaction(db) do |cnn|
         tq = cnn.memo_queries
         if force && !s.empty?
-          hashes = tq.get_embedding_hashes_for_service(id)
-          hashes.each { |hash| tq.delete_chunks_by_hash(hash) }
+          # Chunks another service has embedded too stay, for that service
+          tq.delete_service_chunks(id)
           tq.delete_embeddings_by_service(id)
         end
+        tq.delete_vocab(id)
+        tq.clear_query_cache(id)
         tq.delete_index_data(id)
         tq.delete_service(id)
       end

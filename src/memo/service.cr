@@ -847,18 +847,29 @@ module Memo
     # Delete a service configuration
     #
     # By default, fails if the service has any associated embeddings.
-    # Use force: true to delete the service and all associated data.
+    # Use force: true to delete the service and all associated data;
+    # chunks another service has embedded too stay. The service in use here
+    # can't be deleted (switch with use_service first), and one whose index
+    # another process has open raises USearchIndex::InUse.
     #
     # Returns true if deleted, false if not found.
     def delete_service(name : String, force : Bool = false) : Bool
       svc = ServiceProvider.get_by_name(@db, name)
       return false unless svc
-      result = ServiceProvider.delete(@db, svc.id, force)
-      # Delete USearch index file if service was deleted
-      if result
-        USearchIndex.delete_file(index_path_for(svc.format, svc.model, svc.dimensions))
+      if svc.id == @service_id
+        raise ArgumentError.new("Service '#{name}' is in use here; switch to another with use_service first")
       end
-      result
+
+      # Hold the index's lock throughout, so no one has it open meanwhile
+      path = index_path_for(svc.format, svc.model, svc.dimensions)
+      lock = USearchIndex.lock(path)
+      begin
+        result = ServiceProvider.delete(@db, svc.id, force)
+        USearchIndex.delete_file(path) if result
+        result
+      ensure
+        lock.close
+      end
     end
 
     # Get usage statistics for a service

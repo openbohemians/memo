@@ -186,16 +186,12 @@ module Memo
       id
     end
 
-    def get_embedding_hashes_for_service(service_id : Int64) : Array(Bytes)
-      hashes = [] of Bytes
-      @db.query("SELECT hash FROM memo_embeddings WHERE service_id = $1", service_id) do |rs|
-        rs.each { hashes << rs.read(Bytes) }
-      end
-      hashes
-    end
-
-    def delete_chunks_by_hash(hash : Bytes) : Nil
-      @db.exec("DELETE FROM memo_chunks WHERE hash = $1", hash)
+    def delete_service_chunks(service_id : Int64) : Nil
+      @db.exec(<<-SQL, service_id)
+        DELETE FROM memo_chunks
+        WHERE hash IN (SELECT hash FROM memo_embeddings WHERE service_id = $1)
+          AND hash NOT IN (SELECT hash FROM memo_embeddings WHERE service_id <> $1)
+        SQL
     end
 
     def delete_embeddings_by_service(service_id : Int64) : Nil

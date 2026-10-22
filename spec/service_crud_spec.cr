@@ -188,6 +188,60 @@ describe Memo::Service do
           service.delete_service("ghost").should be_false
         end
       end
+
+      it "deletes its vocabulary and cached queries" do
+        with_test_service do |service|
+          service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          service.use_service("mock2")
+          service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+          service.search("purple gorilla")
+          id = service.service_id
+          service.use_service("mock")
+          service.db.scalar("SELECT COUNT(*) FROM memo_vocab WHERE service_id = ?", id).as(Int64).should be > 0
+          service.db.scalar("SELECT COUNT(*) FROM memo_query_cache WHERE service_id = ?", id).as(Int64).should be > 0
+
+          service.delete_service("mock2", force: true).should be_true
+          service.db.scalar("SELECT COUNT(*) FROM memo_vocab WHERE service_id = ?", id).should eq 0
+          service.db.scalar("SELECT COUNT(*) FROM memo_query_cache WHERE service_id = ?", id).should eq 0
+        end
+      end
+
+      it "keeps chunks another service has embedded too" do
+        with_test_service do |service|
+          service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+          service.use_service("mock2")
+          service.index(source_type: "doc", source_id: 1_i64, text: "purple gorilla in a top hat")
+          service.use_service("mock")
+
+          service.delete_service("mock2", force: true).should be_true
+          service.search("purple gorilla in a top hat").first.source_id.should eq 1
+        end
+      end
+
+      it "refuses the service in use" do
+        with_test_service do |service|
+          expect_raises(ArgumentError, /in use here/) { service.delete_service("mock", force: true) }
+          service.get_service("mock").should_not be_nil
+        end
+      end
+
+      it "refuses a service whose index another process has open, and keeps its lock" do
+        with_test_db_path do |db_path|
+          service = Memo::Service.new(db_path: db_path, service: "mock", chunking_max_tokens: 50)
+          service.create_service(name: "mock2", format: "mock", model: "mock-model", dimensions: 8, max_tokens: 100)
+          holder = Memo::Service.new(db_path: db_path, service: "mock2", chunking_max_tokens: 50)
+
+          expect_raises(Memo::USearchIndex::InUse) { service.delete_service("mock2", force: true) }
+          service.get_service("mock2").should_not be_nil
+
+          holder.close
+          service.delete_service("mock2", force: true).should be_true
+          File.exists?("#{holder.index_path}.lock").should be_true
+          File.exists?(holder.index_path).should be_false
+          service.close
+        end
+      end
     end
 
     describe "#default_service and #set_default_service" do

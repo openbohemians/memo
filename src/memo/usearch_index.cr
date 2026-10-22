@@ -140,9 +140,11 @@ module Memo
       index.close
     end
 
-    # Delete the index file (and its journal checkpoint and lock) from disk.
+    # Delete the index file and its journal checkpoint from disk. The lock
+    # file stays: deleted while another process held it, the next open
+    # would lock a new file at the same path, and both would hold the index.
     def delete_file(path : String)
-      [path, checkpoint_path(path), "#{path}.lock"].each do |file|
+      [path, checkpoint_path(path)].each do |file|
         File.delete(file) if File.exists?(file)
       end
     end

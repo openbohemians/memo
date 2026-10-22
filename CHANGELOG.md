@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dimensions but not its endpoint, so a service set up for an OpenAI-compatible API (Azure, a proxy)
   sent its texts to the provider's public endpoint instead. A `base_url` passed to `Service.new` still
   takes precedence, and now does when opening by name or the default service too, where it was ignored.
+- **`delete_service` works on PostgreSQL, and leaves other services' data alone.**
+  - It didn't delete the service's vocabulary and cached queries, so on PostgreSQL their foreign keys
+    refused the delete, and on SQLite they were left behind. Now they go with it.
+  - With `force: true`, it deleted every chunk whose text the service had embedded, including chunks
+    another service in the database uses. Those stay now.
+  - It deleted the index's lock file even while another process held the lock, so a later open could
+    lock a new file at the same path while the first process still had the index. Now it takes the lock
+    itself before deleting anything (raising `USearchIndex::InUse` if another process has the index
+    open), and leaves the lock file in place.
+  - It refuses to delete the service the `Service` is using.
 
 ## [0.15.1] - 2026-10-22
 

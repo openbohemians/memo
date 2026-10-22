@@ -68,9 +68,8 @@ module Memo
 
     abstract def update_service(id : Int64, updates : Array(String), params : Array(DB::Any)) : Int64
 
-    abstract def get_embedding_hashes_for_service(service_id : Int64) : Array(Bytes)
-
-    abstract def delete_chunks_by_hash(hash : Bytes) : Nil
+    # Delete the chunks whose embeddings only this service has
+    abstract def delete_service_chunks(service_id : Int64) : Nil
 
     abstract def delete_embeddings_by_service(service_id : Int64) : Nil
 
