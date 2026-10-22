@@ -26,7 +26,7 @@ shards:
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git
-    version: 0.14.0
+    version: 0.15.0
 
   docopt:
     git: https://github.com/ralsina/docopt.cr.git
@@ -54,7 +54,7 @@ shards:
 
   pg:
     git: https://github.com/will/crystal-pg.git
-    version: 0.30.0
+    version: 0.31.0
 
   sixteen:
     git: https://github.com/ralsina/sixteen.git
@@ -62,7 +62,7 @@ shards:
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
-    version: 0.22.0
+    version: 0.24.0
 
   tartrazine:
     git: https://github.com/ralsina/tartrazine.git

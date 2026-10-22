@@ -39,7 +39,7 @@ dependencies:
     version: 0.6.3
   pg:
     github: will/crystal-pg
-    version: ~> 0.30.0
+    version: ~> 0.31.0
 
 targets:
   memo:

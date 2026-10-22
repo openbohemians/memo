@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Requires pg ~> 0.31.0, and so crystal-db 0.15** (was pg ~> 0.30.0 on crystal-db 0.14), so memo
+  resolves alongside projects on sqlite3 0.24, which needs crystal-db 0.15. Projects that use memo as a
+  library move up with it (`shards update pg db sqlite3`). crystal-db 0.15's breaking change is for
+  driver authors, and no memo code changed.
+
 ## [0.14.3] - 2026-10-22
 
 ### Fixed
