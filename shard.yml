@@ -21,7 +21,7 @@ dependencies:
   # has 0.22.1). The floor stays at 0.16 so projects pinned to jargon 0.16,
   # directly or through artistry, can still use memo as a library.
   jargon:
-    github: trans/jargon
+    github: openbohemians/jargon.cr
     version: ~> 0.16
   ignore:
     github: trans/ignore

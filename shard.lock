@@ -37,7 +37,7 @@ shards:
     version: 0.4.1
 
   jargon:
-    git: https://github.com/trans/jargon.git
+    git: https://github.com/openbohemians/jargon.cr.git
     version: 0.22.1
 
   magic:
