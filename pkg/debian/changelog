@@ -1,3 +1,10 @@
+memo-rag (0.15.5-1) unstable; urgency=medium
+
+  * Get jargon from its new home, openbohemians/jargon.cr. Same jargon
+    version; projects that also name the new source can resolve memo.
+
+ -- trans <trans@github.com>  Fri, 23 Oct 2026 00:00:00 +0000
+
 memo-rag (0.15.4-1) unstable; urgency=medium
 
   * The memo CLI is built with jargon 0.22.1. Shell completions are now
