@@ -93,15 +93,9 @@
 
 ## Open
 
-- **Arcana owner tokens and keys**: arcana-core 0.20.1 (bus 0.36.4) lets a client claim its
-  address with an owner token at `join`. arcana-core 0.21.0 (bus 0.37.0) adds a key per
-  project; the bus stamps a message `verified` when the sender proves it holds `from`.
-  memo-arcana uses neither yet; adopting 0.21 would raise memo's arcana-core pin. Plan for
-  one change: an address held by a token or key stays listed after its client disconnects,
-  and its mailbox keeps collecting, so while memo-arcana is down a sync call to `memo:rag`
-  waits out its timeout instead of failing with "no mailbox" (the `already_running?` probe
-  still works). The bus wasn't on 0.36.4 or 0.37.0 yet on 2026-10-22. **Open, waiting for
-  the user.**
+- **Who may use a namespace** (review finding 14): **parked by the user, 2026-10-23**, until
+  wow signs its messages. arcana 0.37, which can vouch for senders, is on the bus. The plan is
+  in [roadmap.md](roadmap.md).
 - **goldfish**: `Memory#about` still reads `memo_texts`. It breaks once goldfish builds
   against 0.13. The fix went to goldfish's inbox on 2026-10-11 (`mail/sent/`); goldfish has
   no agent, so the user makes the change. Still open on 2026-10-22: goldfish follows memo's
