@@ -2,6 +2,12 @@
 
 *Updated 2026-10-23*
 
+- **0.15.5 released 2026-10-23** (tag `v0.15.5` at `984bd1b`): memo names jargon by its new
+  home, `openbohemians/jargon.cr` (`fa6ed05`). Shards refuses one shard named from two
+  sources, so `@ipck` couldn't take artistry 0.12.0, which names the new one, until a memo
+  release did; it asked on 2026-10-24 UTC, and the user chose to release before finding 14's
+  work (2026-10-23). `@ipck` (covering 0.15.3 to 0.15.5) and `@datadungeon` were told the
+  same day (`mail/sent/`).
 - **0.15.4 released 2026-10-22** (tag `v0.15.4` at `1c6a326`): the CLI is built with jargon
   0.22.1, at the user's request (`99bb95c`, `b5f47e7`). jargon's completion scripts now call
   the program's hidden `__complete` verb, so `bin/memo.cr` calls `handle_completion` before
@@ -87,11 +93,6 @@
 
 ## Open
 
-- **jargon's new source**: jargon moved from `trans/jargon` to `openbohemians/jargon.cr`, and
-  `fa6ed05` (on main, CI passed) points memo at it. artistry 0.12.0 names the new source too,
-  and shards refuses a shard under two sources, so `@ipck` can't take artistry 0.12 until a
-  memo release has `fa6ed05`. `@ipck` asked for one on 2026-10-24 UTC (`mail/received/`).
-  **Waiting for the user.**
 - **Arcana owner tokens and keys**: arcana-core 0.20.1 (bus 0.36.4) lets a client claim its
   address with an owner token at `join`. arcana-core 0.21.0 (bus 0.37.0) adds a key per
   project; the bus stamps a message `verified` when the sender proves it holds `from`.
