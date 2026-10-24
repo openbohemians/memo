@@ -1,6 +1,6 @@
 # Status
 
-*Updated 2026-10-22*
+*Updated 2026-10-23*
 
 - **0.15.4 released 2026-10-22** (tag `v0.15.4` at `1c6a326`): the CLI is built with jargon
   0.22.1, at the user's request (`99bb95c`, `b5f47e7`). jargon's completion scripts now call
@@ -87,6 +87,20 @@
 
 ## Open
 
+- **jargon's new source**: jargon moved from `trans/jargon` to `openbohemians/jargon.cr`, and
+  `fa6ed05` (on main, CI passed) points memo at it. artistry 0.12.0 names the new source too,
+  and shards refuses a shard under two sources, so `@ipck` can't take artistry 0.12 until a
+  memo release has `fa6ed05`. `@ipck` asked for one on 2026-10-24 UTC (`mail/received/`).
+  **Waiting for the user.**
+- **Arcana owner tokens and keys**: arcana-core 0.20.1 (bus 0.36.4) lets a client claim its
+  address with an owner token at `join`. arcana-core 0.21.0 (bus 0.37.0) adds a key per
+  project; the bus stamps a message `verified` when the sender proves it holds `from`.
+  memo-arcana uses neither yet; adopting 0.21 would raise memo's arcana-core pin. Plan for
+  one change: an address held by a token or key stays listed after its client disconnects,
+  and its mailbox keeps collecting, so while memo-arcana is down a sync call to `memo:rag`
+  waits out its timeout instead of failing with "no mailbox" (the `already_running?` probe
+  still works). The bus wasn't on 0.36.4 or 0.37.0 yet on 2026-10-22. **Open, waiting for
+  the user.**
 - **goldfish**: `Memory#about` still reads `memo_texts`. It breaks once goldfish builds
   against 0.13. The fix went to goldfish's inbox on 2026-10-11 (`mail/sent/`); goldfish has
   no agent, so the user makes the change. Still open on 2026-10-22: goldfish follows memo's
@@ -98,9 +112,10 @@
   `@arcana` asked for this on 2026-10-13 (`mail/received/`), and was told it's done on
   2026-10-14, and again when 0.13.1 was released. 0.13.0 is safe from the removals: it's pinned to arcana-ai ~> 0.4.0,
   and its bus provider treats a missing `total_tokens` as 0.
-- **Consumers need arcana-ai 0.5**: DataDungeon, copious, ipck and justice are on arcana-ai
-  0.4.0 and build against memo's working tree, so they fail until `shards update
-  arcana-ai`. Both agents were told on 2026-10-14 (`mail/sent/`).
+- **Consumers need arcana-ai 0.5**: **closed.** DataDungeon, copious, ipck and justice were on
+  arcana-ai 0.4.0 and built against memo's working tree; both agents were told on 2026-10-14
+  (`mail/sent/`). Both now build against memo's releases: DataDungeon is on 0.15.4
+  (2026-10-22) and ipck on 0.15.2 (2026-10-23).
 - **arcana pins lag**: **fixed in `e901e59`, released in 0.14.0** (2026-10-22). memo had
   pinned arcana-core ~> 0.16.0 and arcana-ai ~> 0.5.1 while 0.20.0 and 0.6.1 were out, so a
   project on the newer ones couldn't resolve it; the user said it needed sorting before the
