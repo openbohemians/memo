@@ -7,7 +7,7 @@ Please report vulnerabilities privately through GitHub: on the repository's **Se
 
 ## Supported versions
 
-Fixes go into the latest release (0.14.x).
+Fixes go into the latest release (0.15.x).
 
 ## Trust boundaries
 
