@@ -38,7 +38,7 @@ shards:
 
   jargon:
     git: https://github.com/openbohemians/jargon.cr.git
-    version: 0.22.1
+    version: 0.22.2
 
   magic:
     git: https://github.com/naqvis/magic.cr.git

@@ -18,7 +18,7 @@ dependencies:
   sqlite3:
     github: crystal-lang/crystal-sqlite3
   # Only the memo CLI uses jargon, and it needs 0.19 or later (shard.lock
-  # has 0.22.1). The floor stays at 0.16 so projects pinned to jargon 0.16,
+  # has 0.22.2). The floor stays at 0.16 so projects pinned to jargon 0.16,
   # directly or through artistry, can still use memo as a library.
   jargon:
     github: openbohemians/jargon.cr

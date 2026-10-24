@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **A mistyped option value is reported once.** `memo search hello --limit abc` printed two errors for
+  one mistake; the CLI is now built with jargon 0.22.2, which reports only the first.
+
 ## [0.15.5] - 2026-10-23
 
 ### Changed
