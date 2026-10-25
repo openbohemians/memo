@@ -1,6 +1,6 @@
 # Roadmap and decisions
 
-*Updated 2026-10-23*
+*Updated 2026-10-25*
 
 - **Attributes and labels stay out of memo** (the user decided, 2026-10-10). Artistry is the
   metadata system (schema-checked fields, expression indexes, tags, links). A separate
@@ -24,9 +24,12 @@
   `Envelope#verified`, `Envelope#signer`). The plan: an optional `allow:` line per namespace
   in `namespaces.yaml` naming the senders that may use it. It gates every action on the
   namespace, reads included (the user chose that, 2026-10-23), and a namespace without one
-  stays open. memo-arcana joins with a key, its path from an environment variable, which
-  also holds `memo:rag` against other clients. It needs arcana-core ~> 0.21.0, so it's a
-  minor release. **Pick it up once wow signs its messages**: wow's own WebSocket client
+  stays open. memo-arcana joins with a key of its own, which also holds `memo:rag`
+  against other clients. Not the project's `.ai/arcana.key`: the user decided on 2026-10-24
+  that a service gets its own key, so a compromised service can't sign as `@memo` (`@arcana`,
+  2026-10-24). `Arcana::Key.from_env` (arcana-core 0.21.1) reads `ARCANA_KEY_FILE`, makes the
+  key there on first use, and returns nil when the variable isn't set; point it into
+  memo-arcana's state folder. It needs arcana-core ~> 0.21.1, so it's a minor release. **Pick it up once wow signs its messages**: wow's own WebSocket client
   doesn't yet, so `allow: wow` would lock wow out. Once a key holds `memo:rag`, the address
   stays listed while memo-arcana is down, so a sync call times out instead of failing with
   "no mailbox".
