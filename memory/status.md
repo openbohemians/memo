@@ -1,7 +1,11 @@
 # Status
 
-*Updated 2026-10-23*
+*Updated 2026-10-25*
 
+- **0.15.6 released 2026-10-25** (tag `v0.15.6` at `7c12060`), at the user's request: the CLI
+  is built with jargon 0.22.2, which reports a mistyped option value once (`28bc54e`). That
+  was the double error noted under 0.15.4. The library is unchanged. `@datadungeon` was told
+  the same day (`mail/sent/`).
 - **0.15.5 released 2026-10-23** (tag `v0.15.5` at `984bd1b`): memo names jargon by its new
   home, `openbohemians/jargon.cr` (`fa6ed05`). Shards refuses one shard named from two
   sources, so `@ipck` couldn't take artistry 0.12.0, which names the new one, until a memo
